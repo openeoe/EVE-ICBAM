@@ -1,0 +1,601 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+<!DOCTYPE GKES:MODEL SYSTEM "resource/mi/model/model.dtd">
+-->
+<GKES:MODEL
+	xmlns:GKES=http://www.gkes.co.kr"
+	NAME="GKES" NASVERSION="1.0" DTDVERSION="1.0">
+<GKES:CORE_MODEL>
+	<!-- Class Definition -->
+	<GKES:MODELCLASS>
+		<!--
+			- 관리 대상 클래스의 최상위 클래스이다.
+
+			- id : 클래스의 instance을 생성할때 키가 되는 값이다.
+			- containment : instance들의 containment 관계을 저장하고 있는
+			  변수이다. 저장 방식을 instanceName@instanceName@instanceName
+			  뒤에 있는 instanceName의 instance가 포함관계의 최상위 instance임
+		-->
+		<GKES:ROOTCLASS NAME="ManagedElement" ISABSTRACT="true" ISCORE="true">
+			<GKES:PROPERTY NAME="id" TYPE="string" CLASSORIGIN="ManagedElement"
+					ISKEY="true" MAXLEN="100"/>
+			<GKES:PROPERTY NAME="containment" TYPE="string"
+					CLASSORIGIN="ManagedElement" MAXLEN="500"/>
+			</GKES:ROOTCLASS>
+		<!--
+			- 시스템 관리 대상의 최상위 클래스이다.
+		-->
+		<GKES:CLASS NAME="ManagedSystemElement" ISABSTRACT="true"
+				PARENT="ManagedElement" ISCORE="true"/>
+
+		<!--
+			- History 대상의 최상위 클래스이다.
+		-->
+		<GKES:CLASS NAME="History" ISABSTRACT="true"
+				PARENT="ManagedElement" ISCORE="true"/>
+
+		<!--
+			- Statistics 대상의 최상위 클래스이다.
+		-->
+		<GKES:CLASS NAME="Statistics" ISABSTRACT="true"
+				PARENT="ManagedElement" ISCORE="true"/>
+
+		<!--
+			- StatisticsAlert 대상의 최상위 클래스이다.
+		-->
+		<GKES:CLASS NAME="StatisticsAlert" ISABSTRACT="true"
+				PARENT="ManagedElement" ISCORE="true"/>
+
+		<!--
+			- StatisticsLabel 대상의 최상위 클래스이다.
+		-->
+		<GKES:CLASS NAME="StatisticsLabel" ISABSTRACT="true"
+				PARENT="ManagedElement" ISCORE="true"/>
+
+		<!--
+			- StatisticsAvail 대상의 최상위 클래스이다.
+		-->
+		<GKES:CLASS NAME="StatisticsAvail" ISABSTRACT="true"
+				PARENT="ManagedElement" ISCORE="true"/>
+
+		<!--
+			- SNMP TRAP의 Variable Bind을 나타내는 클래스이다.
+
+			- oid : SNMP Object ID
+			- value : oid의 value
+		-->
+		<GKES:CLASS NAME="VBCondition" ISCORE="true"
+				PARENT="ManagedElement">
+			<GKES:PROPERTY NAME="oid" TYPE="string"
+					CLASSORIGIN="VBCondition" MAXLEN="100"/>
+			<GKES:PROPERTY NAME="value" TYPE="string"
+					CLASSORIGIN="VBCondition" MAXLEN="20"/>
+		</GKES:CLASS>
+
+		<!--
+			- 관대상의 Group을 나타내는 Class이다.
+
+			- name : Group의 이름
+		-->
+		<GKES:CLASS NAME="Group" ISABSTACT="true" ISCORE="true"
+				PARENT="ManagedElement">
+			<GKES:PROPERTY NAME="name" TYPE="string"
+					CLASSORIGIN="Group" MAXLEN="50"/>
+		</GKES:CLASS>
+
+		<!--
+			- 사람을 나타내는 클래스이다.
+
+			- name : 사람의 이름
+			- descr : 설명
+		-->
+		<GKES:CLASS NAME="Person" ISABSTRACT="true" ISCORE="true"
+				PARENT="ManagedElement">
+			<GKES:PROPERTY NAME="name" TYPE="string"
+					CLASSORIGIN="Person" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="descr" TYPE="string"
+					CLASSORIGIN="Person" MAXLEN="50"/>
+		</GKES:CLASS>
+
+		<!--
+			- 관리 시스템 및 관리 대상에 대한 설정을 나타내는 클래스이다.
+		-->
+		<GKES:CLASS NAME="Setting" ISABSTRACT="true" ISCORE="true"
+				PARENT="ManagedElement"/>
+
+		<!--
+			- Rule
+
+			- faultClassName : 관리자가 정의한 faultClass의 이름
+		-->
+		<GKES:CLASS NAME="Rule" ISCORE="true" PARENT="ManagedElement"
+				ISABSTRACT="true">
+			<GKES:PROPERTY NAME="name" TYPE="string"
+					CLASSORIGIN="Rule" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="faultClassName" TYPE="string"
+					CLASSORIGIN="Rule" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="subject" TYPE="string"
+					CLASSORIGIN="Rule" MAXLEN="20"/>
+			<GKES:PROPERTY NAME="moClass" TYPE="string"
+					CLASSORIGIN="Rule" MAXLEN="255"/>
+			<GKES:PROPERTY NAME="severity" TYPE="int"
+					CLASSORIGIN="Rule" />
+			<GKES:PROPERTY NAME="message" TYPE="string"
+					CLASSORIGIN="Rule" MAXLEN="255"/>
+		</GKES:CLASS>
+
+		<!--
+			- Rule에 해당하는 조취를 나타내는 클래스이다.
+
+			- name :
+			- subject :
+			- type :
+			- script :
+		-->
+		<GKES:CLASS NAME="Action" ISCORE="true" PARENT="ManagedElement">
+			<GKES:PROPERTY NAME="name" TYPE="string"
+					CLASSORIGIN="Action" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="subject" TYPE="int"
+					CLASSORIGIN="Action" />
+			<GKES:PROPERTY NAME="type" TYPE="int"
+					CLASSORIGIN="Action" />
+			<GKES:PROPERTY NAME="script" TYPE="string"
+					CLASSORIGIN="Action" MAXLEN="255"/>
+			<GKES:PROPERTY NAME="descr" TYPE="string"
+					CLASSORIGIN="Action" MAXLEN="255"/>
+		</GKES:CLASS>
+
+		<!--
+			- Logical Element Class
+		-->
+		<GKES:CLASS NAME="LogicalElement" ISABSTRACT="true" ISCORE="true"
+				PARENT="ManagedSystemElement"/>
+
+		<!--
+			- Logical Device Class
+		-->
+		<GKES:CLASS NAME="LogicalDevice" ISABSTRACT="true" ISCORE="true"
+				PARENT="ManagedSystemElement">
+			<GKES:PROPERTY NAME="perfAll" TYPE="int"
+					CLASSORIGIN="ComputerSystem"/>
+		</GKES:CLASS>
+
+		<!--
+			- System class
+		-->
+		<GKES:CLASS NAME="System" ISABSTRACT="false" ISCORE="true"
+				PARENT="ManagedSystemElement">
+			<GKES:PROPERTY NAME="name" TYPE="string"
+					CLASSORIGIN="System" MAXLEN="100"/>
+			<GKES:PROPERTY NAME="sysName" TYPE="string"
+					CLASSORIGIN="System" MAXLEN="100"/>
+			<GKES:PROPERTY NAME="sysDescr" TYPE="string"
+					CLASSORIGIN="System" MAXLEN="255"/>
+			<GKES:PROPERTY NAME="sysObjectId" TYPE="string"
+					CLASSORIGIN="System" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="sysClass" TYPE="string"
+					CLASSORIGIN="System" MAXLEN="40"/>
+			<GKES:PROPERTY NAME="sysLocation" TYPE="string"
+					CLASSORIGIN="System" MAXLEN="100"/>
+			<GKES:PROPERTY NAME="vendor" TYPE="string"
+					CLASSORIGIN="System" MAXLEN="100"/>
+			<GKES:PROPERTY NAME="model" TYPE="string"
+					CLASSORIGIN="System" MAXLEN="100"/>
+			<GKES:PROPERTY NAME="admin" TYPE="string"
+					CLASSORIGIN="System" MAXLEN="100"/>
+			<GKES:PROPERTY NAME="ipAddr" TYPE="string"
+					CLASSORIGIN="System" MAXLEN="20"/>
+			<GKES:PROPERTY NAME="networkStatus" TYPE="int"
+					CLASSORIGIN="System" ISINDICATION="true">
+				<GKES:VALUE>1</GKES:VALUE>
+			</GKES:PROPERTY>
+			<GKES:PROPERTY NAME="SNMPStatus" TYPE="int"
+					CLASSORIGIN="System" ISINDICATION="true">
+				<GKES:VALUE>1</GKES:VALUE>
+			</GKES:PROPERTY>
+
+			<GKES:PROPERTY NAME="hasNASAgent" TYPE="boolean"
+					CLASSORIGIN="System">
+				<GKES:VALUE>false</GKES:VALUE>
+			</GKES:PROPERTY>
+
+			<GKES:PROPERTY NAME="responseTime" TYPE="int"
+					CLASSORIGIN="System" ISINDICATION="true">
+				<GKES:VALUE>0</GKES:VALUE>
+			</GKES:PROPERTY>
+			<GKES:PROPERTY NAME="osType" TYPE="string"
+					CLASSORIGIN="System" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="osVersion" TYPE="string"
+					CLASSORIGIN="System" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="cpuUsage" TYPE="double"
+					CLASSORIGIN="System" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="memoryUsage" TYPE="double"
+					CLASSORIGIN="System" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="FoMemoryUsage" TYPE="double"
+					CLASSORIGIN="System" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="sgid" TYPE="string"
+					CLASSORIGIN="System" MAXLEN="64"/>
+			<GKES:PROPERTY NAME="task" TYPE="string"
+					CLASSORIGIN="System" MAXLEN="3"/>
+			<GKES:PROPERTY NAME="historyStatus" TYPE="int"
+					CLASSORIGIN="System" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="purchaseDate" TYPE="string"
+					CLASSORIGIN="System" MAXLEN="20"/>
+			<GKES:PROPERTY NAME="purchasePrice" TYPE="string"
+					CLASSORIGIN="System" MAXLEN="20"/>
+			<GKES:PROPERTY NAME="contractNumber" TYPE="string"
+					CLASSORIGIN="System" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="contractPrice" TYPE="string"
+					CLASSORIGIN="System" MAXLEN="20"/>
+			<GKES:PROPERTY NAME="purchaseProcess" TYPE="string"
+					CLASSORIGIN="System" MAXLEN="20"/>
+			<GKES:PROPERTY NAME="acquisitionDate" TYPE="string"
+					CLASSORIGIN="System" MAXLEN="20"/>
+			<GKES:PROPERTY NAME="communityString" TYPE="string"
+					CLASSORIGIN="System" MAXLEN="20"/>
+			<GKES:PROPERTY NAME="degree" TYPE="int"
+					CLASSORIGIN="System" />
+			<GKES:PROPERTY NAME="memo" TYPE="string"
+					CLASSORIGIN="System" MAXLEN="4000"/>
+			<GKES:PROPERTY NAME="isAlert" TYPE="boolean"
+					CLASSORIGIN="System" >
+				<GKES:VALUE>true</GKES:VALUE>
+			</GKES:PROPERTY>
+			<GKES:PROPERTY NAME="relatedEquip" TYPE="string"
+					CLASSORIGIN="System" MAXLEN="255"/>
+
+			<GKES:PROPERTY NAME="authUser" TYPE="string"
+					CLASSORIGIN="System" MAXLEN="30"/>
+			<GKES:PROPERTY NAME="authProtocol" TYPE="string"
+					CLASSORIGIN="System" MAXLEN="30"/>
+			<GKES:PROPERTY NAME="authPassword" TYPE="string"
+					CLASSORIGIN="System" MAXLEN="30"/>
+			<GKES:PROPERTY NAME="privProtocol" TYPE="string"
+					CLASSORIGIN="System" MAXLEN="30"/>
+			<GKES:PROPERTY NAME="privPassword" TYPE="string"
+					CLASSORIGIN="System" MAXLEN="30"/>
+
+			<GKES:PROPERTY NAME="reservation1" TYPE="string"
+					CLASSORIGIN="System" MAXLEN="30"/>
+			<GKES:PROPERTY NAME="reservation2" TYPE="string"
+					CLASSORIGIN="System" MAXLEN="30"/>
+			<GKES:PROPERTY NAME="reservation3" TYPE="string"
+					CLASSORIGIN="System" MAXLEN="30"/>
+			<GKES:PROPERTY NAME="serialNumber" TYPE="string"
+								CLASSORIGIN="System" MAXLEN="30"/>
+			<GKES:PROPERTY NAME="isExternal" TYPE="int"
+					CLASSORIGIN="System">
+					<GKES:VALUE>0</GKES:VALUE>
+			</GKES:PROPERTY>
+		</GKES:CLASS>
+
+		<!--
+			- Service class
+		-->
+		<GKES:CLASS NAME="Service" ISABSTRACT="true" ISCORE="true"
+				PARENT="ManagedSystemElement">
+			<GKES:PROPERTY NAME="name" TYPE="string"
+					CLASSORIGIN="Service" MAXLEN="50"/>
+		</GKES:CLASS>
+
+	</GKES:MODELCLASS>
+
+	<!-- Association Definition -->
+	<GKES:MODELASSOCIATION>
+		<GKES:ASSOCIATION NAME="Component"
+				TYPE="CONTAINMENT" ISCORE="true" >
+			<GKES:FIRSTCLASS NAME="ManagedSystemElement"
+					ROLE="containSystemElement"
+					MULTIPLICITY="1"/>
+			<GKES:SECONDCLASS NAME="ManagedSystemElement"
+					ROLE="containedBySystemElement"
+					MULTIPLICITY="*"/>
+		</GKES:ASSOCIATION>
+
+		<GKES:ASSOCIATION NAME="SystemDevice"
+				TYPE="CONTAINMENT" ISCORE="true" >
+			<GKES:FIRSTCLASS NAME="System"
+					ROLE="hasDevice"
+					MULTIPLICITY="1"/>
+			<GKES:SECONDCLASS NAME="LogicalDevice"
+					ROLE="deviceComponentOfSystem"
+					MULTIPLICITY="*"/>
+		</GKES:ASSOCIATION>
+
+		<GKES:ASSOCIATION NAME="ComponentBy"
+				TYPE="CONTAINMENT" ISCORE="true" >
+			<GKES:FIRSTCLASS NAME="Group"
+					ROLE="containManagedElement"
+					MULTIPLICITY="1"/>
+			<GKES:SECONDCLASS NAME="ManagedElement"
+					ROLE="containedByGroup"
+					MULTIPLICITY="*"/>
+		</GKES:ASSOCIATION>
+
+		<GKES:ASSOCIATION NAME="MemberOf"
+				TYPE="REFERENCE" ISCORE="true" >
+			<GKES:FIRSTCLASS NAME="Group"
+					ROLE="includeMember"
+					MULTIPLICITY="1"/>
+			<GKES:SECONDCLASS NAME="ManagedSystemElement"
+					ROLE="memberOfGroup"
+					MULTIPLICITY="*"/>
+		</GKES:ASSOCIATION>
+
+		<GKES:ASSOCIATION NAME="SocializedBy"
+				TYPE="REFERENCE" ISCORE="true" >
+			<GKES:FIRSTCLASS NAME="Person"
+					ROLE="socializedBy"
+					MULTIPLICITY="1"/>
+			<GKES:SECONDCLASS NAME="Group"
+					ROLE="socialize"
+					MULTIPLICITY="*"/>
+		</GKES:ASSOCIATION>
+
+		<GKES:ASSOCIATION NAME="AppliedRule"
+				TYPE="REFERENCE" ISCORE="true" >
+			<GKES:FIRSTCLASS NAME="ManagedSystemElement"
+					ROLE="targetOfrule"
+					MULTIPLICITY="1"/>
+			<GKES:SECONDCLASS NAME="Rule"
+					ROLE="appliedRule"
+					MULTIPLICITY="*"/>
+		</GKES:ASSOCIATION>
+
+
+		<GKES:ASSOCIATION NAME="SystemSecurityFile"
+				TYPE="CONTAINMENT" ISCORE="true" >
+			<GKES:FIRSTCLASS NAME="System"
+					ROLE="containSMSFileMon"
+					MULTIPLICITY="1"/>
+			<GKES:SECONDCLASS NAME="SMSFileMonControl"
+					ROLE="smsyFileMonControlOfSystem"
+					MULTIPLICITY="*"/>
+		</GKES:ASSOCIATION>
+
+
+		<GKES:ASSOCIATION NAME="SystemSecurityPort"
+				TYPE="CONTAINMENT" ISCORE="true" >
+			<GKES:FIRSTCLASS NAME="System"
+					ROLE="containSMSPortMon"
+					MULTIPLICITY="1"/>
+			<GKES:SECONDCLASS NAME="SMSPortMonControl"
+					ROLE="smsyPortMonControlOfSystem"
+					MULTIPLICITY="*"/>
+		</GKES:ASSOCIATION>
+
+		<GKES:ASSOCIATION NAME="SystemSecurityLog"
+				TYPE="CONTAINMENT" ISCORE="true" >
+			<GKES:FIRSTCLASS NAME="System"
+					ROLE="containSMSLogColl"
+					MULTIPLICITY="1"/>
+			<GKES:SECONDCLASS NAME="SMSLogCollControl"
+					ROLE="smsyLogCollControlOfSystem"
+					MULTIPLICITY="*"/>
+		</GKES:ASSOCIATION>
+
+	</GKES:MODELASSOCIATION>
+</GKES:CORE_MODEL>
+
+<!-- MI_System -->
+<GKES:EXT_MODEL
+		xmlns:xlink="http://www.w3.org/1999/xlink/namespace/"
+		xlink:type="simple"
+		xlink:href="system.xml"
+		xlink:role="System Class Model"
+		xlink:title="MI_System"
+		xlink:show="embed"
+		xlink:actuate="auto"/>
+
+<!-- MI_LogicalDevice -->
+<GKES:EXT_MODEL
+		xmlns:xlink="http://www.w3.org/1999/xlink/namespace/"
+		xlink:type="simple"
+		xlink:href="logicaldevice.xml"
+		xlink:role="Logical Device Class Model"
+		xlink:title="MI_LogicalDevice"
+		xlink:show="embed"
+		xlink:actuate="auto"/>
+
+<!-- MI_Service -->
+<GKES:EXT_MODEL
+		xmlns:xlink="http://www.w3.org/1999/xlink/namespace/"
+		xlink:type="simple"
+		xlink:href="service.xml"
+		xlink:role="Service Class Model"
+		xlink:title="MI_Service"
+		xlink:show="embed"
+		xlink:actuate="auto"/>
+
+<!-- MI_LogicalElement -->
+<GKES:EXT_MODEL
+		xmlns:xlink="http://www.w3.org/1999/xlink/namespace/"
+		xlink:type="simple"
+		xlink:href="logicalelement.xml"
+		xlink:role="LogicalElement Class Model"
+		xlink:title="MI_LogicalElement"
+		xlink:show="embed"
+		xlink:actuate="auto"/>
+
+<!-- MI_Group -->
+<GKES:EXT_MODEL
+		xmlns:xlink="http://www.w3.org/1999/xlink/namespace/"
+		xlink:type="simple"
+		xlink:href="group.xml"
+		xlink:role="Group Class Model"
+		xlink:title="MI_Group"
+		xlink:show="embed"
+		xlink:actuate="auto"/>
+
+<!-- MI_Person -->
+<GKES:EXT_MODEL
+		xmlns:xlink="http://www.w3.org/1999/xlink/namespace/"
+		xlink:type="simple"
+		xlink:href="person.xml"
+		xlink:role="Person Class Model"
+		xlink:title="MI_Person"
+		xlink:show="embed"
+		xlink:actuate="auto"/>
+
+<!-- MI_Setting -->
+<GKES:EXT_MODEL
+		xmlns:xlink="http://www.w3.org/1999/xlink/namespace/"
+		xlink:type="simple"
+		xlink:href="setting.xml"
+		xlink:role="Setting Class Model"
+		xlink:title="MI_Setting"
+		xlink:show="embed"
+		xlink:actuate="auto"/>
+
+<!-- MI_Rule -->
+<GKES:EXT_MODEL
+		xmlns:xlink="http://www.w3.org/1999/xlink/namespace/"
+		xlink:type="simple"
+		xlink:href="rule.xml"
+		xlink:role="Rule Class Model"
+		xlink:title="MI_Rule"
+		xlink:show="embed"
+		xlink:actuate="auto"/>
+
+<!-- MI_PMComp -->
+<GKES:EXT_MODEL
+		xmlns:xlink="http://www.w3.org/1999/xlink/namespace/"
+		xlink:type="simple"
+		xlink:href="pmcomp.xml"
+		xlink:role="PMComp Class Model"
+		xlink:title="MI_PMComp"
+		xlink:show="embed"
+		xlink:actuate="auto"/>
+
+<!-- MI_FMComp -->
+<GKES:EXT_MODEL
+		xmlns:xlink="http://www.w3.org/1999/xlink/namespace/"
+		xlink:type="simple"
+		xlink:href="fmcomp.xml"
+		xlink:role="FMComp Class Model"
+		xlink:title="MI_FMComp"
+		xlink:show="embed"
+		xlink:actuate="auto"/>
+<!-- MI_Layout -->
+<GKES:EXT_MODEL
+		xmlns:xlink="http://www.w3.org/1999/xlink/namespace/"
+		xlink:type="simple"
+		xlink:href="layout.xml"
+		xlink:role="Layout Class Model"
+		xlink:title="MI_Layout"
+		xlink:show="embed"
+		xlink:actuate="auto"/>
+<!-- MI_DBInstance -->
+<GKES:EXT_MODEL
+		xmlns:xlink="http://www.w3.org/1999/xlink/namespace/"
+		xlink:type="simple"
+		xlink:href="dbms_service.xml"
+		xlink:role="DBMS Service Model"
+		xlink:title="MI_DBMSService"
+		xlink:show="embed"
+		xlink:actuate="auto"/>
+<!-- MI_Kiosk -->
+<GKES:EXT_MODEL
+		xmlns:xlink="http://www.w3.org/1999/xlink/namespace/"
+		xlink:type="simple"
+		xlink:href="kiosk.xml"
+		xlink:role="Kiosk Class Model"
+		xlink:title="MI_Kiosk"
+		xlink:show="embed"
+		xlink:actuate="auto"/>
+<!-- MI_M2MManager -->
+<GKES:EXT_MODEL
+		xmlns:xlink="http://www.w3.org/1999/xlink/namespace/"
+		xlink:type="simple"
+		xlink:href="m2m_manager.xml"
+		xlink:role="M2M Manager Model"
+		xlink:title="MI_M2MManager"
+		xlink:show="embed"
+		xlink:actuate="auto"/>
+<!-- MI_History -->
+<GKES:EXT_MODEL
+		xmlns:xlink="http://www.w3.org/1999/xlink/namespace/"
+		xlink:type="simple"
+		xlink:href="history.xml"
+		xlink:role="History Model"
+		xlink:title="MI_History"
+		xlink:show="embed"
+		xlink:actuate="auto"/>
+<!-- MI_STATASSET -->
+<GKES:EXT_MODEL
+		xmlns:xlink="http://www.w3.org/1999/xlink/namespace/"
+		xlink:type="simple"
+		xlink:href="statistics.xml"
+		xlink:role="Statistics Model"
+		xlink:title="MI_STATASSET"
+		xlink:show="embed"
+		xlink:actuate="auto"/>
+<!-- MI_STATALERT -->
+<GKES:EXT_MODEL
+		xmlns:xlink="http://www.w3.org/1999/xlink/namespace/"
+		xlink:type="simple"
+		xlink:href="statisticsAlert.xml"
+		xlink:role="StatisticsAlert Model"
+		xlink:title="MI_STATALERT"
+		xlink:show="embed"
+		xlink:actuate="auto"/>
+<!-- MI_STATLABEL -->
+<GKES:EXT_MODEL
+		xmlns:xlink="http://www.w3.org/1999/xlink/namespace/"
+		xlink:type="simple"
+		xlink:href="statisticsLabel.xml"
+		xlink:role="StatisticsLabel Model"
+		xlink:title="MI_STATLABEL"
+		xlink:show="embed"
+		xlink:actuate="auto"/>
+<!-- MI_STATAVAIL -->
+<GKES:EXT_MODEL
+		xmlns:xlink="http://www.w3.org/1999/xlink/namespace/"
+		xlink:type="simple"
+		xlink:href="statisticsAvail.xml"
+		xlink:role="StatisticsAvail Model"
+		xlink:title="MI_STATAVAIL"
+		xlink:show="embed"
+		xlink:actuate="auto"/>
+
+<GKES:EXT_MODEL
+		xmlns:xlink="http://www.w3.org/1999/xlink/namespace/"
+		xlink:type="simple"
+		xlink:href="was_service.xml"
+		xlink:role="WAS Service Model"
+		xlink:title="MI_WASService"
+		xlink:show="embed"
+		xlink:actuate="auto"/>
+<GKES:EXT_MODEL
+		xmlns:xlink="http://www.w3.org/1999/xlink/namespace/"
+		xlink:type="simple"
+		xlink:href="board.xml"
+		xlink:role="Board Class Model"
+		xlink:title="MI_Board"
+		xlink:show="embed"
+		xlink:actuate="auto"/>
+<GKES:EXT_MODEL
+		xmlns:xlink="http://www.w3.org/1999/xlink/namespace/"
+		xlink:type="simple"
+		xlink:href="facility.xml"
+		xlink:role="Facility Class Model"
+		xlink:title="MI_Facility"
+		xlink:show="embed"
+		xlink:actuate="auto"/>
+<GKES:EXT_MODEL
+		xmlns:xlink="http://www.w3.org/1999/xlink/namespace/"
+		xlink:type="simple"
+		xlink:href="vdi_service.xml"
+		xlink:role="VDI Class Model"
+		xlink:title="MI_VDIService"
+		xlink:show="embed"
+		xlink:actuate="auto"/>
+<GKES:EXT_MODEL
+		xmlns:xlink="http://www.w3.org/1999/xlink/namespace/"
+		xlink:type="simple"
+		xlink:href="radius_service.xml"
+		xlink:role="RADIUS Model"
+		xlink:title="MI_RadiusService"
+		xlink:show="embed"
+		xlink:actuate="auto"/>
+</GKES:MODEL>

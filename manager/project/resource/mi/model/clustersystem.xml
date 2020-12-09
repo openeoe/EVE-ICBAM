@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE GKES:EXT_MODEL SYSTEM "resource/mi/model/ext_model.dtd">
+<GKES:EXT_MODEL
+	xmlns:GKES="http://www.gkes.co.kr">
+	<GKES:MODELCLASS>
+		<!--
+			- ClusterSystem
+			- status : 상태
+			- locationZone : 설치 구역(DMZ)
+			- location : 설치 구역 내 설치위치(2Lane-3rd-12U)
+		-->
+		<GKES:CLASS NAME="ClusterSystem" PARENT="System"
+				ISINDICATION ="true" ISABSTRACT="true">
+			<GKES:PROPERTY NAME="status" TYPE="string"
+					CLASSORIGIN="ClusterSystem" MAXLEN="50" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="locationZone" TYPE="string"
+					CLASSORIGIN="ClusterSystem" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="location" TYPE="string"
+					CLASSORIGIN="ClusterSystem" MAXLEN="50"/>
+		</GKES:CLASS>
+
+		<!--
+			- EdgeChassis
+			- powerConsumtion : 소비전력량
+			- temperature : 온도
+			- current : 전류
+			- voltage : 전압
+			- fanSpeed : 팬회전속도
+		-->
+		<GKES:CLASS NAME="EdgeChassis" PARENT="ClusterSystem"
+				ISINDICATION ="true" ISABSTRACT="false">
+			<GKES:PROPERTY NAME="powerConsumtion" TYPE="double"
+					CLASSORIGIN="EdgeChassis" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="temperature" TYPE="double"
+					CLASSORIGIN="EdgeChassis" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="current" TYPE="double"
+					CLASSORIGIN="EdgeChassis" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="voltage" TYPE="double"
+					CLASSORIGIN="EdgeChassis" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="fanSpeed" TYPE="int"
+					CLASSORIGIN="EdgeChassis" ISINDICATION="true"/>
+		</GKES:CLASS>
+
+		<!--
+			- EdgeServer
+		-->
+		<GKES:CLASS NAME="EdgeServer" PARENT="ClusterSystem"
+				ISINDICATION ="true" ISABSTRACT="false">
+			<GKES:PROPERTY NAME="machineType" TYPE="string"
+					CLASSORIGIN="EdgeServer" MAXLEN="20"/>
+			<GKES:PROPERTY NAME="sysUpTime" TYPE="long"
+					CLASSORIGIN="EdgeServer" />
+			<GKES:PROPERTY NAME="cpuCapacity" TYPE="string"
+					CLASSORIGIN="EdgeServer" MAXLEN="20"/>
+			<GKES:PROPERTY NAME="memoryCapacity" TYPE="string"
+					CLASSORIGIN="EdgeServer" MAXLEN="20"/>
+			<GKES:PROPERTY NAME="diskCapacity" TYPE="string"
+					CLASSORIGIN="EdgeServer" MAXLEN="20"/>
+			<GKES:PROPERTY NAME="swapCapacity" TYPE="string"
+					CLASSORIGIN="EdgeServer" MAXLEN="20"/>
+		</GKES:CLASS>
+
+		<!--
+			- EdgeStorage
+		-->
+		<GKES:CLASS NAME="EdgeStorage" PARENT="ClusterSystem"
+				ISINDICATION ="true" ISABSTRACT="false">
+			<GKES:PROPERTY NAME="machineType" TYPE="string"
+					CLASSORIGIN="EdgeStorage" MAXLEN="20"/>
+			<GKES:PROPERTY NAME="sysUpTime" TYPE="long"
+					CLASSORIGIN="EdgeStorage" />
+			<GKES:PROPERTY NAME="cpuCapacity" TYPE="string"
+					CLASSORIGIN="EdgeStorage" MAXLEN="20"/>
+			<GKES:PROPERTY NAME="memoryCapacity" TYPE="string"
+					CLASSORIGIN="EdgeStorage" MAXLEN="20"/>
+			<GKES:PROPERTY NAME="diskCapacity" TYPE="string"
+					CLASSORIGIN="EdgeStorage" MAXLEN="20"/>
+			<GKES:PROPERTY NAME="swapCapacity" TYPE="string"
+					CLASSORIGIN="EdgeStorage" MAXLEN="20"/>
+		</GKES:CLASS>
+	</GKES:MODELCLASS>
+
+	<GKES:MODELASSOCIATION>
+		<GKES:ASSOCIATION NAME="plugInto"
+				TYPE="CONTAINMENT" ISCORE="true" >
+			<GKES:FIRSTCLASS NAME="EdgeChassis"
+					ROLE="chassisOf"
+					MULTIPLICITY="1"/>
+			<GKES:SECONDCLASS NAME="ClusterSystem"
+					ROLE="plugedSystem"
+					MULTIPLICITY="*"/>
+		</GKES:ASSOCIATION>
+	</GKES:MODELASSOCIATION>
+</GKES:EXT_MODEL>

@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rule-base  xmlns="http://nuritelecom.com/nascenter/framework/ecs"
+    xmlns:act="jelly:nuri.nas.framework.ECS.tags.ECSActionTagLibrary"
+    xmlns:mx="jelly:nuri.nas.framework.ECS.tags.jmx.JMXTagLibrary"
+    xmlns:log="jelly:log"
+    xmlns:j="jelly:core">
+
+    <domain name="All indication">
+        <mo><mo-filter/></mo>
+    </domain>
+
+    <rule-set name="Metric rule">
+        <description/>
+        <rule name="TCA">
+            <description/>
+            <parameter identifier="mo" domain-type="mo"/>
+            <variable identifier="mrs" type="java.util.Vector">
+                findRule(mo)
+            </variable>
+            <variable identifier="fullmo" type="nuri.nas.framework.MI.common.schema.MOINSTANCE">
+                findMO(mo)
+            </variable>
+
+            <condition>mrs.size()&gt;0</condition>
+
+            <action> <xml-semantic>
+                <j:forEach var="mr" items="${mrs}">
+       				<!-- 2003 07 31 -->
+					<act:script>
+                        import org.apache.commons.beanutils.PropertyUtils;
+                        import nuri.nas.framework.MI.common.schema.MOPROPERTY;
+
+            			String attr
+                			= (String)PropertyUtils.getProperty(mr,"metric");
+
+                        MOPROPERTY moProp = mo.getProperty(attr);
+                        context.setVariable("moProp", moProp);
+
+                        String moClassName = mo.getClassName();
+                        context.setVariable("moClassName", moClassName);
+
+                        boolean isInterface = moClassName.equals("Interface");
+                        context.setVariable("isInterface", isInterface);
+
+                    </act:script>
+
+                    <log:debug>moProp: ${moProp}</log:debug>
+                    <log:debug>metric: ${mr.metric}</log:debug>
+
+                    <j:if test="${isInterface==true}">
+                        <act:script>
+				        <![CDATA[
+                            String peer = mo.getPropertyValueString("peer");
+                            context.setVariable("peer", peer);
+                            int peerLength = peer.length();
+                            context.setVariable("peerLength", peerLength);
+                            String metric = mr.getMetric();
+                            String sysInst = 
+                                mo.getPropertyValueString("containment");
+                            String sysClassName = 
+                                getClassNameFromMOKey(sysInst);
+                            context.setVariable("sysClassName", sysClassName);
+
+                            int loopExit=0;
+                            if( peerLength <= 0 && 
+                                metric.equals("ifOperStatus"))
+                            {
+                                if( !sysClassName.equals("L4Switch") &&
+                                    !sysClassName.equals("VPN")
+                                  )
+                                {
+                                    loopExit = 1;
+                                }
+                            }
+                            context.setVariable("loopExit", loopExit);
+				        ]]>
+                        </act:script>
+                        <log:debug>Interface peer: ${peer}-${peerLength}</log:debug>
+                        <log:debug>Interface sysClass: ${sysClassName}</log:debug>
+                        <j:if test="${loopExit == 1}">
+                            <log:debug>DONT GENERATE ALERT PEER=0</log:debug>
+                            <j:break/>
+                        </j:if>
+                    </j:if>
+                    <log:debug>moClassName: ${moClassName} peer=${peerLength}</log:debug>
+
+                <j:if test="${moProp!=null}">
+
+                    <act:script>
+                        boolean matched = isRuleMatched(mo, mr);
+                        String hasNAS_st = fullmo.getPropertyValueString("hasNASAgent");
+                        boolean hasNAS = Boolean.valueOf(hasNAS_st).booleanValue();
+                        if("SNMPStatus".equals(mr.metric)){
+                            if( hasNAS == true ){
+                                mr.setFaultClassName("Agent Down");
+                            }
+                        }
+                        
+                        context.setVariable("matched", matched);
+                    </act:script>
+
+                    <log:debug>isRulematched: ${matched}</log:debug>
+                    <log:debug>moClass: ${mr.moClass}</log:debug>
+                    <log:debug>moInstance: ${mr.moInstance}</log:debug>
+                    
+
+
+                    <act:find-alert mo="${mo.name}"
+                        faultClassName="${mr.faultClassName}" var="alerts" 
+						metric="${mr.metric}" severity="${mr.severity}"/>
+
+                    <act:script>
+                    int alerts_num = alerts.size();
+                    context.setVariable("alerts_num", alerts_num);
+                    </act:script>
+
+                    <j:switch on="${matched}">
+                        <j:case value="${true}">
+
+                        <log:debug>metric-rule.xml: alerts_num=${alerts_num}</log:debug>
+
+                            <j:switch on="${alerts_num==0}">
+                                <j:case value="${true}">
+                                    <act:script>
+                                    String metric = mr.getMetric();
+                                    String faultClassName = mr.getFaultClassName();
+
+                                    Object observedValue = getAttribute(mo, metric);
+
+                                    context.setVariable("observedValue", observedValue);
+                                    context.setVariable("tca", true);
+
+                                    if(!faultClassName.equals("Threshold")){
+                                        context.setVariable("tca", false);
+                                    }
+
+                                    </act:script>
+
+                                    <act:new-alert	
+                                        tca="${tca}" 
+                                        alertingMO="${mo}" 
+                                        faultClassName="${mr.faultClassName}"
+                                        message="${mr.message}"
+                                        metric="${mr.metric}"
+                                        thresholdValue="${mr.value}"
+                                        observedValue="${observedValue}"
+                                        severity="${mr.severity}"
+                                        var="alert"/>
+
+                    				<log:debug>newAlert Severity:${mr.severity}</log:debug>
+<!--
+                                    <act:script>
+                                    String msg = alert.getMessage();
+                                    msg = msg+" ThresholdValue("+mr.getValue()+")";
+                                    msg = msg+" ObservedValue("+observedValue+")";
+                                    alert.setMessage(msg);
+                                    </act:script>
+-->
+                                    <act:create-notification object="${alert}"/>
+                                </j:case>
+                                <j:default>
+                                    <j:forEach var="ta" items="${alerts}">
+                                        <act:script>
+                                        Integer T = ta.getTimes();
+                                        int i = T.intValue()+1;
+                                        ta.setTimes(new Integer(i));
+                                        </act:script>
+                                        <act:update-notification object="${ta}"/>
+                                    </j:forEach>
+                                </j:default>
+                            </j:switch>
+                        </j:case>
+                        <j:case value="${false}">
+                            <j:forEach var="ta" items="${alerts}">
+                                <j:setProperties object="${ta}" status="2"/>
+                                <act:update-notification object="${ta}"/>
+                            </j:forEach>
+                        </j:case>
+                    </j:switch>
+					</j:if>
+                </j:forEach>
+            </xml-semantic> </action>
+        </rule>
+    </rule-set>
+</rule-base>

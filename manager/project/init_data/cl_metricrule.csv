@@ -1,0 +1,478 @@
+@CLASS:MetricRule
+id,name,faultClassName,moClass,severity,message,moInstance,metric,operator,value,upperValue,isAlert
+APCpuUsage2,APCpuUsage2,Threshold,AccessPoint,2,AP CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,50,60,FALSE
+APCpuUsage3,APCpuUsage3,Threshold,AccessPoint,3,AP CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,60,70,FALSE
+APCpuUsage4,APCpuUsage4,Threshold,AccessPoint,4,AP CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,70,80,FALSE
+APCpuUsage5,APCpuUsage5,Threshold,AccessPoint,5,AP CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,80,90,FALSE
+APCpuUsage6,APCpuUsage6,Threshold,AccessPoint,6,AP CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,90,,TRUE
+APMemUsage2,APMemUsage2,Threshold,AccessPoint,2,AP 메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,50,60,FALSE
+APMemUsage3,APMemUsage3,Threshold,AccessPoint,3,AP 메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,60,70,FALSE
+APMemUsage4,APMemUsage4,Threshold,AccessPoint,4,AP 메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,70,80,FALSE
+APMemUsage5,APMemUsage5,Threshold,AccessPoint,5,AP 메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,80,90,FALSE
+APMemUsage6,APMemUsage6,Threshold,AccessPoint,6,AP 메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,90,,TRUE
+APRadioPower2,APRadioPower2,Threshold,AccessPoint,2,AP 신호세기 이하. 임계치($(thresholdValue)) 측정치($(observedValue)),,radioPower,gt,18,20,FALSE
+APRadioPower3,APRadioPower3,Threshold,AccessPoint,3,AP 신호세기 이하. 임계치($(thresholdValue)) 측정치($(observedValue)),,radioPower,gt,15,18,FALSE
+APRadioPower4,APRadioPower4,Threshold,AccessPoint,4,AP 신호세기 이하. 임계치($(thresholdValue)) 측정치($(observedValue)),,radioPower,gt,13,15,FALSE
+APRadioPower5,APRadioPower5,Threshold,AccessPoint,5,AP 신호세기 이하. 임계치($(thresholdValue)) 측정치($(observedValue)),,radioPower,gt,10,13,FALSE
+APRadioPower,APRadioPower,Threshold,AccessPoint,6,AP 신호세기 이하. 임계치($(thresholdValue)) 측정치($(observedValue)),,radioPower,lt,8,,TRUE
+APNodeDown,APNodeDown,Network Node Down,AccessPoint,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+APCNodeDown,APCNodeDown,Network Node Down,WController,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+StatAsset,StatAsset,Threshold,StatAsset,2,자산통계. 임계치($(thresholdValue)) 측정치($(observedValue)),,count,gt,10000,,FALSE
+StatAlert,StatAlert,Threshold,StatAlert,2,장애통계. 임계치($(thresholdValue)) 측정치($(observedValue)),,count,gt,10000,,FALSE
+StatLabel,StatLabel,Threshold,StatLabel,2,라벨명. 임계치($(thresholdValue)) 측정치($(observedValue)),,labelname,gt,10000,,FALSE
+StatAvail,StatAvail,Threshold,StatAvail,2,가동율. 임계치($(thresholdValue)) 측정치($(observedValue)),,availability,gt,95,,FALSE
+UnixCpuUsage2,UnixCpuUsage2,Threshold,Unix,2,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,70,75,FALSE
+UnixCpuUsage3,UnixCpuUsage3,Threshold,Unix,3,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,75,80,FALSE
+UnixCpuUsage4,UnixCpuUsage4,Threshold,Unix,4,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,80,90,FALSE
+UnixCpuUsage5,UnixCpuUsage5,Threshold,Unix,5,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,90,95,FALSE
+UnixCpuUsage6,UnixCpuUsage6,Threshold,Unix,6,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,95,,TRUE
+EdgeServerCpuUsage2,EdgeServerCpuUsage2,Threshold,EdgeServer,2,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,65,70,FALSE
+EdgeServerCpuUsage3,EdgeServerCpuUsage3,Threshold,EdgeServer,3,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,70,75,FALSE
+EdgeServerCpuUsage4,EdgeServerCpuUsage4,Threshold,EdgeServer,4,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,75,80,FALSE
+EdgeServerCpuUsage5,EdgeServerCpuUsage5,Threshold,EdgeServer,5,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,80,90,FALSE
+EdgeServerCpuUsage6,EdgeServerCpuUsage6,Threshold,EdgeServer,6,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,90,,TRUE
+UnixMemoryUsage2,UnixMemoryUsage2,Threshold,Unix,2,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,65,70,FALSE
+UnixMemoryUsage3,UnixMemoryUsage3,Threshold,Unix,3,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,70,80,FALSE
+UnixMemoryUsage4,UnixMemoryUsage4,Threshold,Unix,4,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,80,95,FALSE
+UnixMemoryUsage5,UnixMemoryUsage5,Threshold,Unix,5,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,95,99,FALSE
+UnixMemoryUsage6,UnixMemoryUsage6,Threshold,Unix,6,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,99,,TRUE
+EdgeServerMemoryUsage2,EdgeServerMemoryUsage2,Threshold,EdgeServer,2,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,75,80,FALSE
+EdgeServerMemoryUsage3,EdgeServerMemoryUsage3,Threshold,EdgeServer,3,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,80,85,FALSE
+EdgeServerMemoryUsage4,EdgeServerMemoryUsage4,Threshold,EdgeServer,4,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,85,90,FALSE
+EdgeServerMemoryUsage5,EdgeServerMemoryUsage5,Threshold,EdgeServer,5,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,90,95,FALSE
+EdgeServerMemoryUsage6,EdgeServerMemoryUsage6,Threshold,EdgeServer,6,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,95,,TRUE
+UnixFoMemoryUsage2,UnixFoMemoryUsage2,Threshold,Unix,2,메모리이용률 초과 예측. 임계치($(thresholdValue)) 예측치($(observedValue)),,FoMemoryUsage,gt,65,70,FALSE
+UnixFoMemoryUsage3,UnixFoMemoryUsage3,Threshold,Unix,3,메모리이용률 초과 예측. 임계치($(thresholdValue)) 예측치($(observedValue)),,FoMemoryUsage,gt,70,80,FALSE
+UnixFoMemoryUsage4,UnixFoMemoryUsage4,Threshold,Unix,4,메모리이용률 초과 예측. 임계치($(thresholdValue)) 예측치($(observedValue)),,FoMemoryUsage,gt,80,95,FALSE
+UnixFoMemoryUsage5,UnixFoMemoryUsage5,Threshold,Unix,5,메모리이용률 초과 예측. 임계치($(thresholdValue)) 예측치($(observedValue)),,FoMemoryUsage,gt,95,99,FALSE
+UnixFoMemoryUsage6,UnixFoMemoryUsage6,Threshold,Unix,6,메모리이용률 초과 예측. 임계치($(thresholdValue)) 예측치($(observedValue)),,FoMemoryUsage,gt,99,,TRUE
+UnixResTime2,UnixResTime2,Threshold,Unix,2,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,100,200,FALSE
+UnixResTime3,UnixResTime3,Threshold,Unix,3,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,200,300,FALSE
+UnixResTime4,UnixResTime4,Threshold,Unix,4,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,300,400,FALSE
+UnixResTime5,UnixResTime5,Threshold,Unix,5,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,400,500,FALSE
+UnixResTime6,UnixResTime6,Threshold,Unix,6,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,500,,TRUE
+EdgeServerResTime2,EdgeServerResTime2,Threshold,EdgeServer,2,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,100,200,FALSE
+EdgeServerResTime3,EdgeServerResTime3,Threshold,EdgeServer,3,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,200,300,FALSE
+EdgeServerResTime4,EdgeServerResTime4,Threshold,EdgeServer,4,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,300,400,FALSE
+EdgeServerResTime5,EdgeServerResTime5,Threshold,EdgeServer,5,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,400,500,FALSE
+EdgeServerResTime6,EdgeServerResTime6,Threshold,EdgeServer,6,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,500,,TRUE
+UnixProcessCount2,UnixProcessCount2,Threshold,Unix,2,프로세스수 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,processCount,gt,70,100,FALSE
+UnixProcessCount3,UnixProcessCount3,Threshold,Unix,3,프로세스수 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,processCount,gt,100,200,FALSE
+UnixProcessCount4,UnixProcessCount4,Threshold,Unix,4,프로세스수 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,processCount,gt,200,300,FALSE
+UnixProcessCount5,UnixProcessCount5,Threshold,Unix,5,프로세스수 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,processCount,gt,300,400,FALSE
+UnixProcessCount6,UnixProcessCount6,Threshold,Unix,6,프로세스수 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,processCount,gt,400,,TRUE
+EdgeServerProcessCount2,EdgeServerProcessCount2,Threshold,EdgeServer,2,프로세스수 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,processCount,gt,70,100,FALSE
+EdgeServerProcessCount3,EdgeServerProcessCount3,Threshold,EdgeServer,3,프로세스수 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,processCount,gt,100,200,FALSE
+EdgeServerProcessCount4,EdgeServerProcessCount4,Threshold,EdgeServer,4,프로세스수 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,processCount,gt,200,300,FALSE
+EdgeServerProcessCount5,EdgeServerProcessCount5,Threshold,EdgeServer,5,프로세스수 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,processCount,gt,300,400,FALSE
+EdgeServerProcessCount6,EdgeServerProcessCount6,Threshold,EdgeServer,6,프로세스수 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,processCount,gt,400,,TRUE
+NTCpuUsage2,NTCpuUsage2,Threshold,Nt,2,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,30,50,FALSE
+NTCpuUsage3,NTCpuUsage3,Threshold,Nt,3,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,50,70,FALSE
+NTCpuUsage4,NTCpuUsage4,Threshold,Nt,4,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,70,80,FALSE
+NTCpuUsage5,NTCpuUsage5,Threshold,Nt,5,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue))$(systemIpAddr),,cpuUsage,gt,80,95,FALSE
+NTCpuUsage6,NTCpuUsage6,Threshold,Nt,6,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,95,,TRUE
+NTMemoryUsage2,NTMemoryUsage2,Threshold,Nt,2,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,50,70,FALSE
+NTMemoryUsage3,NTMemoryUsage3,Threshold,Nt,3,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,70,80,FALSE
+NTMemoryUsage4,NTMemoryUsage4,Threshold,Nt,4,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,80,90,FALSE
+NTMemoryUsage5,NTMemoryUsage5,Threshold,Nt,5,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,90,98,FALSE
+NTMemoryUsage6,NTMemoryUsage6,Threshold,Nt,6,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,98,,TRUE
+NTFoMemoryUsage2,NTFoMemoryUsage2,Threshold,Nt,2,메모리이용률 초과 예측. 임계치($(thresholdValue)) 예측치($(observedValue)),,FoMemoryUsage,gt,50,70,FALSE
+NTFoMemoryUsage3,NTFoMemoryUsage3,Threshold,Nt,3,메모리이용률 초과 예측. 임계치($(thresholdValue)) 예측치($(observedValue)),,FoMemoryUsage,gt,70,80,FALSE
+NTFoMemoryUsage4,NTFoMemoryUsage4,Threshold,Nt,4,메모리이용률 초과 예측. 임계치($(thresholdValue)) 예측치($(observedValue)),,FoMemoryUsage,gt,80,90,FALSE
+NTFoMemoryUsage5,NTFoMemoryUsage5,Threshold,Nt,5,메모리이용률 초과 예측. 임계치($(thresholdValue)) 예측치($(observedValue)),,FoMemoryUsage,gt,90,98,FALSE
+NTFoMemoryUsage6,NTFoMemoryUsage6,Threshold,Nt,6,메모리이용률 초과 예측. 임계치($(thresholdValue)) 예측치($(observedValue)),,FoMemoryUsage,gt,98,,TRUE
+NTResTime2,NTResTime2,Threshold,Nt,2,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,100,200,FALSE
+NTResTime3,NTResTime3,Threshold,Nt,3,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,200,300,FALSE
+NTResTime4,NTResTime4,Threshold,Nt,4,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,300,500,FALSE
+NTResTime5,NTResTime5,Threshold,Nt,5,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,500,600,FALSE
+NTResTime6,NTResTime6,Threshold,Nt,6,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,600,,TRUE
+NtProcessCount2,NtProcessCount2,Threshold,Nt,2,프로세스수 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,processCount,gt,70,100,FALSE
+NtProcessCount3,NtProcessCount3,Threshold,Nt,3,프로세스수 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,processCount,gt,100,200,FALSE
+NtProcessCount4,NtProcessCount4,Threshold,Nt,4,프로세스수 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,processCount,gt,200,300,FALSE
+NtProcessCount5,NtProcessCount5,Threshold,Nt,5,프로세스수 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,processCount,gt,300,400,FALSE
+NtProcessCount6,NtProcessCount6,Threshold,Nt,6,프로세스수 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,processCount,gt,400,,TRUE
+NTNodeDown,NTNodeDown,Server Down,Nt,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+UnixNodeDown,UnixNodeDown,Server Down,Unix,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+EdgeChassisNodeDown,EdgeChassisNodeDown,Server Down,EdgeChassis,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+EdgeServerNodeDown,EdgeServerNodeDown,Server Down,EdgeServer,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+EdgeStorageNodeDown,EdgeStorageNodeDown,Server Down,EdgeStorage,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+RouterNodeDown,RouterNodeDown,Network Node Down,Router,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+SwitchHubNodeDown,SwitchHubNodeDown,Network Node Down,SwitchHub,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+InterfaceDown,InterfaceDown,Interface Down,Interface,6,인터페이스 장애 발생,,ifOperStatus,eq,2,,TRUE
+RouterCpuUsage2,RouterCpuUsage2,Threshold,Router,2,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,30,50,FALSE
+RouterCpuUsage3,RouterCpuUsage3,Threshold,Router,3,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,50,70,FALSE
+RouterCpuUsage4,RouterCpuUsage4,Threshold,Router,4,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,70,80,FALSE
+RouterCpuUsage5,RouterCpuUsage5,Threshold,Router,5,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,80,95,FALSE
+RouterCpuUsage6,RouterCpuUsage6,Threshold,Router,6,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,95,,TRUE
+RouterMemoryUsage2,RouterMemoryUsage2,Threshold,Router,2,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,30,50,FALSE
+RouterMemoryUsage3,RouterMemoryUsage3,Threshold,Router,3,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,50,70,FALSE
+RouterMemoryUsage4,RouterMemoryUsage4,Threshold,Router,4,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,70,80,FALSE
+RouterMemoryUsage5,RouterMemoryUsage5,Threshold,Router,5,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,80,90,FALSE
+RouterMemoryUsage6,RouterMemoryUsage6,Threshold,Router,6,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,90,,TRUE
+RouterResTime2,RouterResTime2,Threshold,Router,2,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,30,50,FALSE
+RouterResTime3,RouterResTime3,Threshold,Router,3,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue))!,,responseTime,gt,50,100,FALSE
+RouterResTime4,RouterResTime4,Threshold,Router,4,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,100,150,FALSE
+RouterResTime5,RouterResTime5,Threshold,Router,5,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,150,250,FALSE
+RouterResTime6,RouterResTime6,Threshold,Router,6,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,250,,TRUE
+SwitchHubCpuUsage2,SwitchHubCpuUsage2,Threshold,SwitchHub,2,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,30,50,FALSE
+SwitchHubCpuUsage3,SwitchHubCpuUsage3,Threshold,SwitchHub,3,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,50,70,FALSE
+SwitchHubCpuUsage4,SwitchHubCpuUsage4,Threshold,SwitchHub,4,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,70,80,FALSE
+SwitchHubCpuUsage5,SwitchHubCpuUsage5,Threshold,SwitchHub,5,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,80,95,FALSE
+SwitchHubCpuUsage6,SwitchHubCpuUsage6,Threshold,SwitchHub,6,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,95,,TRUE
+SwitchHubMemoryUsage2,SwitchHubMemoryUsage2,Threshold,SwitchHub,2,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,30,50,FALSE
+SwitchHubMemoryUsage3,SwitchHubMemoryUsage3,Threshold,SwitchHub,3,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,50,70,FALSE
+SwitchHubMemoryUsage4,SwitchHubMemoryUsage4,Threshold,SwitchHub,4,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,70,80,FALSE
+SwitchHubMemoryUsage5,SwitchHubMemoryUsage5,Threshold,SwitchHub,5,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,80,95,FALSE
+SwitchHubMemoryUsage6,SwitchHubMemoryUsage6,Threshold,SwitchHub,6,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,95,,TRUE
+SwitchHubResTime2,SwitchHubResTime2,Threshold,SwitchHub,2,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,100,150,FALSE
+SwitchHubResTime3,SwitchHubResTime3,Threshold,SwitchHub,3,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,150,200,FALSE
+SwitchHubResTime4,SwitchHubResTime4,Threshold,SwitchHub,4,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,200,250,FALSE
+SwitchHubResTime5,SwitchHubResTime5,Threshold,SwitchHub,5,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,250,300,FALSE
+SwitchHubResTime6,SwitchHubResTime6,Threshold,SwitchHub,6,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,300,,TRUE
+InterfaceInUsage2,InterfaceInUsage2,Threshold,Interface,2,회선입력이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,inUsage,gt,30,40,FALSE
+InterfaceInUsage3,InterfaceInUsage3,Threshold,Interface,3,회선입력이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,inUsage,gt,40,50,FALSE
+InterfaceInUsage4,InterfaceInUsage4,Threshold,Interface,4,회선입력이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,inUsage,gt,50,60,FALSE
+InterfaceInUsage5,InterfaceInUsage5,Threshold,Interface,5,회선입력이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,inUsage,gt,60,70,FALSE
+InterfaceInUsage6,InterfaceInUsage6,Threshold,Interface,6,회선입력이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,inUsage,gt,70,,TRUE
+InterfaceFoInUsage2,InterfaceFoInUsage2,Threshold,Interface,2,회선입력이용률 초과 예측. 임계치($(thresholdValue)) 예측치($(observedValue)),,FoInUsage,gt,30,40,FALSE
+InterfaceFoInUsage3,InterfaceFoInUsage3,Threshold,Interface,3,회선입력이용률 초과 예측. 임계치($(thresholdValue)) 예측치($(observedValue)),,FoInUsage,gt,40,50,FALSE
+InterfaceFoInUsage4,InterfaceFoInUsage4,Threshold,Interface,4,회선입력이용률 초과 예측. 임계치($(thresholdValue)) 예측치($(observedValue)),,FoInUsage,gt,50,60,FALSE
+InterfaceFoInUsage5,InterfaceFoInUsage5,Threshold,Interface,5,회선입력이용률 초과 예측. 임계치($(thresholdValue)) 예측치($(observedValue)),,FoInUsage,gt,60,70,FALSE
+InterfaceFoInUsage6,InterfaceFoInUsage6,Threshold,Interface,6,회선입력이용률 초과 예측. 임계치($(thresholdValue)) 예측치($(observedValue)),,FoInUsage,gt,70,,TRUE
+InterfaceOutUsage2,InterfaceOutUsage2,Threshold,Interface,2,회선출력이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,outUsage,gt,30,40,FALSE
+InterfaceOutUsage3,InterfaceOutUsage3,Threshold,Interface,3,회선출력이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,outUsage,gt,40,50,FALSE
+InterfaceOutUsage4,InterfaceOutUsage4,Threshold,Interface,4,회선출력이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,outUsage,gt,50,60,FALSE
+InterfaceOutUsage5,InterfaceOutUsage5,Threshold,Interface,5,회선출력이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,outUsage,gt,60,70,FALSE
+InterfaceOutUsage6,InterfaceOutUsage6,Threshold,Interface,6,회선출력이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,outUsage,gt,70,,TRUE
+InterfaceFoOutUsage2,InterfaceFoOutUsage2,Threshold,Interface,2,회선출력이용률 초과 예측. 임계치($(thresholdValue)) 예측치($(observedValue)),,FoOutUsage,gt,30,40,FALSE
+InterfaceFoOutUsage3,InterfaceFoOutUsage3,Threshold,Interface,3,회선출력이용률 초과 예측. 임계치($(thresholdValue)) 예측치($(observedValue)),,FoOutUsage,gt,40,50,FALSE
+InterfaceFoOutUsage4,InterfaceFoOutUsage4,Threshold,Interface,4,회선출력이용률 초과 예측. 임계치($(thresholdValue)) 예측치($(observedValue)),,FoOutUsage,gt,50,60,FALSE
+InterfaceFoOutUsage5,InterfaceFoOutUsage5,Threshold,Interface,5,회선출력이용률 초과 예측. 임계치($(thresholdValue)) 예측치($(observedValue)),,FoOutUsage,gt,60,70,FALSE
+InterfaceFoOutUsage6,InterfaceFoOutUsage6,Threshold,Interface,6,회선출력이용률 초과 예측. 임계치($(thresholdValue)) 예측치($(observedValue)),,FoOutUsage,gt,70,,TRUE
+InterfaceInErrorUsage2,InterfaceInErrorUsage2,Threshold,Interface,2,회선입력에러률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,inErrorUsage,gt,0,1,FALSE
+InterfaceInErrorUsage3,InterfaceInErrorUsage3,Threshold,Interface,3,회선입력에러률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,inErrorUsage,gt,1,2,FALSE
+InterfaceInErrorUsage4,InterfaceInErrorUsage4,Threshold,Interface,4,회선입력에러률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,inErrorUsage,gt,2,5,FALSE
+InterfaceInErrorUsage5,InterfaceInErrorUsage5,Threshold,Interface,5,회선입력에러률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,inErrorUsage,gt,5,10,FALSE
+InterfaceInErrorUsage6,InterfaceInErrorUsage6,Threshold,Interface,6,회선입력에러률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,inErrorUsage,gt,10,,TRUE
+InterfaceOutErrorUsage2,InterfaceOutErrorUsage2,Threshold,Interface,2,회선출력에러률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,outErrorUsage,gt,0,1,FALSE
+InterfaceOutErrorUsage3,InterfaceOutErrorUsage3,Threshold,Interface,3,회선출력에러률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,outErrorUsage,gt,1,2,FALSE
+InterfaceOutErrorUsage4,InterfaceOutErrorUsage4,Threshold,Interface,4,회선출력에러률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,outErrorUsage,gt,2,5,FALSE
+InterfaceOutErrorUsage5,InterfaceOutErrorUsage5,Threshold,Interface,5,회선출력에러률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,outErrorUsage,gt,5,10,FALSE
+InterfaceOutErrorUsage6,InterfaceOutErrorUsage6,Threshold,Interface,6,회선출력에러률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,outErrorUsage,gt,10,,TRUE
+InterfaceInCRC2,InterfaceInCRC2,Threshold,Interface,2,CRC에러 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,inCRC,gt,1,2,FALSE
+InterfaceInCRC3,InterfaceInCRC3,Threshold,Interface,3,CRC에러 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,inCRC,gt,2,5,FALSE
+InterfaceInCRC4,InterfaceInCRC4,Threshold,Interface,4,CRC에러 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,inCRC,gt,5,7,FALSE
+InterfaceInCRC5,InterfaceInCRC5,Threshold,Interface,5,CRC에러 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,inCRC,gt,7,10,FALSE
+InterfaceInCRC6,InterfaceInCRC6,Threshold,Interface,6,CRC에러 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,inCRC,gt,10,,TRUE
+BBRouterNodeDown,BBRouterNodeDown,Network Node Down,BBRouter,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+BBRouterCpuUsage2,BBRouterCpuUsage2,Threshold,BBRouter,2,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,30,50,FALSE
+BBRouterCpuUsage3,BBRouterCpuUsage3,Threshold,BBRouter,3,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,50,70,FALSE
+BBRouterCpuUsage4,BBRouterCpuUsage4,Threshold,BBRouter,4,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,70,80,FALSE
+BBRouterCpuUsage5,BBRouterCpuUsage5,Threshold,BBRouter,5,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,80,95,FALSE
+BBRouterCpuUsage6,BBRouterCpuUsage6,Threshold,BBRouter,6,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,95,,TRUE
+BBRouterMemoryUsage2,BBRouterMemoryUsage2,Threshold,BBRouter,2,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,30,50,FALSE
+BBRouterMemoryUsage3,BBRouterMemoryUsage3,Threshold,BBRouter,3,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,50,70,FALSE
+BBRouterMemoryUsage4,BBRouterMemoryUsage4,Threshold,BBRouter,4,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,70,80,FALSE
+BBRouterMemoryUsage5,BBRouterMemoryUsage5,Threshold,BBRouter,5,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,80,90,FALSE
+BBRouterMemoryUsage6,BBRouterMemoryUsage6,Threshold,BBRouter,6,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,90,,TRUE
+BBRouterResTime2,BBRouterResTime2,Threshold,BBRouter,2,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,30,50,FALSE
+BBRouterResTime3,BBRouterResTime3,Threshold,BBRouter,3,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue))!,,responseTime,gt,50,100,FALSE
+BBRouterResTime4,BBRouterResTime4,Threshold,BBRouter,4,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,100,150,FALSE
+BBRouterResTime5,BBRouterResTime5,Threshold,BBRouter,5,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,150,250,FALSE
+BBRouterResTime6,BBRouterResTime6,Threshold,BBRouter,6,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,250,,TRUE
+SwitchRouterNodeDown,SwitchRouterNodeDown,Network Node Down,SwitchRouter,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+SwitchRouterCpuUsage2,SwitchRouterCpuUsage2,Threshold,SwitchRouter,2,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,30,50,FALSE
+SwitchRouterCpuUsage3,SwitchRouterCpuUsage3,Threshold,SwitchRouter,3,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,50,70,FALSE
+SwitchRouterCpuUsage4,SwitchRouterCpuUsage4,Threshold,SwitchRouter,4,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,70,80,FALSE
+SwitchRouterCpuUsage5,SwitchRouterCpuUsage5,Threshold,SwitchRouter,5,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,80,95,FALSE
+SwitchRouterCpuUsage6,SwitchRouterCpuUsage6,Threshold,SwitchRouter,6,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,95,,TRUE
+SwitchRouterMemoryUsage2,SwitchRouterMemoryUsage2,Threshold,SwitchRouter,2,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,30,50,FALSE
+SwitchRouterMemoryUsage3,SwitchRouterMemoryUsage3,Threshold,SwitchRouter,3,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,50,70,FALSE
+SwitchRouterMemoryUsage4,SwitchRouterMemoryUsage4,Threshold,SwitchRouter,4,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,70,80,FALSE
+SwitchRouterMemoryUsage5,SwitchRouterMemoryUsage5,Threshold,SwitchRouter,5,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,80,90,FALSE
+SwitchRouterMemoryUsage6,SwitchRouterMemoryUsage6,Threshold,SwitchRouter,6,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,90,,TRUE
+SwitchRouterResTime2,SwitchRouterResTime2,Threshold,SwitchRouter,2,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,30,50,FALSE
+SwitchRouterResTime3,SwitchRouterResTime3,Threshold,SwitchRouter,3,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue))!,,responseTime,gt,50,100,FALSE
+SwitchRouterResTime4,SwitchRouterResTime4,Threshold,SwitchRouter,4,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,100,150,FALSE
+SwitchRouterResTime5,SwitchRouterResTime5,Threshold,SwitchRouter,5,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,150,250,FALSE
+SwitchRouterResTime6,SwitchRouterResTime6,Threshold,SwitchRouter,6,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,250,,TRUE
+ATMRouterNodeDown,ATMRouterNodeDown,Network Node Down,ATMRouter,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+ATMRouterCpuUsage2,ATMRouterCpuUsage2,Threshold,ATMRouter,2,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,30,50,FALSE
+ATMRouterCpuUsage3,ATMRouterCpuUsage3,Threshold,ATMRouter,3,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,50,70,FALSE
+ATMRouterCpuUsage4,ATMRouterCpuUsage4,Threshold,ATMRouter,4,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,70,80,FALSE
+ATMRouterCpuUsage5,ATMRouterCpuUsage5,Threshold,ATMRouter,5,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,80,95,FALSE
+ATMRouterCpuUsage6,ATMRouterCpuUsage6,Threshold,ATMRouter,6,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,95,,TRUE
+ATMRouterMemoryUsage2,ATMRouterMemoryUsage2,Threshold,ATMRouter,2,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,30,50,FALSE
+ATMRouterMemoryUsage3,ATMRouterMemoryUsage3,Threshold,ATMRouter,3,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,50,70,FALSE
+ATMRouterMemoryUsage4,ATMRouterMemoryUsage4,Threshold,ATMRouter,4,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,70,80,FALSE
+ATMRouterMemoryUsage5,ATMRouterMemoryUsage5,Threshold,ATMRouter,5,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,80,90,FALSE
+ATMRouterMemoryUsage6,ATMRouterMemoryUsage6,Threshold,ATMRouter,6,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,90,,TRUE
+ATMRouterResTime2,ATMRouterResTime2,Threshold,ATMRouter,2,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,30,50,FALSE
+ATMRouterResTime3,ATMRouterResTime3,Threshold,ATMRouter,3,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue))!,,responseTime,gt,50,100,FALSE
+ATMRouterResTime4,ATMRouterResTime4,Threshold,ATMRouter,4,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,100,150,FALSE
+ATMRouterResTime5,ATMRouterResTime5,Threshold,ATMRouter,5,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,150,250,FALSE
+ATMRouterResTime6,ATMRouterResTime6,Threshold,ATMRouter,6,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,250,,TRUE
+BBSwitchNodeDown,BBSwitchNodeDown,Network Node Down,BBSwitch,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+BBSwitchCpuUsage2,BBSwitchCpuUsage2,Threshold,BBSwitch,2,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,30,50,FALSE
+BBSwitchCpuUsage3,BBSwitchCpuUsage3,Threshold,BBSwitch,3,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,50,70,FALSE
+BBSwitchCpuUsage4,BBSwitchCpuUsage4,Threshold,BBSwitch,4,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,70,80,FALSE
+BBSwitchCpuUsage5,BBSwitchCpuUsage5,Threshold,BBSwitch,5,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,80,95,FALSE
+BBSwitchCpuUsage6,BBSwitchCpuUsage6,Threshold,BBSwitch,6,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,95,,TRUE
+BBSwitchMemoryUsage2,BBSwitchMemoryUsage2,Threshold,BBSwitch,2,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,30,50,FALSE
+BBSwitchMemoryUsage3,BBSwitchMemoryUsage3,Threshold,BBSwitch,3,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,50,70,FALSE
+BBSwitchMemoryUsage4,BBSwitchMemoryUsage4,Threshold,BBSwitch,4,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,70,80,FALSE
+BBSwitchMemoryUsage5,BBSwitchMemoryUsage5,Threshold,BBSwitch,5,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,80,90,FALSE
+BBSwitchMemoryUsage6,BBSwitchMemoryUsage6,Threshold,BBSwitch,6,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,90,,TRUE
+BBSwitchResTime2,BBSwitchResTime2,Threshold,BBSwitch,2,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,30,50,FALSE
+BBSwitchResTime3,BBSwitchResTime3,Threshold,BBSwitch,3,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue))!,,responseTime,gt,50,100,FALSE
+BBSwitchResTime4,BBSwitchResTime4,Threshold,BBSwitch,4,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,100,150,FALSE
+BBSwitchResTime5,BBSwitchResTime5,Threshold,BBSwitch,5,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,150,250,FALSE
+BBSwitchResTime6,BBSwitchResTime6,Threshold,BBSwitch,6,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,250,,TRUE
+WGSwitchNodeDown,WGSwitchNodeDown,Network Node Down,WGSwitch,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+WGSwitchCpuUsage2,WGSwitchCpuUsage2,Threshold,WGSwitch,2,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,30,50,FALSE
+WGSwitchCpuUsage3,WGSwitchCpuUsage3,Threshold,WGSwitch,3,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,50,70,FALSE
+WGSwitchCpuUsage4,WGSwitchCpuUsage4,Threshold,WGSwitch,4,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,70,80,FALSE
+WGSwitchCpuUsage5,WGSwitchCpuUsage5,Threshold,WGSwitch,5,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,80,95,FALSE
+WGSwitchCpuUsage6,WGSwitchCpuUsage6,Threshold,WGSwitch,6,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,95,,TRUE
+WGSwitchMemoryUsage2,WGSwitchMemoryUsage2,Threshold,WGSwitch,2,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,30,50,FALSE
+WGSwitchMemoryUsage3,WGSwitchMemoryUsage3,Threshold,WGSwitch,3,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,50,70,FALSE
+WGSwitchMemoryUsage4,WGSwitchMemoryUsage4,Threshold,WGSwitch,4,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,70,80,FALSE
+WGSwitchMemoryUsage5,WGSwitchMemoryUsage5,Threshold,WGSwitch,5,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,80,90,FALSE
+WGSwitchMemoryUsage6,WGSwitchMemoryUsage6,Threshold,WGSwitch,6,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,90,,TRUE
+WGSwitchResTime2,WGSwitchResTime2,Threshold,WGSwitch,2,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,30,50,FALSE
+WGSwitchResTime3,WGSwitchResTime3,Threshold,WGSwitch,3,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue))!,,responseTime,gt,50,100,FALSE
+WGSwitchResTime4,WGSwitchResTime4,Threshold,WGSwitch,4,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,100,150,FALSE
+WGSwitchResTime5,WGSwitchResTime5,Threshold,WGSwitch,5,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,150,250,FALSE
+WGSwitchResTime6,WGSwitchResTime6,Threshold,WGSwitch,6,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,250,,TRUE
+ATMSwitchNodeDown,ATMSwitchNodeDown,Network Node Down,ATMSwitch,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+ATMSwitchCpuUsage2,ATMSwitchCpuUsage2,Threshold,ATMSwitch,2,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,30,50,FALSE
+ATMSwitchCpuUsage3,ATMSwitchCpuUsage3,Threshold,ATMSwitch,3,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,50,70,FALSE
+ATMSwitchCpuUsage4,ATMSwitchCpuUsage4,Threshold,ATMSwitch,4,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,70,80,FALSE
+ATMSwitchCpuUsage5,ATMSwitchCpuUsage5,Threshold,ATMSwitch,5,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,80,95,FALSE
+ATMSwitchCpuUsage6,ATMSwitchCpuUsage6,Threshold,ATMSwitch,6,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,95,,TRUE
+ATMSwitchMemoryUsage2,ATMSwitchMemoryUsage2,Threshold,ATMSwitch,2,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,30,50,FALSE
+ATMSwitchMemoryUsage3,ATMSwitchMemoryUsage3,Threshold,ATMSwitch,3,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,50,70,FALSE
+ATMSwitchMemoryUsage4,ATMSwitchMemoryUsage4,Threshold,ATMSwitch,4,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,70,80,FALSE
+ATMSwitchMemoryUsage5,ATMSwitchMemoryUsage5,Threshold,ATMSwitch,5,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,80,90,FALSE
+ATMSwitchMemoryUsage6,ATMSwitchMemoryUsage6,Threshold,ATMSwitch,6,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,90,,TRUE
+ATMSwitchResTime2,ATMSwitchResTime2,Threshold,ATMSwitch,2,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,30,50,FALSE
+ATMSwitchResTime3,ATMSwitchResTime3,Threshold,ATMSwitch,3,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue))!,,responseTime,gt,50,100,FALSE
+ATMSwitchResTime4,ATMSwitchResTime4,Threshold,ATMSwitch,4,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,100,150,FALSE
+ATMSwitchResTime5,ATMSwitchResTime5,Threshold,ATMSwitch,5,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,150,250,FALSE
+ATMSwitchResTime6,ATMSwitchResTime6,Threshold,ATMSwitch,6,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,250,,TRUE
+L2SwitchNodeDown,L2SwitchNodeDown,Network Node Down,L2Switch,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+L2SwitchCpuUsage2,L2SwitchCpuUsage2,Threshold,L2Switch,2,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,30,50,FALSE
+L2SwitchCpuUsage3,L2SwitchCpuUsage3,Threshold,L2Switch,3,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,50,70,FALSE
+L2SwitchCpuUsage4,L2SwitchCpuUsage4,Threshold,L2Switch,4,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,70,80,FALSE
+L2SwitchCpuUsage5,L2SwitchCpuUsage5,Threshold,L2Switch,5,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,80,95,FALSE
+L2SwitchCpuUsage6,L2SwitchCpuUsage6,Threshold,L2Switch,6,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,95,,TRUE
+L2SwitchMemoryUsage2,L2SwitchMemoryUsage2,Threshold,L2Switch,2,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,30,50,FALSE
+L2SwitchMemoryUsage3,L2SwitchMemoryUsage3,Threshold,L2Switch,3,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,50,70,FALSE
+L2SwitchMemoryUsage4,L2SwitchMemoryUsage4,Threshold,L2Switch,4,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,70,80,FALSE
+L2SwitchMemoryUsage5,L2SwitchMemoryUsage5,Threshold,L2Switch,5,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,80,90,FALSE
+L2SwitchMemoryUsage6,L2SwitchMemoryUsage6,Threshold,L2Switch,6,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,90,,TRUE
+L2SwitchResTime2,L2SwitchResTime2,Threshold,L2Switch,2,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,30,50,FALSE
+L2SwitchResTime3,L2SwitchResTime3,Threshold,L2Switch,3,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue))!,,responseTime,gt,50,100,FALSE
+L2SwitchResTime4,L2SwitchResTime4,Threshold,L2Switch,4,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,100,150,FALSE
+L2SwitchResTime5,L2SwitchResTime5,Threshold,L2Switch,5,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,150,250,FALSE
+L2SwitchResTime6,L2SwitchResTime6,Threshold,L2Switch,6,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,250,,TRUE
+L3SwitchNodeDown,L3SwitchNodeDown,Network Node Down,L3Switch,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+L3SwitchCpuUsage2,L3SwitchCpuUsage2,Threshold,L3Switch,2,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,30,50,FALSE
+L3SwitchCpuUsage3,L3SwitchCpuUsage3,Threshold,L3Switch,3,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,50,70,FALSE
+L3SwitchCpuUsage4,L3SwitchCpuUsage4,Threshold,L3Switch,4,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,70,80,FALSE
+L3SwitchCpuUsage5,L3SwitchCpuUsage5,Threshold,L3Switch,5,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,80,95,FALSE
+L3SwitchCpuUsage6,L3SwitchCpuUsage6,Threshold,L3Switch,6,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,95,,TRUE
+L3SwitchMemoryUsage2,L3SwitchMemoryUsage2,Threshold,L3Switch,2,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,30,50,FALSE
+L3SwitchMemoryUsage3,L3SwitchMemoryUsage3,Threshold,L3Switch,3,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,50,70,FALSE
+L3SwitchMemoryUsage4,L3SwitchMemoryUsage4,Threshold,L3Switch,4,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,70,80,FALSE
+L3SwitchMemoryUsage5,L3SwitchMemoryUsage5,Threshold,L3Switch,5,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,80,90,FALSE
+L3SwitchMemoryUsage6,L3SwitchMemoryUsage6,Threshold,L3Switch,6,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,90,,TRUE
+L3SwitchResTime2,L3SwitchResTime2,Threshold,L3Switch,2,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,30,50,FALSE
+L3SwitchResTime3,L3SwitchResTime3,Threshold,L3Switch,3,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue))!,,responseTime,gt,50,100,FALSE
+L3SwitchResTime4,L3SwitchResTime4,Threshold,L3Switch,4,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,100,150,FALSE
+L3SwitchResTime5,L3SwitchResTime5,Threshold,L3Switch,5,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,150,250,FALSE
+L3SwitchResTime6,L3SwitchResTime6,Threshold,L3Switch,6,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,250,,TRUE
+L4SwitchNodeDown,L4SwitchNodeDown,Network Node Down,L4Switch,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+L4SwitchCpuUsage2,L4SwitchCpuUsage2,Threshold,L4Switch,2,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,30,50,FALSE
+L4SwitchCpuUsage3,L4SwitchCpuUsage3,Threshold,L4Switch,3,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,50,70,FALSE
+L4SwitchCpuUsage4,L4SwitchCpuUsage4,Threshold,L4Switch,4,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,70,80,FALSE
+L4SwitchCpuUsage5,L4SwitchCpuUsage5,Threshold,L4Switch,5,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,80,95,FALSE
+L4SwitchCpuUsage6,L4SwitchCpuUsage6,Threshold,L4Switch,6,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,95,,TRUE
+L4SwitchMemoryUsage2,L4SwitchMemoryUsage2,Threshold,L4Switch,2,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,30,50,FALSE
+L4SwitchMemoryUsage3,L4SwitchMemoryUsage3,Threshold,L4Switch,3,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,50,70,FALSE
+L4SwitchMemoryUsage4,L4SwitchMemoryUsage4,Threshold,L4Switch,4,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,70,80,FALSE
+L4SwitchMemoryUsage5,L4SwitchMemoryUsage5,Threshold,L4Switch,5,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,80,90,FALSE
+L4SwitchMemoryUsage6,L4SwitchMemoryUsage6,Threshold,L4Switch,6,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,90,,TRUE
+L4SwitchResTime2,L4SwitchResTime2,Threshold,L4Switch,2,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,30,50,FALSE
+L4SwitchResTime3,L4SwitchResTime3,Threshold,L4Switch,3,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue))!,,responseTime,gt,50,100,FALSE
+L4SwitchResTime4,L4SwitchResTime4,Threshold,L4Switch,4,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,100,150,FALSE
+L4SwitchResTime5,L4SwitchResTime5,Threshold,L4Switch,5,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,150,250,FALSE
+L4SwitchResTime6,L4SwitchResTime6,Threshold,L4Switch,6,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,250,,TRUE
+VPNNodeDown,VPNNodeDown,Network Node Down,VPN,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+VPNCpuUsage2,VPNCpuUsage2,Threshold,VPN,2,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,30,50,FALSE
+VPNCpuUsage3,VPNCpuUsage3,Threshold,VPN,3,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,50,70,FALSE
+VPNCpuUsage4,VPNCpuUsage4,Threshold,VPN,4,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,70,80,FALSE
+VPNCpuUsage5,VPNCpuUsage5,Threshold,VPN,5,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,80,95,FALSE
+VPNCpuUsage6,VPNCpuUsage6,Threshold,VPN,6,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,95,,TRUE
+VPNMemoryUsage2,VPNMemoryUsage2,Threshold,VPN,2,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,30,50,FALSE
+VPNMemoryUsage3,VPNMemoryUsage3,Threshold,VPN,3,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,50,70,FALSE
+VPNMemoryUsage4,VPNMemoryUsage4,Threshold,VPN,4,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,70,80,FALSE
+VPNMemoryUsage5,VPNMemoryUsage5,Threshold,VPN,5,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,80,90,FALSE
+VPNMemoryUsage6,VPNMemoryUsage6,Threshold,VPN,6,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,90,,TRUE
+VPNResTime2,VPNResTime2,Threshold,VPN,2,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,30,50,FALSE
+VPNResTime3,VPNResTime3,Threshold,VPN,3,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue))!,,responseTime,gt,50,100,FALSE
+VPNResTime4,VPNResTime4,Threshold,VPN,4,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,100,150,FALSE
+VPNResTime5,VPNResTime5,Threshold,VPN,5,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,150,250,FALSE
+VPNResTime6,VPNResTime6,Threshold,VPN,6,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,250,,TRUE
+SwitchHubSnmpDown,SwitchHubSnmpDown,Snmp Down,SwitchHub,3,SNMP 응답 없음,,SNMPStatus,eq,0,,TRUE
+SwitchSnmpDown,SwitchSnmpDown,Snmp Down,Switch,3,SNMP 응답 없음,,SNMPStatus,eq,0,,TRUE
+ATMSwitchSnmpDown,ATMSwitchSnmpDown,Snmp Down,ATMSwitch,3,SNMP 응답 없음,,SNMPStatus,eq,0,,TRUE
+BBSwitchSnmpDown,BBSwitchSnmpDown,Snmp Down,BBSwitch,3,SNMP 응답 없음,,SNMPStatus,eq,0,,TRUE
+WGSwitchSnmpDown,WGSwitchSnmpDown,Snmp Down,BBSwitch,3,SNMP 응답 없음,,SNMPStatus,eq,0,,TRUE
+L2SwitchSnmpDown,L2SwitchSnmpDown,Snmp Down,L2Switch,3,SNMP 응답 없음,,SNMPStatus,eq,0,,TRUE
+L3SwitchSnmpDown,L3SwitchSnmpDown,Snmp Down,L3Switch,3,SNMP 응답 없음,,SNMPStatus,eq,0,,TRUE
+L4SwitchSnmpDown,L4SwitchSnmpDown,Snmp Down,L4Switch,3,SNMP 응답 없음,,SNMPStatus,eq,0,,TRUE
+RouterSnmpDown,RouterSnmpDown,Snmp Down,Router,3,SNMP 응답 없음,,SNMPStatus,eq,0,,TRUE
+ATMRouterSnmpDown,ATMRouterSnmpDown,Snmp Down,ATMRouter,3,SNMP 응답 없음,,SNMPStatus,eq,0,,TRUE
+BBRouterSnmpDown,BBRouterSnmpDown,Snmp Down,BBRouter,3,SNMP 응답 없음,,SNMPStatus,eq,0,,TRUE
+VPNSnmpDown,VPNSnmpDown,Snmp Down,VPN,3,SNMP 응답 없음,,SNMPStatus,eq,0,,TRUE
+HubSnmpDown,HubSnmpDown,Snmp Down,Hub,3,SNMP 응답 없음,,SNMPStatus,eq,0,,TRUE
+SwitchRouterSnmpDown,SwitchRouterSnmpDown,Snmp Down,SwitchRouter,3,SNMP 응답 없음,,SNMPStatus,eq,0,,TRUE
+UnixSnmpDown,UnixSnmpDown,Snmp Down,Unix,3,SNMP 응답 없음,,SNMPStatus,eq,0,,TRUE
+NTSnmpDown,NTSnmpDown,Snmp Down,Nt,3,SNMP 응답 없음,,SNMPStatus,eq,0,,TRUE 
+TMSNodeDown,TMSNodeDown,Network Node Down,TMS,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE 
+DOTSNodeDown,DOTSNodeDown,Network Node Down,DOTS,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE 
+MUXNodeDown,MUXNodeDown,Network Node Down,MUX,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+MSPPNodeDown,MSPPNodeDown,Network Node Down,MSPP,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+QOSNodeDown,QOSNodeDown,Network Node Down,QOS,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+IPSNodeDown,IPSNodeDown,Network Node Down,IPS,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+DDoSNodeDown,DDoSNodeDown,Network Node Down,DDoS,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+FWNodeDown,FWNodeDown,Network Node Down,FW,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+WebFWNodeDown,WebFWNodeDown,Network Node Down,WebFW,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+SANSwtichNodeDown,SANSwitchNodeDown,Network Node Down,SANSwitch,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+UTMNodeDown,UTMNodeDown,Network Node Down,UTM,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+WIPSNodeDown,WIPSNodeDown,Network Node Down,WIPS,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+MPLSNodeDown,MPLSNodeDown,Network Node Down,MPLS,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+NACNodeDown,NACNodeDown,Network Node Down,NAC,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+IPPBXNodeDown,IPPBXNodeDown,Network Node Down,IPPBX,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+IPPBXCpuUsage2,IPPBXCpuUsage2,Threshold,IPPBX,2,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,30,50,FALSE
+IPPBXCpuUsage3,IPPBXCpuUsage3,Threshold,IPPBX,3,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,50,70,FALSE
+IPPBXCpuUsage4,IPPBXCpuUsage4,Threshold,IPPBX,4,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,70,80,FALSE
+IPPBXCpuUsage5,IPPBXCpuUsage5,Threshold,IPPBX,5,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,80,95,FALSE
+IPPBXCpuUsage6,IPPBXCpuUsage6,Threshold,IPPBX,6,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,95,,TRUE
+IPPBXMemoryUsage2,IPPBXMemoryUsage2,Threshold,IPPBX,2,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,30,50,FALSE
+IPPBXMemoryUsage3,IPPBXMemoryUsage3,Threshold,IPPBX,3,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,50,70,FALSE
+IPPBXMemoryUsage4,IPPBXMemoryUsage4,Threshold,IPPBX,4,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,70,80,FALSE
+IPPBXMemoryUsage5,IPPBXMemoryUsage5,Threshold,IPPBX,5,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,80,90,FALSE
+IPPBXMemoryUsage6,IPPBXMemoryUsage6,Threshold,IPPBX,6,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,90,,TRUE
+IPPBXResTime2,IPPBXResTime2,Threshold,IPPBX,2,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,30,50,FALSE
+IPPBXResTime3,IPPBXResTime3,Threshold,IPPBX,3,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue))!,,responseTime,gt,50,100,FALSE
+IPPBXResTime4,IPPBXResTime4,Threshold,IPPBX,4,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,100,150,FALSE
+IPPBXResTime5,IPPBXResTime5,Threshold,IPPBX,5,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,150,250,FALSE
+IPPBXResTime6,IPPBXResTime6,Threshold,IPPBX,6,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,250,,TRUE
+IPPBXSnmpDown,IPPBXSnmpDown,Snmp Down,IPPBX,3,SNMP 응답 없음,,SNMPStatus,eq,0,,TRUE
+VoiceGWNodeDown,VoiceGWNodeDown,Network Node Down,VoiceGW,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+VoiceGWCpuUsage2,VoiceGWCpuUsage2,Threshold,VoiceGW,2,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,30,50,FALSE
+VoiceGWCpuUsage3,VoiceGWCpuUsage3,Threshold,VoiceGW,3,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,50,70,FALSE
+VoiceGWCpuUsage4,VoiceGWCpuUsage4,Threshold,VoiceGW,4,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,70,80,FALSE
+VoiceGWCpuUsage5,VoiceGWCpuUsage5,Threshold,VoiceGW,5,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,80,95,FALSE
+VoiceGWCpuUsage6,VoiceGWCpuUsage6,Threshold,VoiceGW,6,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,95,,TRUE
+VoiceGWMemoryUsage2,VoiceGWMemoryUsage2,Threshold,VoiceGW,2,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,30,50,FALSE
+VoiceGWMemoryUsage3,VoiceGWMemoryUsage3,Threshold,VoiceGW,3,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,50,70,FALSE
+VoiceGWMemoryUsage4,VoiceGWMemoryUsage4,Threshold,VoiceGW,4,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,70,80,FALSE
+VoiceGWMemoryUsage5,VoiceGWMemoryUsage5,Threshold,VoiceGW,5,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,80,90,FALSE
+VoiceGWMemoryUsage6,VoiceGWMemoryUsage6,Threshold,VoiceGW,6,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,90,,TRUE
+VoiceGWResTime2,VoiceGWResTime2,Threshold,VoiceGW,2,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,30,50,FALSE
+VoiceGWResTime3,VoiceGWResTime3,Threshold,VoiceGW,3,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue))!,,responseTime,gt,50,100,FALSE
+VoiceGWResTime4,VoiceGWResTime4,Threshold,VoiceGW,4,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,100,150,FALSE
+VoiceGWResTime5,VoiceGWResTime5,Threshold,VoiceGW,5,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,150,250,FALSE
+VoiceGWResTime6,VoiceGWResTime6,Threshold,VoiceGW,6,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,250,,TRUE
+VoiceGWSnmpDown,VoiceGWSnmpDown,Snmp Down,VoiceGW,3,SNMP 응답 없음,,SNMPStatus,eq,0,,TRUE
+AnalogGWNodeDown,AnalogGWNodeDown,Network Node Down,AnalogGW,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+AnalogGWCpuUsage2,AnalogGWCpuUsage2,Threshold,AnalogGW,2,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,30,50,FALSE
+AnalogGWCpuUsage3,AnalogGWCpuUsage3,Threshold,AnalogGW,3,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,50,70,FALSE
+AnalogGWCpuUsage4,AnalogGWCpuUsage4,Threshold,AnalogGW,4,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,70,80,FALSE
+AnalogGWCpuUsage5,AnalogGWCpuUsage5,Threshold,AnalogGW,5,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,80,95,FALSE
+AnalogGWCpuUsage6,AnalogGWCpuUsage6,Threshold,AnalogGW,6,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,95,,TRUE
+AnalogGWMemoryUsage2,AnalogGWMemoryUsage2,Threshold,AnalogGW,2,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,30,50,FALSE
+AnalogGWMemoryUsage3,AnalogGWMemoryUsage3,Threshold,AnalogGW,3,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,50,70,FALSE
+AnalogGWMemoryUsage4,AnalogGWMemoryUsage4,Threshold,AnalogGW,4,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,70,80,FALSE
+AnalogGWMemoryUsage5,AnalogGWMemoryUsage5,Threshold,AnalogGW,5,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,80,90,FALSE
+AnalogGWMemoryUsage6,AnalogGWMemoryUsage6,Threshold,AnalogGW,6,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,90,,TRUE
+AnalogGWResTime2,AnalogGWResTime2,Threshold,AnalogGW,2,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,30,50,FALSE
+AnalogGWResTime3,AnalogGWResTime3,Threshold,AnalogGW,3,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue))!,,responseTime,gt,50,100,FALSE
+AnalogGWResTime4,AnalogGWResTime4,Threshold,AnalogGW,4,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,100,150,FALSE
+AnalogGWResTime5,AnalogGWResTime5,Threshold,AnalogGW,5,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,150,250,FALSE
+AnalogGWResTime6,AnalogGWResTime6,Threshold,AnalogGW,6,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,250,,TRUE
+AnalogGWSnmpDown,AnalogGWSnmpDown,Snmp Down,AnalogGW,3,SNMP 응답 없음,,SNMPStatus,eq,0,,TRUE
+PoESwitchNodeDown,PoESwitchNodeDown,Network Node Down,PoESwitch,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+PoESwitchCpuUsage2,PoESwitchCpuUsage2,Threshold,PoESwitch,2,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,30,50,FALSE
+PoESwitchCpuUsage3,PoESwitchCpuUsage3,Threshold,PoESwitch,3,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,50,70,FALSE
+PoESwitchCpuUsage4,PoESwitchCpuUsage4,Threshold,PoESwitch,4,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,70,80,FALSE
+PoESwitchCpuUsage5,PoESwitchCpuUsage5,Threshold,PoESwitch,5,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,80,95,FALSE
+PoESwitchCpuUsage6,PoESwitchCpuUsage6,Threshold,PoESwitch,6,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,95,,TRUE
+PoESwitchMemoryUsage2,PoESwitchMemoryUsage2,Threshold,PoESwitch,2,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,30,50,FALSE
+PoESwitchMemoryUsage3,PoESwitchMemoryUsage3,Threshold,PoESwitch,3,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,50,70,FALSE
+PoESwitchMemoryUsage4,PoESwitchMemoryUsage4,Threshold,PoESwitch,4,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,70,80,FALSE
+PoESwitchMemoryUsage5,PoESwitchMemoryUsage5,Threshold,PoESwitch,5,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,80,90,FALSE
+PoESwitchMemoryUsage6,PoESwitchMemoryUsage6,Threshold,PoESwitch,6,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,90,,TRUE
+PoESwitchResTime2,PoESwitchResTime2,Threshold,PoESwitch,2,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,30,50,FALSE
+PoESwitchResTime3,PoESwitchResTime3,Threshold,PoESwitch,3,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue))!,,responseTime,gt,50,100,FALSE
+PoESwitchResTime4,PoESwitchResTime4,Threshold,PoESwitch,4,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,100,150,FALSE
+PoESwitchResTime5,PoESwitchResTime5,Threshold,PoESwitch,5,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,150,250,FALSE
+PoESwitchResTime6,PoESwitchResTime6,Threshold,PoESwitch,6,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,250,,TRUE
+PoESwitchSnmpDown,PoESwitchSnmpDown,Snmp Down,PoESwitch,3,SNMP 응답 없음,,SNMPStatus,eq,0,,TRUE
+IPCameraNodeDown,IPCameraNodeDown,Network Node Down,IPCamera,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+IPCameraCpuUsage2,IPCameraCpuUsage2,Threshold,IPCamera,2,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,30,50,FALSE
+IPCameraCpuUsage3,IPCameraCpuUsage3,Threshold,IPCamera,3,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,50,70,FALSE
+IPCameraCpuUsage4,IPCameraCpuUsage4,Threshold,IPCamera,4,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,70,80,FALSE
+IPCameraCpuUsage5,IPCameraCpuUsage5,Threshold,IPCamera,5,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,80,95,FALSE
+IPCameraCpuUsage6,IPCameraCpuUsage6,Threshold,IPCamera,6,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,95,,TRUE
+IPCameraMemoryUsage2,IPCameraMemoryUsage2,Threshold,IPCamera,2,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,30,50,FALSE
+IPCameraMemoryUsage3,IPCameraMemoryUsage3,Threshold,IPCamera,3,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,50,70,FALSE
+IPCameraMemoryUsage4,IPCameraMemoryUsage4,Threshold,IPCamera,4,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,70,80,FALSE
+IPCameraMemoryUsage5,IPCameraMemoryUsage5,Threshold,IPCamera,5,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,80,90,FALSE
+IPCameraMemoryUsage6,IPCameraMemoryUsage6,Threshold,IPCamera,6,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,90,,TRUE
+IPCameraResTime2,IPCameraResTime2,Threshold,IPCamera,2,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,30,50,FALSE
+IPCameraResTime3,IPCameraResTime3,Threshold,IPCamera,3,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue))!,,responseTime,gt,50,100,FALSE
+IPCameraResTime4,IPCameraResTime4,Threshold,IPCamera,4,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,100,150,FALSE
+IPCameraResTime5,IPCameraResTime5,Threshold,IPCamera,5,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,150,250,FALSE
+IPCameraResTime6,IPCameraResTime6,Threshold,IPCamera,6,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,250,,TRUE
+IPCameraSnmpDown,IPCameraSnmpDown,Snmp Down,IPCamera,3,SNMP 응답 없음,,SNMPStatus,eq,0,,TRUE
+STBCpuUsage2,STBCpuUsage2,Threshold,STB,2,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,70,75,FALSE
+STBCpuUsage3,STBCpuUsage3,Threshold,STB,3,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,75,80,FALSE
+STBCpuUsage4,STBCpuUsage4,Threshold,STB,4,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,80,90,FALSE
+STBCpuUsage5,STBCpuUsage5,Threshold,STB,5,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,90,95,FALSE
+STBCpuUsage6,STBCpuUsage6,Threshold,STB,6,CPU이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpuUsage,gt,95,,TRUE
+STBMemoryUsage2,STBMemoryUsage2,Threshold,STB,2,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,65,70,FALSE
+STBMemoryUsage3,STBMemoryUsage3,Threshold,STB,3,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,70,80,FALSE
+STBMemoryUsage4,STBMemoryUsage4,Threshold,STB,4,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,80,95,FALSE
+STBMemoryUsage5,STBMemoryUsage5,Threshold,STB,5,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,95,99,FALSE
+STBMemoryUsage6,STBMemoryUsage6,Threshold,STB,6,메모리이용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryUsage,gt,99,,TRUE
+STBResTime2,STBResTime2,Threshold,STB,2,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,100,200,FALSE
+STBResTime3,STBResTime3,Threshold,STB,3,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,200,300,FALSE
+STBResTime4,STBResTime4,Threshold,STB,4,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,300,400,FALSE
+STBResTime5,STBResTime5,Threshold,STB,5,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,400,500,FALSE
+STBResTime6,STBResTime6,Threshold,STB,6,응답시간 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,responseTime,gt,500,,TRUE
+STBProcessCount2,STBProcessCount2,Threshold,STB,2,프로세스수 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,processCount,gt,70,100,FALSE
+STBProcessCount3,STBProcessCount3,Threshold,STB,3,프로세스수 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,processCount,gt,100,200,FALSE
+STBProcessCount4,STBProcessCount4,Threshold,STB,4,프로세스수 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,processCount,gt,200,300,FALSE
+STBProcessCount5,STBProcessCount5,Threshold,STB,5,프로세스수 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,processCount,gt,300,400,FALSE
+STBProcessCount6,STBProcessCount6,Threshold,STB,6,프로세스수 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,processCount,gt,400,,TRUE
+STBNodeDown,STBNodeDown,Server Down,STB,7,네트워크 다운 장애 발생,,networkStatus,eq,0,,TRUE
+STBSnmpDown,STBSnmpDown,Snmp Down,STB,3,SNMP 응답 없음,,SNMPStatus,eq,0,,TRUE
+cpmCPUTotal2,cpmCPUTotal2,Threshold,CiscoCpmCpuTotal,2,CPU사용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpmCPUTotal5minRev,gt,30,40,FALSE
+cpmCPUTotal3,cpmCPUTotal3,Threshold,CiscoCpmCpuTotal,3,CPU사용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpmCPUTotal5minRev,gt,40,50,FALSE
+cpmCPUTotal4,cpmCPUTotal4,Threshold,CiscoCpmCpuTotal,4,CPU사용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpmCPUTotal5minRev,gt,50,60,FALSE
+cpmCPUTotal5,cpmCPUTotal5,Threshold,CiscoCpmCpuTotal,5,CPU사용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpmCPUTotal5minRev,gt,60,70,FALSE
+cpmCPUTotal6,cpmCPUTotal6,Threshold,CiscoCpmCpuTotal,6,CPU사용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,cpmCPUTotal5minRev,gt,70,,TRUE
+memoryUsage2,memoryUsage2,Threshold,CiscoMemoryPool,2,메모리사용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryPoolUsage,gt,30,40,FALSE
+memoryUsage3,memoryUsage3,Threshold,CiscoMemoryPool,3,메모리사용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryPoolUsage,gt,40,50,FALSE
+memoryUsage4,memoryUsage4,Threshold,CiscoMemoryPool,4,메모리사용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryPoolUsage,gt,50,60,FALSE
+memoryUsage5,memoryUsage5,Threshold,CiscoMemoryPool,5,메모리사용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryPoolUsage,gt,60,70,FALSE
+memoryUsage6,memoryUsage6,Threshold,CiscoMemoryPool,6,메모리사용률 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,memoryPoolUsage,gt,70,,TRUE
+temperatureValue2,temperatureValue2,Threshold,CiscoEnvMonTemperature,2,현재온도 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,temperatureStatusValue,gt,30,40,FALSE
+temperatureValue3,temperatureValue3,Threshold,CiscoEnvMonTemperature,3,현재온도 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,temperatureStatusValue,gt,40,50,FALSE
+temperatureValue4,temperatureValue4,Threshold,CiscoEnvMonTemperature,4,현재온도 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,temperatureStatusValue,gt,50,60,FALSE
+temperatureValue5,temperatureValue5,Threshold,CiscoEnvMonTemperature,5,현재온도 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,temperatureStatusValue,gt,60,70,FALSE
+temperatureValue6,temperatureValue6,Threshold,CiscoEnvMonTemperature,6,현재온도 초과. 임계치($(thresholdValue)) 측정치($(observedValue)),,temperatureStatusValue,gt,70,,TRUE

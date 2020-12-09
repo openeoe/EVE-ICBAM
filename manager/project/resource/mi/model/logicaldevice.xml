@@ -1,0 +1,1985 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE GKES:EXT_MODEL SYSTEM "resource/mi/model/ext_model.dtd">
+<GKES:EXT_MODEL
+	xmlns:GKES="http://www.gkes.co.kr">
+	<GKES:MODELCLASS>
+		<!--
+			Disk Class
+
+			- deviceName :
+			- model :
+			- queueLength :
+			- utilzation :
+			- accessTime :
+			- readCountPerSec :
+			- writeCountPerSec :
+			- KBPerSec :
+		-->
+		<GKES:CLASS NAME="Disk" PARENT="LogicalDevice"
+			ISINDICATION ="true" >
+		<GKES:PROPERTY NAME="diskIndex" TYPE="int"
+			CLASSORIGIN="Disk" />
+		<GKES:PROPERTY NAME="deviceName" TYPE="string"
+			CLASSORIGIN="Disk" MAXLEN="50"/>
+		<GKES:PROPERTY NAME="model" TYPE="string"
+			CLASSORIGIN="Disk" MAXLEN="50"/>
+		<GKES:PROPERTY NAME="queueLength" TYPE="int"
+			CLASSORIGIN="Disk" />
+		<GKES:PROPERTY NAME="utilization" TYPE="double"
+			CLASSORIGIN="Disk" />
+		<GKES:PROPERTY NAME="accessTime" TYPE="double"
+			CLASSORIGIN="Disk" />
+		<GKES:PROPERTY NAME="readCountPerSec" TYPE="double"
+			CLASSORIGIN="Disk" />
+		<GKES:PROPERTY NAME="writeCountPerSec" TYPE="double"
+			CLASSORIGIN="Disk" />
+		<GKES:PROPERTY NAME="KBPerSec" TYPE="double"
+			CLASSORIGIN="Disk" />
+		</GKES:CLASS>
+		<!--
+			DiskPerf Class
+		-->
+		<GKES:CLASS NAME="DiskPerf" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="diskIndex" TYPE="int"
+					CLASSORIGIN="DiskPerf" />
+			<GKES:PROPERTY NAME="name" TYPE="string"
+					CLASSORIGIN="DiskPerf" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="transfers" TYPE="long"
+					CLASSORIGIN="DiskPerf" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="totalIO" TYPE="long"
+					CLASSORIGIN="DiskPerf" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="blocksRead" TYPE="long"
+					CLASSORIGIN="DiskPerf" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="blocksWrite" TYPE="long"
+					CLASSORIGIN="DiskPerf" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="activeTime" TYPE="long"
+					CLASSORIGIN="DiskPerf" ISINDICATION="true"/>
+		</GKES:CLASS>
+		<!--
+			DiskCapacity Class
+		-->
+		<GKES:CLASS NAME="DiskCapacity" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="diskIndex" TYPE="int"
+					CLASSORIGIN="DiskCapacity" />
+			<GKES:PROPERTY NAME="name" TYPE="string"
+					CLASSORIGIN="DiskCapacity" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="totalSize" TYPE="long"
+					CLASSORIGIN="DiskCapacity" />
+			<GKES:PROPERTY NAME="usedSize" TYPE="long"
+					CLASSORIGIN="DiskCapacity" />
+			<GKES:PROPERTY NAME="freeSize" TYPE="long"
+					CLASSORIGIN="DiskCapacity" />
+			<GKES:PROPERTY NAME="usage" TYPE="int"
+					CLASSORIGIN="DiskCapacity" ISINDICATION="true"/>
+		</GKES:CLASS>
+		<!--
+			- Processor Class
+
+			- processorIndex :
+			- userPercent :
+			- sysPercent :
+			- waitPercent :
+			- idlePercent :
+			- processorUsage :
+			- cpuModel :
+			- cpuClock :
+			- descr :
+		-->
+		<GKES:CLASS NAME="Processor" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="processorIndex" TYPE="int"
+					CLASSORIGIN="Processor" />
+			<GKES:PROPERTY NAME="userPercent" TYPE="int"
+					CLASSORIGIN="Processor" />
+			<GKES:PROPERTY NAME="sysPercent" TYPE="int"
+					CLASSORIGIN="Processor" />
+			<GKES:PROPERTY NAME="waitPercent" TYPE="int"
+					CLASSORIGIN="Processor" />
+			<GKES:PROPERTY NAME="idlePercent" TYPE="int"
+					CLASSORIGIN="Processor" />
+			<GKES:PROPERTY NAME="processorUsage" TYPE="int"
+					CLASSORIGIN="Processor" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="cpuModel" TYPE="string"
+					CLASSORIGIN="Processor" MAXLEN="100"/>
+			<GKES:PROPERTY NAME="cpuClock" TYPE="int"
+					CLASSORIGIN="Processor"/>
+			<GKES:PROPERTY NAME="descr" TYPE="string"
+					CLASSORIGIN="Processor" MAXLEN="200"/>
+		</GKES:CLASS>
+
+		<!--
+			- CPU Class
+
+			- userPercent :
+			- sysPercent :
+			- waitPercent :
+			- idlePercent :
+			- cpuUsage:
+			- descr :
+		-->
+
+		<GKES:CLASS NAME="CPU" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="sysCPUUserTime" TYPE="int"
+					CLASSORIGIN="CPU" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="sysCPUSystemTime" TYPE="int"
+					CLASSORIGIN="CPU" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="sysCPUWaitTime" TYPE="int"
+					CLASSORIGIN="CPU" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="sysCPUIdleTime" TYPE="int"
+					CLASSORIGIN="CPU" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="sysCPUAverage" TYPE="int"
+					CLASSORIGIN="CPU" ISINDICATION="true"/>
+		</GKES:CLASS>
+
+		<!--
+			- SysCall Class
+
+			- totalSystemCalls:
+			- sreadCalls:
+			- swriteCalls:
+			- forkCalls:
+			- execCalls:
+		-->
+
+		<GKES:CLASS NAME="SysCall" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="totalSystemCalls" TYPE="long"
+					CLASSORIGIN="SysCall" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="sreadCalls" TYPE="long"
+					CLASSORIGIN="SysCall" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="swriteCalls" TYPE="long"
+					CLASSORIGIN="SysCall" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="forkCalls" TYPE="long"
+					CLASSORIGIN="SysCall" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="execCalls" TYPE="long"
+					CLASSORIGIN="SysCall" ISINDICATION="true"/>
+		</GKES:CLASS>
+
+
+		<!--
+			- RunQueue
+
+			- length :
+		-->
+		<GKES:CLASS NAME="RunQueue" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="cpuRunQueueLength" TYPE="int"
+					CLASSORIGIN="RunQueue"/>
+			<GKES:PROPERTY NAME="runqSz" TYPE="long"
+					CLASSORIGIN="RunQueue" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="runOcc" TYPE="long"
+					CLASSORIGIN="RunQueue" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="swapSz" TYPE="long"
+					CLASSORIGIN="RunQueue" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="swpOcc" TYPE="long"
+					CLASSORIGIN="RunQueue" ISINDICATION="true"/>
+		</GKES:CLASS>
+
+		<!--
+			- Filesystem Class
+
+			- fsIndex :
+			- descr :
+			- type :
+			- bootable :
+			- accessMode :
+			- mountPoint :
+			- allocationUnits :
+			- totalSize :
+			- usedSize :
+			- fsusage :
+			- allocationFailurePerSec : double
+		-->
+		<GKES:CLASS NAME="Filesystem" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="fsIndex" TYPE="int"
+					CLASSORIGIN="Filesystem" />
+			<GKES:PROPERTY NAME="srIndex" TYPE="int"
+					CLASSORIGIN="Filesystem" />
+			<GKES:PROPERTY NAME="descr" TYPE="string"
+					CLASSORIGIN="Filesystem" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="type" TYPE="string"
+					CLASSORIGIN="Filesystem" MAXLEN="100"/>
+			<GKES:PROPERTY NAME="bootable" TYPE="boolean"
+					CLASSORIGIN="Filesystem" />
+			<GKES:PROPERTY NAME="accessMode" TYPE="int"
+					CLASSORIGIN="Filesystem" />
+			<GKES:PROPERTY NAME="mountPoint" TYPE="string"
+					CLASSORIGIN="Filesystem" MAXLEN="255"/>
+			<GKES:PROPERTY NAME="allocationUnits" TYPE="int"
+					CLASSORIGIN="Filesystem" />
+			<GKES:PROPERTY NAME="totalSize" TYPE="int"
+					CLASSORIGIN="Filesystem" />
+			<GKES:PROPERTY NAME="usedSize" TYPE="int"
+					CLASSORIGIN="Filesystem" />
+			<GKES:PROPERTY NAME="fsUsage" TYPE="int"
+					CLASSORIGIN="Filesystem" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="FoFsUsage" TYPE="int"
+					CLASSORIGIN="Filesystem" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="allocationFailuresPerSec" TYPE="double"
+					CLASSORIGIN="Filesystem" />
+		</GKES:CLASS>
+
+		<!--
+			- Memory
+
+			- memoryTotal :
+			- memoryFree :
+			- memoryActive :
+			- memoryUsage :
+		-->
+		<GKES:CLASS NAME="Memory" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="memoryIndex" TYPE="int"
+					CLASSORIGIN="Memory" />
+			<GKES:PROPERTY NAME="memoryTotal" TYPE="int"
+					CLASSORIGIN="Memory" />
+			<GKES:PROPERTY NAME="memoryFree" TYPE="int"
+					CLASSORIGIN="Memory" />
+			<GKES:PROPERTY NAME="memoryActive" TYPE="int"
+					CLASSORIGIN="Memory" />
+			<GKES:PROPERTY NAME="memoryUsage" TYPE="int"
+					CLASSORIGIN="Memory" ISINDICATION="true"/>
+		</GKES:CLASS>
+
+		<!--
+			- Page Class
+
+			- pageInCountPerSec :
+			- pageOutCountPerSec :
+			- pageFaultCountPerSec :
+			- pageReclaimCountPerSec :
+			Appended by Hur, wonsuck 20040420
+		-->
+		<GKES:CLASS NAME="Page" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="pageInCountPerSec" TYPE="double"
+					CLASSORIGIN="Page" />
+			<GKES:PROPERTY NAME="pageOutCountPerSec" TYPE="double"
+					CLASSORIGIN="Page" />
+			<GKES:PROPERTY NAME="pageFaultCountPerSec" TYPE="double"
+					CLASSORIGIN="Page" />
+			<GKES:PROPERTY NAME="pageReclaimCountPerSec" TYPE="double"
+					CLASSORIGIN="Page" />
+
+			<GKES:PROPERTY NAME="pageFaultReclaim" TYPE="long"
+					CLASSORIGIN="Page" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="pageFaultFreeList" TYPE="long"
+					CLASSORIGIN="Page" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="pageFaultNotFulfilled" TYPE="long"
+					CLASSORIGIN="Page" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="pageIns" TYPE="long"
+					CLASSORIGIN="Page" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="pgInsPaging" TYPE="long"
+					CLASSORIGIN="Page" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="pageFaultProtection" TYPE="long"
+					CLASSORIGIN="Page" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="pageFaultAddrTrans" TYPE="long"
+					CLASSORIGIN="Page" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="pageFaultSWLock" TYPE="long"
+					CLASSORIGIN="Page" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="pageOuts" TYPE="long"
+					CLASSORIGIN="Page" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="pgOutsPaging" TYPE="long"
+					CLASSORIGIN="Page" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="vPageOnFreeList" TYPE="long"
+					CLASSORIGIN="Page" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="pPageOnFreeList" TYPE="long"
+					CLASSORIGIN="Page" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="pageScaned" TYPE="long"
+					CLASSORIGIN="Page" ISINDICATION="true"/>
+		</GKES:CLASS>
+
+		<!--
+			- Swap Class
+
+			- swapIndex:
+			- swapTotal :
+			- swapFree :
+			- swapUsage :
+		-->
+		<GKES:CLASS NAME="Swap" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="swapIndex" TYPE="int"
+					CLASSORIGIN="Swap" />
+			<GKES:PROPERTY NAME="swapTotal" TYPE="int"
+					CLASSORIGIN="Swap" />
+			<GKES:PROPERTY NAME="swapActive" TYPE="int"
+					CLASSORIGIN="Swap" />
+			<GKES:PROPERTY NAME="swapFree" TYPE="int"
+					CLASSORIGIN="Swap" />
+			<GKES:PROPERTY NAME="swapUsage" TYPE="double"
+					CLASSORIGIN="Swap" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="FoSwapUsage" TYPE="double"
+					CLASSORIGIN="Swap" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="numProcessOuts" TYPE="long"
+					CLASSORIGIN="Swap" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="numProcessIns" TYPE="long"
+					CLASSORIGIN="Swap" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="pageNumSwapIn" TYPE="long"
+					CLASSORIGIN="Swap" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="pageNumSwapOut" TYPE="long"
+					CLASSORIGIN="Swap" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="vPageSwapOut" TYPE="long"
+					CLASSORIGIN="Swap" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="processContextSwitch" TYPE="long"
+					CLASSORIGIN="Swap" ISINDICATION="true"/>
+		</GKES:CLASS>
+
+		<!--
+			- Interface Class
+		-->
+		<GKES:CLASS NAME="Interface" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="ifIndex" TYPE="int"
+					CLASSORIGIN="Interface" />
+			<GKES:PROPERTY NAME="ifDescr" TYPE="string"
+					CLASSORIGIN="Interface" MAXLEN="255"/>
+			<GKES:PROPERTY NAME="ifType" TYPE="string"
+					CLASSORIGIN="Interface" MAXLEN="20"/>
+			<GKES:PROPERTY NAME="ifMtu" TYPE="int"
+					CLASSORIGIN="Interface" />
+			<GKES:PROPERTY NAME="ifSpeed" TYPE="long"
+					CLASSORIGIN="Interface" />
+			<GKES:PROPERTY NAME="ifPhysAddress" TYPE="string"
+					CLASSORIGIN="Interface" MAXLEN="20"/>
+			<GKES:PROPERTY NAME="ifAdminStatus" TYPE="int"
+					CLASSORIGIN="Interface"/>
+			<GKES:PROPERTY NAME="ifOperStatus" TYPE="int"
+					CLASSORIGIN="Interface" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="ifLastChange" TYPE="long"
+					CLASSORIGIN="Interface" />
+
+			<GKES:PROPERTY NAME="inKBPS" TYPE="double"
+					CLASSORIGIN="Interface" />
+			<GKES:PROPERTY NAME="outKBPS" TYPE="double"
+					CLASSORIGIN="Interface" />
+			<GKES:PROPERTY NAME="inPPS" TYPE="double"
+					CLASSORIGIN="Interface" />
+			<GKES:PROPERTY NAME="outPPS" TYPE="double"
+					CLASSORIGIN="Interface" />
+			<GKES:PROPERTY NAME="inUsage" TYPE="double"
+					CLASSORIGIN="Interface" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="outUsage" TYPE="double"
+					CLASSORIGIN="Interface" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="FoInUsage" TYPE="double"
+					CLASSORIGIN="Interface" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="FoOutUsage" TYPE="double"
+					CLASSORIGIN="Interface" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="inErrorUsage" TYPE="double"
+					CLASSORIGIN="Interface" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="outErrorUsage" TYPE="double"
+					CLASSORIGIN="Interface" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="inDiscardUsage" TYPE="double"
+					CLASSORIGIN="Interface" />
+			<GKES:PROPERTY NAME="outDiscardUsage" TYPE="double"
+					CLASSORIGIN="Interface" />
+
+			<GKES:PROPERTY NAME="ifInOctetsPerSec" TYPE="double"
+					CLASSORIGIN="Interface" />
+			<GKES:PROPERTY NAME="ifInErrorsPerSec" TYPE="double"
+					CLASSORIGIN="Interface" />
+			<GKES:PROPERTY NAME="ifOutOctetsPerSec" TYPE="double"
+					CLASSORIGIN="Interface" />
+			<GKES:PROPERTY NAME="ifOutErrorsPerSec" TYPE="double"
+					CLASSORIGIN="Interface" />
+			<GKES:PROPERTY NAME="ifQLen" TYPE="int"
+					CLASSORIGIN="Interface" />
+
+			<GKES:PROPERTY NAME="peer" TYPE="string"
+					CLASSORIGIN="Interface" MAXLEN="200"/>
+
+			<GKES:PROPERTY NAME="userIfSpeed" TYPE="long"
+					CLASSORIGIN="Interface">
+			   <GKES:VALUE>0</GKES:VALUE>
+			</GKES:PROPERTY>
+
+			<GKES:PROPERTY NAME="inCRC" TYPE="double"
+					CLASSORIGIN="Interface" />
+		</GKES:CLASS>
+
+		<!--
+			- PBXGW Class
+
+			- PBXGWIndex
+			- PBXGWName
+			- PBXGWType
+			- PBXGWDescr
+			- PBXGWStatus
+			- PBXGWDevicePoolIndex
+			- PBXGWInetAddressType
+			- PBXGWInetAddress
+			- PBXGWProductId
+			- PBXGWStatusReason
+			- PBXGWStatusUpdt
+			- PBXGWRegistDate
+			- PBXGWDChannelStatus
+			- PBXGWDChannelNumber
+			- PBXGWProductTypeIndex
+			- PBXGWUnregReason
+			- PBXGWRegFailReason
+		-->
+		<GKES:CLASS NAME="PBXGW" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="PBXGWIndex" TYPE="int"
+					CLASSORIGIN="PBXGW" />
+			<GKES:PROPERTY NAME="PBXGWName" TYPE="string"
+					CLASSORIGIN="PBXGW" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="PBXGWType" TYPE="int"
+					CLASSORIGIN="PBXGW" />
+			<GKES:PROPERTY NAME="PBXGWDescr" TYPE="string"
+					CLASSORIGIN="PBXGW" MAXLEN="255"/>
+			<GKES:PROPERTY NAME="PBXGWStatus" TYPE="int"
+					CLASSORIGIN="PBXGW" />
+			<GKES:PROPERTY NAME="PBXGWDevicePoolIndex" TYPE="int"
+					CLASSORIGIN="PBXGW" />
+			<GKES:PROPERTY NAME="PBXGWInetAddressType" TYPE="string"
+					CLASSORIGIN="PBXGW" MAXLEN="20"/>
+			<GKES:PROPERTY NAME="PBXGWInetAddress" TYPE="string"
+					CLASSORIGIN="PBXGW" MAXLEN="20"/>
+			<GKES:PROPERTY NAME="PBXGWProductId" TYPE="string"
+					CLASSORIGIN="PBXGW" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="PBXGWStatusReason" TYPE="int"
+					CLASSORIGIN="PBXGW" />
+			<GKES:PROPERTY NAME="PBXGWStatusUpdt" TYPE="int"
+					CLASSORIGIN="PBXGW" />
+			<GKES:PROPERTY NAME="PBXGWRegistDate" TYPE="int"
+					CLASSORIGIN="PBXGW" />
+			<GKES:PROPERTY NAME="PBXGWDChannelStatus" TYPE="int"
+					CLASSORIGIN="PBXGW" />
+			<GKES:PROPERTY NAME="PBXGWDChannelNumber" TYPE="int"
+					CLASSORIGIN="PBXGW" />
+			<GKES:PROPERTY NAME="PBXGWProductTypeIndex" TYPE="int"
+					CLASSORIGIN="PBXGW" />
+			<GKES:PROPERTY NAME="PBXGWUnregReason" TYPE="int"
+					CLASSORIGIN="PBXGW" />
+			<GKES:PROPERTY NAME="PBXGWRegFailReason" TYPE="int"
+					CLASSORIGIN="PBXGW" />
+		</GKES:CLASS>
+
+		<!--
+			- PBXGWTrunk Class
+
+			- PBXGWTrunkIndex
+			- PBXGWTrunkType
+			- PBXGWTrunkName
+			- PBXTrunkGWIndex
+			- PBXGWTrunkStatus
+		-->
+		<GKES:CLASS NAME="PBXGWTrunk" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="PBXGWTrunkIndex" TYPE="int"
+					CLASSORIGIN="PBXGWTrunk" />
+			<GKES:PROPERTY NAME="PBXGWTrunkType" TYPE="int"
+					CLASSORIGIN="PBXGWTrunk" />
+			<GKES:PROPERTY NAME="PBXGWTrunkName" TYPE="string"
+					CLASSORIGIN="PBXGWTrunk" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="PBXTrunkGWIndex" TYPE="int"
+					CLASSORIGIN="PBXGWTrunk" />
+			<GKES:PROPERTY NAME="PBXGWTrunkStatus" TYPE="int"
+					CLASSORIGIN="PBXGWTrunk" />
+		</GKES:CLASS>
+
+		<!--
+			- UPSBattery Class
+		-->
+		<GKES:CLASS NAME="UPSBattery" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="BatteryIndex" TYPE="int"
+					CLASSORIGIN="UPSBattery" />
+			<GKES:PROPERTY NAME="BatteryStatus" TYPE="int"
+					CLASSORIGIN="UPSBattery" />
+			<GKES:PROPERTY NAME="SecondsOnBattery" TYPE="int"
+					CLASSORIGIN="UPSBattery" />
+			<GKES:PROPERTY NAME="EstMinutesRem" TYPE="int"
+					CLASSORIGIN="UPSBattery" />
+			<GKES:PROPERTY NAME="EstChargeRem" TYPE="int"
+					CLASSORIGIN="UPSBattery" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="BatteryVoltage" TYPE="double"
+					CLASSORIGIN="UPSBattery" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="BatteryCurrent" TYPE="double"
+					CLASSORIGIN="UPSBattery" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="BatteryTemperature" TYPE="int"
+					CLASSORIGIN="UPSBattery" ISINDICATION="true"/>
+		</GKES:CLASS>
+
+		<!--
+			- UPSInput Class
+		-->
+		<GKES:CLASS NAME="UPSInput" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="InputLineIndex" TYPE="int"
+					CLASSORIGIN="UPSInput" />
+			<GKES:PROPERTY NAME="InputFrequency" TYPE="double"
+					CLASSORIGIN="UPSInput" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="InputVoltage" TYPE="int"
+					CLASSORIGIN="UPSInput" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="InputCurrent" TYPE="double"
+					CLASSORIGIN="UPSInput" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="InputTruePower" TYPE="int"
+					CLASSORIGIN="UPSInput" ISINDICATION="true"/>
+		</GKES:CLASS>
+
+		<!--
+			- UPSOutput Class
+		-->
+		<GKES:CLASS NAME="UPSOutput" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="OutputLineIndex" TYPE="int"
+					CLASSORIGIN="UPSOutput" />
+			<GKES:PROPERTY NAME="OutputVoltage" TYPE="int"
+					CLASSORIGIN="UPSOutput" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="OutputCurrent" TYPE="double"
+					CLASSORIGIN="UPSOutput" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="OutputPower" TYPE="int"
+					CLASSORIGIN="UPSOutput" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="OutputPercentLoad" TYPE="int"
+					CLASSORIGIN="UPSOutput" ISINDICATION="true"/>
+		</GKES:CLASS>
+
+		<!--
+			- UPSBypass Class
+		-->
+		<GKES:CLASS NAME="UPSBypass" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="BypassLineIndex" TYPE="int"
+					CLASSORIGIN="UPSBypass" />
+			<GKES:PROPERTY NAME="BypassVoltage" TYPE="int"
+					CLASSORIGIN="UPSBypass" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="BypassCurrent" TYPE="double"
+					CLASSORIGIN="UPSBypass" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="BypassPower" TYPE="int"
+					CLASSORIGIN="UPSBypass" ISINDICATION="true"/>
+		</GKES:CLASS>
+
+		<!--
+			- Cisco IOS Software releases 12.2(3.5) or later
+			- CISCO cpmCPU Total
+		-->
+		<GKES:CLASS NAME="CiscoCpmCpuTotal" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="cpmCPUTotalIndex" TYPE="int"
+					CLASSORIGIN="CiscoCpmCpuTotal" />
+			<GKES:PROPERTY NAME="cpmCPUTotalPhysicalIndex" TYPE="int"
+					CLASSORIGIN="CiscoCpmCpuTotal" />
+			<GKES:PROPERTY NAME="entPhysicalName" TYPE="string"
+					CLASSORIGIN="CiscoCpmCpuTotal" MAXLEN="255"/>
+			<GKES:PROPERTY NAME="entPhysicalDescr" TYPE="string"
+					CLASSORIGIN="CiscoCpmCpuTotal" MAXLEN="255"/>
+			<GKES:PROPERTY NAME="cpmCPUTotal5secRev" TYPE="int"
+					CLASSORIGIN="CiscoCpmCpuTotal" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="cpmCPUTotal1minRev" TYPE="int"
+					CLASSORIGIN="CiscoCpmCpuTotal" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="cpmCPUTotal5minRev" TYPE="int"
+					CLASSORIGIN="CiscoCpmCpuTotal" ISINDICATION="true"/>
+		</GKES:CLASS>
+
+		<!--
+			- CISCO Memory pool
+		-->
+		<GKES:CLASS NAME="CiscoMemoryPool" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="memoryPoolType" TYPE="int"
+					CLASSORIGIN="CiscoMemoryPool" />
+			<GKES:PROPERTY NAME="memoryPoolName" TYPE="string"
+					CLASSORIGIN="CiscoMemoryPool" MAXLEN="100"/>
+			<GKES:PROPERTY NAME="memoryPoolAlternate" TYPE="int"
+					CLASSORIGIN="CiscoMemoryPool" />
+			<GKES:PROPERTY NAME="memoryPoolValid" TYPE="int"
+					CLASSORIGIN="CiscoMemoryPool" />
+			<GKES:PROPERTY NAME="memoryPoolUsed" TYPE="long"
+					CLASSORIGIN="CiscoMemoryPool" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="memoryPoolFree" TYPE="long"
+					CLASSORIGIN="CiscoMemoryPool" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="memoryPoolUsage" TYPE="int"
+					CLASSORIGIN="CiscoMemoryPool" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="memoryPoolLargestFree" TYPE="long"
+					CLASSORIGIN="CiscoMemoryPool" />
+		</GKES:CLASS>
+
+		<!--
+			- CISCO Enhanced Memory pool
+		-->
+		<GKES:CLASS NAME="CempMemPool" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="entPhysicalIndex" TYPE="int"
+					CLASSORIGIN="CempMemPool" />
+			<GKES:PROPERTY NAME="cempMemPoolIndex" TYPE="int"
+					CLASSORIGIN="CempMemPool" />
+			<GKES:PROPERTY NAME="idx" TYPE="string"
+					CLASSORIGIN="CempMemPool" MAXLEN="100"/>
+			<GKES:PROPERTY NAME="type" TYPE="int"
+					CLASSORIGIN="CempMemPool" />
+			<GKES:PROPERTY NAME="name" TYPE="string"
+					CLASSORIGIN="CempMemPool" MAXLEN="255"/>
+			<GKES:PROPERTY NAME="platformMemory" TYPE="string"
+					CLASSORIGIN="CempMemPool" MAXLEN="100"/>
+			<GKES:PROPERTY NAME="alternate" TYPE="int"
+					CLASSORIGIN="CempMemPool" />
+			<GKES:PROPERTY NAME="valid" TYPE="int"
+					CLASSORIGIN="CempMemPool" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="used" TYPE="long"
+					CLASSORIGIN="CempMemPool" />
+			<GKES:PROPERTY NAME="free" TYPE="long"
+					CLASSORIGIN="CempMemPool" />
+			<GKES:PROPERTY NAME="memoryUsage" TYPE="int"
+					CLASSORIGIN="CempMemPool" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="largestFree" TYPE="long"
+					CLASSORIGIN="CempMemPool" />
+			<GKES:PROPERTY NAME="lowestFree" TYPE="long"
+					CLASSORIGIN="CempMemPool" />
+			<GKES:PROPERTY NAME="usedLowWaterMark" TYPE="long"
+					CLASSORIGIN="CempMemPool" />
+			<GKES:PROPERTY NAME="allocHit" TYPE="long"
+					CLASSORIGIN="CempMemPool" />
+			<GKES:PROPERTY NAME="allocMiss" TYPE="long"
+					CLASSORIGIN="CempMemPool" />
+			<GKES:PROPERTY NAME="freeHit" TYPE="long"
+					CLASSORIGIN="CempMemPool" />
+			<GKES:PROPERTY NAME="freeMiss" TYPE="long"
+					CLASSORIGIN="CempMemPool" />
+			<GKES:PROPERTY NAME="shared" TYPE="long"
+					CLASSORIGIN="CempMemPool" />
+		</GKES:CLASS>
+
+		<!--
+			- CISCO Environmental Monitor Temperature Status
+		-->
+		<GKES:CLASS NAME="CiscoEnvMonTemperature" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="temperatureStatusIndex" TYPE="int"
+					CLASSORIGIN="CiscoEnvMonTemperature" />
+			<GKES:PROPERTY NAME="temperatureStatusDescr" TYPE="string"
+					CLASSORIGIN="CiscoEnvMonTemperature" MAXLEN="100"/>
+			<GKES:PROPERTY NAME="temperatureStatusValue" TYPE="int"
+					CLASSORIGIN="CiscoEnvMonTemperature" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="temperatureThreshold" TYPE="int"
+					CLASSORIGIN="CiscoEnvMonTemperature" />
+			<GKES:PROPERTY NAME="temperatureState" TYPE="string"
+					CLASSORIGIN="CiscoEnvMonTemperature" MAXLEN="50"
+					ISINDICATION="true"/>
+		</GKES:CLASS>
+
+		<!--
+			- CISCO entSensorValueTable
+		-->
+		<GKES:CLASS NAME="EntSensorValue" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="entPhysicalIndex" TYPE="int"
+					CLASSORIGIN="EntSensorValue" />
+			<GKES:PROPERTY NAME="entPhysicalName" TYPE="string"
+					CLASSORIGIN="EntSensorValue" MAXLEN="255"/>
+			<GKES:PROPERTY NAME="entPhysicalDescr" TYPE="string"
+					CLASSORIGIN="EntSensorValue" MAXLEN="255"/>
+			<GKES:PROPERTY NAME="entSensorType" TYPE="int"
+					CLASSORIGIN="EntSensorValue" />
+			<GKES:PROPERTY NAME="entSensorScale" TYPE="int"
+					CLASSORIGIN="EntSensorValue" />
+			<GKES:PROPERTY NAME="entSensorPrecision" TYPE="int"
+					CLASSORIGIN="EntSensorValue" />
+			<GKES:PROPERTY NAME="entSensorValue" TYPE="int"
+					CLASSORIGIN="EntSensorValue" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="entSensorStatus" TYPE="int"
+					CLASSORIGIN="EntSensorValue" />
+		</GKES:CLASS>
+
+		<!--
+			- HP(a3com, huawei) hwCpuTable
+		-->
+		<GKES:CLASS NAME="A3ComHuaweiCpu" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="hwCpuIndex" TYPE="int"
+					CLASSORIGIN="A3ComHuaweiCpu" />
+			<GKES:PROPERTY NAME="hwCpuCostRate" TYPE="int"
+					CLASSORIGIN="A3ComHuaweiCpu" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="hwCpuCostRatePer1Min" TYPE="int"
+					CLASSORIGIN="A3ComHuaweiCpu" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="hwCpuCostRatePer5Min" TYPE="int"
+					CLASSORIGIN="A3ComHuaweiCpu" ISINDICATION="true"/>
+		</GKES:CLASS>
+
+		<!--
+			- HP(a3com, huawei) hwMemTable
+		-->
+		<GKES:CLASS NAME="A3ComHuaweiMemory" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="hwMemModuleIndex" TYPE="int"
+					CLASSORIGIN="A3ComHuaweiMemory" />
+			<GKES:PROPERTY NAME="hwMemSize" TYPE="long"
+					CLASSORIGIN="A3ComHuaweiMemory" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="hwMemFree" TYPE="long"
+					CLASSORIGIN="A3ComHuaweiMemory" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="hwMemUsage" TYPE="int"
+					CLASSORIGIN="A3ComHuaweiMemory" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="hwMemRawSliceUsed" TYPE="long"
+					CLASSORIGIN="A3ComHuaweiMemory" />
+			<GKES:PROPERTY NAME="hwMemLgFree" TYPE="long"
+					CLASSORIGIN="A3ComHuaweiMemory" />
+			<GKES:PROPERTY NAME="hwMemFail" TYPE="int"
+					CLASSORIGIN="A3ComHuaweiMemory" />
+			<GKES:PROPERTY NAME="hwMemFailNoMem" TYPE="int"
+					CLASSORIGIN="A3ComHuaweiMemory" />
+		</GKES:CLASS>
+
+		<!--
+			- HP(a3com, huawei) h3cEntityExtStateTable
+		-->
+		<GKES:CLASS NAME="H3CEntityExtState" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="physicalIndex" TYPE="int"
+					CLASSORIGIN="H3CEntityExtState" />
+			<GKES:PROPERTY NAME="adminStatus" TYPE="int"
+					CLASSORIGIN="H3CEntityExtState" />
+			<GKES:PROPERTY NAME="operStatus" TYPE="int"
+					CLASSORIGIN="H3CEntityExtState" />
+			<GKES:PROPERTY NAME="standbyStatus" TYPE="int"
+					CLASSORIGIN="H3CEntityExtState" />
+			<GKES:PROPERTY NAME="alarmLight" TYPE="int"
+					CLASSORIGIN="H3CEntityExtState" />
+			<GKES:PROPERTY NAME="cpuUsage" TYPE="int"
+					CLASSORIGIN="H3CEntityExtState" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="cpuUsageThreshold" TYPE="int"
+					CLASSORIGIN="H3CEntityExtState" />
+			<GKES:PROPERTY NAME="memUsage" TYPE="int"
+					CLASSORIGIN="H3CEntityExtState" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="memUsageThreshold" TYPE="int"
+					CLASSORIGIN="H3CEntityExtState" />
+			<GKES:PROPERTY NAME="memSize" TYPE="long"
+					CLASSORIGIN="H3CEntityExtState" />
+			<GKES:PROPERTY NAME="upTime" TYPE="long"
+					CLASSORIGIN="H3CEntityExtState" />
+			<GKES:PROPERTY NAME="temperature" TYPE="int"
+					CLASSORIGIN="H3CEntityExtState" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="temperatureThreshold" TYPE="int"
+					CLASSORIGIN="H3CEntityExtState" />
+			<GKES:PROPERTY NAME="voltage" TYPE="int"
+					CLASSORIGIN="H3CEntityExtState" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="voltageLowThreshold" TYPE="int"
+					CLASSORIGIN="H3CEntityExtState" />
+			<GKES:PROPERTY NAME="voltageHighThreshold" TYPE="int"
+					CLASSORIGIN="H3CEntityExtState" />
+			<GKES:PROPERTY NAME="criticalTemperatureThreshold" TYPE="int"
+					CLASSORIGIN="H3CEntityExtState" />
+			<GKES:PROPERTY NAME="macAddress" TYPE="string"
+					CLASSORIGIN="H3CEntityExtState" MAXLEN="20"/>
+			<GKES:PROPERTY NAME="errorStatus" TYPE="int"
+					CLASSORIGIN="H3CEntityExtState" />
+			<GKES:PROPERTY NAME="cpuMaxUsage" TYPE="int"
+					CLASSORIGIN="H3CEntityExtState" />
+			<GKES:PROPERTY NAME="lowerTemperatureThreshold" TYPE="int"
+					CLASSORIGIN="H3CEntityExtState" />
+			<GKES:PROPERTY NAME="shutdownTemperatureThreshold" TYPE="int"
+					CLASSORIGIN="H3CEntityExtState" />
+			<GKES:PROPERTY NAME="phyMemSize" TYPE="long"
+					CLASSORIGIN="H3CEntityExtState" />
+			<GKES:PROPERTY NAME="phyCpuFrequency" TYPE="int"
+					CLASSORIGIN="H3CEntityExtState" />
+			<GKES:PROPERTY NAME="firstUsedDate" TYPE="string"
+					CLASSORIGIN="H3CEntityExtState" MAXLEN="32"/>
+			<GKES:PROPERTY NAME="cpuAvgUsage" TYPE="int"
+					CLASSORIGIN="H3CEntityExtState" />
+			<GKES:PROPERTY NAME="memAvgUsage" TYPE="int"
+					CLASSORIGIN="H3CEntityExtState" />
+			<GKES:PROPERTY NAME="memType" TYPE="int"
+					CLASSORIGIN="H3CEntityExtState" />
+			<GKES:PROPERTY NAME="cpuUsageRecoverThreshold" TYPE="int"
+					CLASSORIGIN="H3CEntityExtState" />
+		</GKES:CLASS>
+
+		<!--
+			- SlbServerFarmTable
+		-->
+		<GKES:CLASS NAME="SlbServerFarm" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="slbEntity" TYPE="int"
+					CLASSORIGIN="SlbServerFarm" />
+			<GKES:PROPERTY NAME="slbServerFarmName" TYPE="string"
+					CLASSORIGIN="SlbServerFarm" MAXLEN="96" />
+			<GKES:PROPERTY NAME="idx" TYPE="string"
+					CLASSORIGIN="SlbServerFarm" MAXLEN="512" />
+			<GKES:PROPERTY NAME="predictor" TYPE="int"
+					CLASSORIGIN="SlbServerFarm" />
+			<GKES:PROPERTY NAME="nat" TYPE="int"
+					CLASSORIGIN="SlbServerFarm" />
+			<GKES:PROPERTY NAME="numberOfRealServers" TYPE="int"
+					CLASSORIGIN="SlbServerFarm" />
+			<GKES:PROPERTY NAME="bindId" TYPE="int"
+					CLASSORIGIN="SlbServerFarm" />
+			<GKES:PROPERTY NAME="rowStatus" TYPE="int"
+					CLASSORIGIN="SlbServerFarm" />
+		</GKES:CLASS>
+
+		<!--
+			- CesRserverTable
+		-->
+		<GKES:CLASS NAME="CesRserver" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="slbEntity" TYPE="int"
+					CLASSORIGIN="CesRserver" />
+			<GKES:PROPERTY NAME="cesRserverName" TYPE="string"
+					CLASSORIGIN="CesRserver" MAXLEN="255" />
+			<GKES:PROPERTY NAME="idx" TYPE="string"
+					CLASSORIGIN="CesRserver" MAXLEN="1024" />
+			<GKES:PROPERTY NAME="type" TYPE="int"
+					CLASSORIGIN="CesRserver" />
+			<GKES:PROPERTY NAME="ipAddressType" TYPE="int"
+					CLASSORIGIN="CesRserver" />
+			<GKES:PROPERTY NAME="ipAddress" TYPE="string"
+					CLASSORIGIN="CesRserver" MAXLEN="255" />
+			<GKES:PROPERTY NAME="description" TYPE="string"
+					CLASSORIGIN="CesRserver" MAXLEN="255" />
+			<GKES:PROPERTY NAME="maxConns" TYPE="long"
+					CLASSORIGIN="CesRserver" />
+			<GKES:PROPERTY NAME="minConns" TYPE="long"
+					CLASSORIGIN="CesRserver" />
+			<GKES:PROPERTY NAME="adminWeight" TYPE="int"
+					CLASSORIGIN="CesRserver" />
+			<GKES:PROPERTY NAME="redirectRelocationStr" TYPE="string"
+					CLASSORIGIN="CesRserver" MAXLEN="255" />
+			<GKES:PROPERTY NAME="redirectPort" TYPE="int"
+					CLASSORIGIN="CesRserver" />
+			<GKES:PROPERTY NAME="redirectCode" TYPE="int"
+					CLASSORIGIN="CesRserver" />
+			<GKES:PROPERTY NAME="adminStatus" TYPE="int"
+					CLASSORIGIN="CesRserver" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="operStatus" TYPE="int"
+					CLASSORIGIN="CesRserver" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="statechangeDescr" TYPE="string"
+					CLASSORIGIN="CesRserver" MAXLEN="255" />
+			<GKES:PROPERTY NAME="storageType" TYPE="int"
+					CLASSORIGIN="CesRserver" />
+			<GKES:PROPERTY NAME="rowStatus" TYPE="int"
+					CLASSORIGIN="CesRserver" />
+		</GKES:CLASS>
+
+		<!--
+			- CesServerFarmRserverTable
+		-->
+		<GKES:CLASS NAME="CesServerFarmRserver" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="slbEntity" TYPE="int"
+					CLASSORIGIN="CesServerFarmRserver" />
+			<GKES:PROPERTY NAME="slbServerFarmName" TYPE="string"
+					CLASSORIGIN="CesServerFarmRserver" MAXLEN="96" />
+			<GKES:PROPERTY NAME="cesRserverName" TYPE="string"
+					CLASSORIGIN="CesServerFarmRserver" MAXLEN="255" />
+			<GKES:PROPERTY NAME="cesServerFarmRserverPort" TYPE="int"
+					CLASSORIGIN="CesServerFarmRserver" />
+			<GKES:PROPERTY NAME="idx" TYPE="string"
+					CLASSORIGIN="CesServerFarmRserver" MAXLEN="1417" />
+			<GKES:PROPERTY NAME="adminWeight" TYPE="int"
+					CLASSORIGIN="CesServerFarmRserver" />
+			<GKES:PROPERTY NAME="operWeight" TYPE="int"
+					CLASSORIGIN="CesServerFarmRserver" />
+			<GKES:PROPERTY NAME="maxConns" TYPE="long"
+					CLASSORIGIN="CesServerFarmRserver" />
+			<GKES:PROPERTY NAME="minConns" TYPE="long"
+					CLASSORIGIN="CesServerFarmRserver" />
+			<GKES:PROPERTY NAME="adminStatus" TYPE="int"
+					CLASSORIGIN="CesServerFarmRserver" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="operStatus" TYPE="int"
+					CLASSORIGIN="CesServerFarmRserver" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="stateDescr" TYPE="string"
+					CLASSORIGIN="CesServerFarmRserver" MAXLEN="255" />
+			<GKES:PROPERTY NAME="backupName" TYPE="string"
+					CLASSORIGIN="CesServerFarmRserver" MAXLEN="255" />
+			<GKES:PROPERTY NAME="backupPort" TYPE="int"
+					CLASSORIGIN="CesServerFarmRserver" />
+			<GKES:PROPERTY NAME="totalConns" TYPE="long"
+					CLASSORIGIN="CesServerFarmRserver" />
+			<GKES:PROPERTY NAME="failedConns" TYPE="long"
+					CLASSORIGIN="CesServerFarmRserver" />
+			<GKES:PROPERTY NAME="droppedConns" TYPE="long"
+					CLASSORIGIN="CesServerFarmRserver" />
+			<GKES:PROPERTY NAME="currentConns" TYPE="long"
+					CLASSORIGIN="CesServerFarmRserver" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="storageType" TYPE="int"
+					CLASSORIGIN="CesServerFarmRserver" />
+			<GKES:PROPERTY NAME="rowStatus" TYPE="int"
+					CLASSORIGIN="CesServerFarmRserver" />
+		</GKES:CLASS>
+
+		<!--
+			- SlbVirtualServerTable
+		-->
+		<GKES:CLASS NAME="SlbVirtualServer" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="slbEntity" TYPE="int"
+					CLASSORIGIN="SlbVirtualServer" />
+			<GKES:PROPERTY NAME="serverName" TYPE="string"
+					CLASSORIGIN="SlbVirtualServer" MAXLEN="96" />
+			<GKES:PROPERTY NAME="idx" TYPE="string"
+					CLASSORIGIN="SlbVirtualServer" MAXLEN="512" />
+			<GKES:PROPERTY NAME="serverState" TYPE="int"
+					CLASSORIGIN="SlbVirtualServer" />
+			<GKES:PROPERTY NAME="slbVirtualIndex" TYPE="long"
+					CLASSORIGIN="SlbVirtualServer" />
+			<GKES:PROPERTY NAME="ipAddress" TYPE="string"
+					CLASSORIGIN="SlbVirtualServer" MAXLEN="15" />
+			<GKES:PROPERTY NAME="port" TYPE="int"
+					CLASSORIGIN="SlbVirtualServer" />
+			<GKES:PROPERTY NAME="protocol" TYPE="int"
+					CLASSORIGIN="SlbVirtualServer" />
+			<GKES:PROPERTY NAME="farmName" TYPE="string"
+					CLASSORIGIN="SlbVirtualServer" MAXLEN="96" />
+			<GKES:PROPERTY NAME="numberOfConnections" TYPE="long"
+					CLASSORIGIN="SlbVirtualServer" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="totalConnections" TYPE="long"
+					CLASSORIGIN="SlbVirtualServer" />
+			<GKES:PROPERTY NAME="hcTotalConnections" TYPE="long"
+					CLASSORIGIN="SlbVirtualServer" />
+			<GKES:PROPERTY NAME="mask" TYPE="string"
+					CLASSORIGIN="SlbVirtualServer" MAXLEN="15" />
+		</GKES:CLASS>
+
+		<!--
+			- AWS series switches ( Cheetah )
+			- SlbCurCfgRealServerTable
+		-->
+		<GKES:CLASS NAME="SlbCurCfgRealServer" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="slbCurCfgRealServerIndex" TYPE="int"
+					CLASSORIGIN="SlbCurCfgRealServer" />
+			<GKES:PROPERTY NAME="ipAddr" TYPE="string"
+					CLASSORIGIN="SlbCurCfgRealServer" MAXLEN="255" />
+			<GKES:PROPERTY NAME="weight" TYPE="int"
+					CLASSORIGIN="SlbCurCfgRealServer" />
+			<GKES:PROPERTY NAME="state" TYPE="int"
+					CLASSORIGIN="SlbCurCfgRealServer" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="type" TYPE="int"
+					CLASSORIGIN="SlbCurCfgRealServer" />
+			<GKES:PROPERTY NAME="name" TYPE="string"
+					CLASSORIGIN="SlbCurCfgRealServer" MAXLEN="32" />
+			<GKES:PROPERTY NAME="currSessions" TYPE="long"
+					CLASSORIGIN="SlbCurCfgRealServer" ISINDICATION="true" />
+		</GKES:CLASS>
+
+		<!--
+			- AWS series switches ( Cheetah )
+			- SlbCurCfgGroupTable
+		-->
+		<GKES:CLASS NAME="SlbCurCfgGroup" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="slbCurCfgGroupIndex" TYPE="int"
+					CLASSORIGIN="SlbCurCfgGroup" />
+			<GKES:PROPERTY NAME="realServers" TYPE="string"
+					CLASSORIGIN="SlbCurCfgGroup" MAXLEN="512" />
+			<GKES:PROPERTY NAME="metric" TYPE="int"
+					CLASSORIGIN="SlbCurCfgGroup" />
+			<GKES:PROPERTY NAME="name" TYPE="string"
+					CLASSORIGIN="SlbCurCfgGroup" MAXLEN="32" />
+			<GKES:PROPERTY NAME="currSessions" TYPE="long"
+					CLASSORIGIN="SlbCurCfgGroup" ISINDICATION="true" />
+		</GKES:CLASS>
+
+		<!--
+			- AWS series switches ( Cheetah )
+			- SlbCurCfgVirtServerTable
+		-->
+		<GKES:CLASS NAME="SlbCurCfgVirtServer" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="slbCurCfgVirtServerIndex" TYPE="int"
+					CLASSORIGIN="SlbCurCfgVirtServer" />
+			<GKES:PROPERTY NAME="ipAddress" TYPE="string"
+					CLASSORIGIN="SlbCurCfgVirtServer" MAXLEN="255" />
+			<GKES:PROPERTY NAME="state" TYPE="int"
+					CLASSORIGIN="SlbCurCfgVirtServer" />
+			<GKES:PROPERTY NAME="name" TYPE="string"
+					CLASSORIGIN="SlbCurCfgVirtServer" MAXLEN="32" />
+			<GKES:PROPERTY NAME="currSessions" TYPE="long"
+					CLASSORIGIN="SlbCurCfgVirtServer" ISINDICATION="true" />
+		</GKES:CLASS>
+
+		<!--
+			- SlbServiceTable
+		-->
+		<GKES:CLASS NAME="SlbService" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="slbServiceName" TYPE="string"
+					CLASSORIGIN="SlbService" MAXLEN="255" />
+			<GKES:PROPERTY NAME="idx" TYPE="string"
+					CLASSORIGIN="SlbService" MAXLEN="1024" />
+			<GKES:PROPERTY NAME="priority" TYPE="int"
+					CLASSORIGIN="SlbService" />
+			<GKES:PROPERTY NAME="vip" TYPE="string"
+					CLASSORIGIN="SlbService" MAXLEN="15" />
+			<GKES:PROPERTY NAME="vport" TYPE="string"
+					CLASSORIGIN="SlbService" MAXLEN="5" />
+			<GKES:PROPERTY NAME="natMode" TYPE="string"
+					CLASSORIGIN="SlbService" MAXLEN="255" />
+			<GKES:PROPERTY NAME="lan2LanIP" TYPE="string"
+					CLASSORIGIN="SlbService" MAXLEN="255" />
+			<GKES:PROPERTY NAME="scheduler" TYPE="string"
+					CLASSORIGIN="SlbService" MAXLEN="255" />
+			<GKES:PROPERTY NAME="stickyTime" TYPE="int"
+					CLASSORIGIN="SlbService" />
+			<GKES:PROPERTY NAME="status" TYPE="int"
+					CLASSORIGIN="SlbService" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="actConn" TYPE="long"
+					CLASSORIGIN="SlbService" ISINDICATION="true" />
+		</GKES:CLASS>
+
+		<!--
+			- SlbRealTable
+		-->
+		<GKES:CLASS NAME="SlbReal" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="slbServiceName" TYPE="string"
+					CLASSORIGIN="SlbReal" MAXLEN="255" />
+			<GKES:PROPERTY NAME="slbRealID" TYPE="int"
+					CLASSORIGIN="SlbReal" />
+			<GKES:PROPERTY NAME="idx" TYPE="string"
+					CLASSORIGIN="SlbReal" MAXLEN="1024" />
+			<GKES:PROPERTY NAME="name" TYPE="string"
+					CLASSORIGIN="SlbReal" MAXLEN="255" />
+			<GKES:PROPERTY NAME="ip" TYPE="string"
+					CLASSORIGIN="SlbReal" MAXLEN="15" />
+			<GKES:PROPERTY NAME="port" TYPE="int"
+					CLASSORIGIN="SlbReal" />
+			<GKES:PROPERTY NAME="weight" TYPE="int"
+					CLASSORIGIN="SlbReal" />
+			<GKES:PROPERTY NAME="status" TYPE="int"
+					CLASSORIGIN="SlbReal" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="actStatus" TYPE="string"
+					CLASSORIGIN="SlbReal" MAXLEN="255" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="actConn" TYPE="long"
+					CLASSORIGIN="SlbReal" ISINDICATION="true" />
+		</GKES:CLASS>
+
+		<!--
+			- FwlbServiceTable
+		-->
+		<GKES:CLASS NAME="FwlbService" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="fwlbServiceName" TYPE="string"
+					CLASSORIGIN="FwlbService" MAXLEN="255" />
+			<GKES:PROPERTY NAME="idx" TYPE="string"
+					CLASSORIGIN="FwlbService" MAXLEN="1024" />
+			<GKES:PROPERTY NAME="priority" TYPE="int"
+					CLASSORIGIN="FwlbService" />
+			<GKES:PROPERTY NAME="scheduler" TYPE="string"
+					CLASSORIGIN="FwlbService" MAXLEN="255" />
+			<GKES:PROPERTY NAME="stickyTime" TYPE="int"
+					CLASSORIGIN="FwlbService" />
+			<GKES:PROPERTY NAME="vpnLB" TYPE="int"
+					CLASSORIGIN="FwlbService" />
+			<GKES:PROPERTY NAME="position" TYPE="int"
+					CLASSORIGIN="FwlbService" />
+			<GKES:PROPERTY NAME="status" TYPE="int"
+					CLASSORIGIN="FwlbService" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="actConn" TYPE="long"
+					CLASSORIGIN="FwlbService" ISINDICATION="true" />
+		</GKES:CLASS>
+
+		<!--
+			- FwlbRealTable
+		-->
+		<GKES:CLASS NAME="FwlbReal" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="fwlbServiceName" TYPE="string"
+					CLASSORIGIN="FwlbReal" MAXLEN="255" />
+			<GKES:PROPERTY NAME="fwlbRealID" TYPE="int"
+					CLASSORIGIN="FwlbReal" />
+			<GKES:PROPERTY NAME="idx" TYPE="string"
+					CLASSORIGIN="FwlbReal" MAXLEN="1024" />
+			<GKES:PROPERTY NAME="name" TYPE="string"
+					CLASSORIGIN="FwlbReal" MAXLEN="255" />
+			<GKES:PROPERTY NAME="ip" TYPE="string"
+					CLASSORIGIN="FwlbReal" MAXLEN="15" />
+			<GKES:PROPERTY NAME="macAddr" TYPE="string"
+					CLASSORIGIN="FwlbReal" MAXLEN="32" />
+			<GKES:PROPERTY NAME="weight" TYPE="int"
+					CLASSORIGIN="FwlbReal" />
+			<GKES:PROPERTY NAME="status" TYPE="int"
+					CLASSORIGIN="FwlbReal" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="actStatus" TYPE="string"
+					CLASSORIGIN="FwlbReal" MAXLEN="255" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="actConn" TYPE="long"
+					CLASSORIGIN="FwlbReal" ISINDICATION="true" />
+		</GKES:CLASS>
+
+		<!--
+			- CslbServiceTable
+		-->
+		<GKES:CLASS NAME="CslbService" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="cslbServiceName" TYPE="string"
+					CLASSORIGIN="CslbService" MAXLEN="255" />
+			<GKES:PROPERTY NAME="idx" TYPE="string"
+					CLASSORIGIN="CslbService" MAXLEN="1024" />
+			<GKES:PROPERTY NAME="priority" TYPE="int"
+					CLASSORIGIN="CslbService" />
+			<GKES:PROPERTY NAME="scheduler" TYPE="string"
+					CLASSORIGIN="CslbService" MAXLEN="255" />
+			<GKES:PROPERTY NAME="stickyTime" TYPE="int"
+					CLASSORIGIN="CslbService" />
+			<GKES:PROPERTY NAME="status" TYPE="int"
+					CLASSORIGIN="CslbService" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="actConn" TYPE="long"
+					CLASSORIGIN="CslbService" ISINDICATION="true" />
+		</GKES:CLASS>
+
+		<!--
+			- CslbRealTable
+		-->
+		<GKES:CLASS NAME="CslbReal" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="cslbServiceName" TYPE="string"
+					CLASSORIGIN="CslbReal" MAXLEN="255" />
+			<GKES:PROPERTY NAME="cslbRealID" TYPE="int"
+					CLASSORIGIN="CslbReal" />
+			<GKES:PROPERTY NAME="idx" TYPE="string"
+					CLASSORIGIN="CslbReal" MAXLEN="1024" />
+			<GKES:PROPERTY NAME="name" TYPE="string"
+					CLASSORIGIN="CslbReal" MAXLEN="255" />
+			<GKES:PROPERTY NAME="ip" TYPE="string"
+					CLASSORIGIN="CslbReal" MAXLEN="15" />
+			<GKES:PROPERTY NAME="weight" TYPE="int"
+					CLASSORIGIN="CslbReal" />
+			<GKES:PROPERTY NAME="status" TYPE="int"
+					CLASSORIGIN="CslbReal" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="actStatus" TYPE="string"
+					CLASSORIGIN="CslbReal" MAXLEN="255" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="actConn" TYPE="long"
+					CLASSORIGIN="CslbReal" ISINDICATION="true" />
+		</GKES:CLASS>
+
+		<GKES:CLASS NAME="PaskSlbS" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="paskSlbServiceName" TYPE="string"
+					CLASSORIGIN="PaskSlbS" MAXLEN="255" />
+			<GKES:PROPERTY NAME="idx" TYPE="string"
+					CLASSORIGIN="PaskSlbS" MAXLEN="1024" />
+			<GKES:PROPERTY NAME="priority" TYPE="int"
+					CLASSORIGIN="PaskSlbS" />
+			<GKES:PROPERTY NAME="vip" TYPE="string"
+					CLASSORIGIN="PaskSlbS" MAXLEN="15" />
+			<GKES:PROPERTY NAME="vport" TYPE="string"
+					CLASSORIGIN="PaskSlbS" MAXLEN="5" />
+			<GKES:PROPERTY NAME="protocol" TYPE="string"
+					CLASSORIGIN="PaskSlbS" MAXLEN="255" />
+			<GKES:PROPERTY NAME="natMode" TYPE="string"
+					CLASSORIGIN="PaskSlbS" MAXLEN="255" />
+			<GKES:PROPERTY NAME="status" TYPE="int"
+					CLASSORIGIN="PaskSlbS" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="actConn" TYPE="long"
+					CLASSORIGIN="PaskSlbS" ISINDICATION="true" />
+		</GKES:CLASS>
+
+		<GKES:CLASS NAME="PaskSlbR" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="paskSlbServiceName" TYPE="string"
+					CLASSORIGIN="PaskSlbR" MAXLEN="255" />
+			<GKES:PROPERTY NAME="paskSlbRealID" TYPE="int"
+					CLASSORIGIN="PaskSlbR" />
+			<GKES:PROPERTY NAME="idx" TYPE="string"
+					CLASSORIGIN="PaskSlbR" MAXLEN="1024" />
+			<GKES:PROPERTY NAME="name" TYPE="string"
+					CLASSORIGIN="PaskSlbR" MAXLEN="255" />
+			<GKES:PROPERTY NAME="ip" TYPE="string"
+					CLASSORIGIN="PaskSlbR" MAXLEN="15" />
+			<GKES:PROPERTY NAME="port" TYPE="int"
+					CLASSORIGIN="PaskSlbR" />
+			<GKES:PROPERTY NAME="macAddr" TYPE="string"
+					CLASSORIGIN="PaskSlbR" MAXLEN="255" />
+			<GKES:PROPERTY NAME="backUp" TYPE="string"
+					CLASSORIGIN="PaskSlbR" MAXLEN="255" />
+			<GKES:PROPERTY NAME="status" TYPE="string"
+					CLASSORIGIN="PaskSlbR" MAXLEN="255" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="actStatus" TYPE="int"
+					CLASSORIGIN="PaskSlbR" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="actConn" TYPE="long"
+					CLASSORIGIN="PaskSlbR" ISINDICATION="true" />
+		</GKES:CLASS>
+
+		<GKES:CLASS NAME="PaskFwlbS" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="paskFwlbServiceName" TYPE="string"
+					CLASSORIGIN="PaskFwlbS" MAXLEN="255" />
+			<GKES:PROPERTY NAME="idx" TYPE="string"
+					CLASSORIGIN="PaskFwlbS" MAXLEN="1024" />
+			<GKES:PROPERTY NAME="priority" TYPE="int"
+					CLASSORIGIN="PaskFwlbS" />
+			<GKES:PROPERTY NAME="status" TYPE="int"
+					CLASSORIGIN="PaskFwlbS" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="actConn" TYPE="long"
+					CLASSORIGIN="PaskFwlbS" ISINDICATION="true" />
+		</GKES:CLASS>
+
+		<GKES:CLASS NAME="PaskFwlbR" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="paskFwlbServiceName" TYPE="string"
+					CLASSORIGIN="PaskFwlbR" MAXLEN="255" />
+			<GKES:PROPERTY NAME="paskFwlbRealID" TYPE="int"
+					CLASSORIGIN="PaskFwlbR" />
+			<GKES:PROPERTY NAME="idx" TYPE="string"
+					CLASSORIGIN="PaskFwlbR" MAXLEN="1024" />
+			<GKES:PROPERTY NAME="name" TYPE="string"
+					CLASSORIGIN="PaskFwlbR" MAXLEN="255" />
+			<GKES:PROPERTY NAME="ip" TYPE="string"
+					CLASSORIGIN="PaskFwlbR" MAXLEN="15" />
+			<GKES:PROPERTY NAME="port" TYPE="int"
+					CLASSORIGIN="PaskFwlbR" />
+			<GKES:PROPERTY NAME="macAddr" TYPE="string"
+					CLASSORIGIN="PaskFwlbR" MAXLEN="255" />
+			<GKES:PROPERTY NAME="backUp" TYPE="string"
+					CLASSORIGIN="PaskFwlbR" MAXLEN="255" />
+			<GKES:PROPERTY NAME="status" TYPE="string"
+					CLASSORIGIN="PaskFwlbR" MAXLEN="255" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="actStatus" TYPE="int"
+					CLASSORIGIN="PaskFwlbR" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="actConn" TYPE="long"
+					CLASSORIGIN="PaskFwlbR" ISINDICATION="true" />
+		</GKES:CLASS>
+
+		<GKES:CLASS NAME="PaskCslbS" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="paskCslbServiceName" TYPE="string"
+					CLASSORIGIN="PaskCslbS" MAXLEN="255" />
+			<GKES:PROPERTY NAME="idx" TYPE="string"
+					CLASSORIGIN="PaskCslbS" MAXLEN="1024" />
+			<GKES:PROPERTY NAME="priority" TYPE="int"
+					CLASSORIGIN="PaskCslbS" />
+			<GKES:PROPERTY NAME="status" TYPE="int"
+					CLASSORIGIN="PaskCslbS" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="actConn" TYPE="long"
+					CLASSORIGIN="PaskCslbS" ISINDICATION="true" />
+		</GKES:CLASS>
+
+		<GKES:CLASS NAME="PaskCslbR" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="paskCslbServiceName" TYPE="string"
+					CLASSORIGIN="PaskCslbR" MAXLEN="255" />
+			<GKES:PROPERTY NAME="paskCslbRealID" TYPE="int"
+					CLASSORIGIN="PaskCslbR" />
+			<GKES:PROPERTY NAME="idx" TYPE="string"
+					CLASSORIGIN="PaskCslbR" MAXLEN="1024" />
+			<GKES:PROPERTY NAME="name" TYPE="string"
+					CLASSORIGIN="PaskCslbR" MAXLEN="255" />
+			<GKES:PROPERTY NAME="ip" TYPE="string"
+					CLASSORIGIN="PaskCslbR" MAXLEN="15" />
+			<GKES:PROPERTY NAME="port" TYPE="int"
+					CLASSORIGIN="PaskCslbR" />
+			<GKES:PROPERTY NAME="macAddr" TYPE="string"
+					CLASSORIGIN="PaskCslbR" MAXLEN="255" />
+			<GKES:PROPERTY NAME="backUp" TYPE="string"
+					CLASSORIGIN="PaskCslbR" MAXLEN="255" />
+			<GKES:PROPERTY NAME="status" TYPE="string"
+					CLASSORIGIN="PaskCslbR" MAXLEN="255" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="actStatus" TYPE="int"
+					CLASSORIGIN="PaskCslbR" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="actConn" TYPE="long"
+					CLASSORIGIN="PaskCslbR" ISINDICATION="true" />
+		</GKES:CLASS>
+
+		<!--
+			- LtmPoolTable
+		-->
+		<GKES:CLASS NAME="LtmPool" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="name" TYPE="string"
+					CLASSORIGIN="LtmPool" MAXLEN="1024" />
+			<GKES:PROPERTY NAME="idx" TYPE="string"
+					CLASSORIGIN="LtmPool" MAXLEN="4000" />
+			<GKES:PROPERTY NAME="lbMode" TYPE="int"
+					CLASSORIGIN="LtmPool" />
+			<GKES:PROPERTY NAME="actionOnServiceDown" TYPE="int"
+					CLASSORIGIN="LtmPool" />
+			<GKES:PROPERTY NAME="minUpMembers" TYPE="int"
+					CLASSORIGIN="LtmPool" />
+			<GKES:PROPERTY NAME="minUpMembersEnable" TYPE="int"
+					CLASSORIGIN="LtmPool" />
+			<GKES:PROPERTY NAME="minUpMemberAction" TYPE="int"
+					CLASSORIGIN="LtmPool" />
+			<GKES:PROPERTY NAME="minActiveMembers" TYPE="int"
+					CLASSORIGIN="LtmPool" />
+			<GKES:PROPERTY NAME="activeMemberCnt" TYPE="int"
+					CLASSORIGIN="LtmPool" />
+			<GKES:PROPERTY NAME="disallowSnat" TYPE="int"
+					CLASSORIGIN="LtmPool" />
+			<GKES:PROPERTY NAME="disallowNat" TYPE="int"
+					CLASSORIGIN="LtmPool" />
+			<GKES:PROPERTY NAME="simpleTimeout" TYPE="int"
+					CLASSORIGIN="LtmPool" />
+			<GKES:PROPERTY NAME="ipTosToClient" TYPE="int"
+					CLASSORIGIN="LtmPool" />
+			<GKES:PROPERTY NAME="ipTosToServer" TYPE="int"
+					CLASSORIGIN="LtmPool" />
+			<GKES:PROPERTY NAME="linkQosToClient" TYPE="int"
+					CLASSORIGIN="LtmPool" />
+			<GKES:PROPERTY NAME="linkQosToServer" TYPE="int"
+					CLASSORIGIN="LtmPool" />
+			<GKES:PROPERTY NAME="dynamicRatioSum" TYPE="int"
+					CLASSORIGIN="LtmPool" />
+			<GKES:PROPERTY NAME="monitorRule" TYPE="string"
+					CLASSORIGIN="LtmPool" MAXLEN="1024" />
+			<GKES:PROPERTY NAME="availabilityState" TYPE="int"
+					CLASSORIGIN="LtmPool" />
+			<GKES:PROPERTY NAME="enabledState" TYPE="int"
+					CLASSORIGIN="LtmPool" />
+			<GKES:PROPERTY NAME="disabledParentType" TYPE="int"
+					CLASSORIGIN="LtmPool" />
+			<GKES:PROPERTY NAME="statusReason" TYPE="string"
+					CLASSORIGIN="LtmPool" MAXLEN="1024" />
+			<GKES:PROPERTY NAME="slowRampTime" TYPE="int"
+					CLASSORIGIN="LtmPool" />
+		</GKES:CLASS>
+
+		<!--
+			- LtmPoolStatTable
+		-->
+		<GKES:CLASS NAME="LtmPoolStat" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="name" TYPE="string"
+					CLASSORIGIN="LtmPoolStat" MAXLEN="1024" />
+			<GKES:PROPERTY NAME="idx" TYPE="string"
+					CLASSORIGIN="LtmPoolStat" MAXLEN="4000" />
+			<GKES:PROPERTY NAME="serverPktsIn" TYPE="long"
+					CLASSORIGIN="LtmPoolStat" />
+			<GKES:PROPERTY NAME="serverBytesIn" TYPE="long"
+					CLASSORIGIN="LtmPoolStat" />
+			<GKES:PROPERTY NAME="serverPktsOut" TYPE="long"
+					CLASSORIGIN="LtmPoolStat" />
+			<GKES:PROPERTY NAME="serverBytesOut" TYPE="long"
+					CLASSORIGIN="LtmPoolStat" />
+			<GKES:PROPERTY NAME="serverMaxConns" TYPE="long"
+					CLASSORIGIN="LtmPoolStat" />
+			<GKES:PROPERTY NAME="serverTotConns" TYPE="long"
+					CLASSORIGIN="LtmPoolStat" />
+			<GKES:PROPERTY NAME="serverCurConns" TYPE="long"
+					CLASSORIGIN="LtmPoolStat" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="pvaPktsIn" TYPE="long"
+					CLASSORIGIN="LtmPoolStat" />
+			<GKES:PROPERTY NAME="pvaBytesIn" TYPE="long"
+					CLASSORIGIN="LtmPoolStat" />
+			<GKES:PROPERTY NAME="pvaPktsOut" TYPE="long"
+					CLASSORIGIN="LtmPoolStat" />
+			<GKES:PROPERTY NAME="pvaBytesOut" TYPE="long"
+					CLASSORIGIN="LtmPoolStat" />
+			<GKES:PROPERTY NAME="pvaMaxConns" TYPE="long"
+					CLASSORIGIN="LtmPoolStat" />
+			<GKES:PROPERTY NAME="pvaTotConns" TYPE="long"
+					CLASSORIGIN="LtmPoolStat" />
+			<GKES:PROPERTY NAME="pvaCurConns" TYPE="long"
+					CLASSORIGIN="LtmPoolStat" />
+			<GKES:PROPERTY NAME="totPvaAssistConn" TYPE="long"
+					CLASSORIGIN="LtmPoolStat" />
+			<GKES:PROPERTY NAME="currPvaAssistConn" TYPE="long"
+					CLASSORIGIN="LtmPoolStat" />
+		</GKES:CLASS>
+
+		<!--
+			- LtmPoolMemberTable
+		-->
+		<GKES:CLASS NAME="LtmPoolMember" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="poolName" TYPE="string"
+					CLASSORIGIN="LtmPoolMember" MAXLEN="1024" />
+			<GKES:PROPERTY NAME="addrType" TYPE="int"
+					CLASSORIGIN="LtmPoolMember" />
+			<GKES:PROPERTY NAME="addr" TYPE="string"
+					CLASSORIGIN="LtmPoolMember" MAXLEN="255" />
+			<GKES:PROPERTY NAME="port" TYPE="int"
+					CLASSORIGIN="LtmPoolMember" />
+			<GKES:PROPERTY NAME="idx" TYPE="string"
+					CLASSORIGIN="LtmPoolMember" MAXLEN="4000" />
+			<GKES:PROPERTY NAME="connLimit" TYPE="int"
+					CLASSORIGIN="LtmPoolMember" />
+			<GKES:PROPERTY NAME="ratio" TYPE="int"
+					CLASSORIGIN="LtmPoolMember" />
+			<GKES:PROPERTY NAME="weight" TYPE="int"
+					CLASSORIGIN="LtmPoolMember" />
+			<GKES:PROPERTY NAME="priority" TYPE="int"
+					CLASSORIGIN="LtmPoolMember" />
+			<GKES:PROPERTY NAME="dynamicRatio" TYPE="int"
+					CLASSORIGIN="LtmPoolMember" />
+			<GKES:PROPERTY NAME="monitorState" TYPE="int"
+					CLASSORIGIN="LtmPoolMember" />
+			<GKES:PROPERTY NAME="monitorStatus" TYPE="int"
+					CLASSORIGIN="LtmPoolMember" />
+			<GKES:PROPERTY NAME="newSessionEnable" TYPE="int"
+					CLASSORIGIN="LtmPoolMember" />
+			<GKES:PROPERTY NAME="sessionStatus" TYPE="int"
+					CLASSORIGIN="LtmPoolMember" />
+			<GKES:PROPERTY NAME="monitorRule" TYPE="string"
+					CLASSORIGIN="LtmPoolMember" MAXLEN="1024" />
+			<GKES:PROPERTY NAME="availabilityState" TYPE="int"
+					CLASSORIGIN="LtmPoolMember" />
+			<GKES:PROPERTY NAME="enabledState" TYPE="int"
+					CLASSORIGIN="LtmPoolMember" />
+			<GKES:PROPERTY NAME="disabledParentType" TYPE="int"
+					CLASSORIGIN="LtmPoolMember" />
+			<GKES:PROPERTY NAME="statusReason" TYPE="string"
+					CLASSORIGIN="LtmPoolMember" MAXLEN="1024" />
+		</GKES:CLASS>
+
+		<!--
+			- LtmPoolMemberStatTable
+		-->
+		<GKES:CLASS NAME="LtmPoolMemberStat" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="poolName" TYPE="string"
+					CLASSORIGIN="LtmPoolMemberStat" MAXLEN="1024" />
+			<GKES:PROPERTY NAME="addrType" TYPE="int"
+					CLASSORIGIN="LtmPoolMemberStat" />
+			<GKES:PROPERTY NAME="addr" TYPE="string"
+					CLASSORIGIN="LtmPoolMemberStat" MAXLEN="255" />
+			<GKES:PROPERTY NAME="port" TYPE="int"
+					CLASSORIGIN="LtmPoolMemberStat" />
+			<GKES:PROPERTY NAME="idx" TYPE="string"
+					CLASSORIGIN="LtmPoolMemberStat" MAXLEN="4000" />
+			<GKES:PROPERTY NAME="serverPktsIn" TYPE="long"
+					CLASSORIGIN="LtmPoolMemberStat" />
+			<GKES:PROPERTY NAME="serverBytesIn" TYPE="long"
+					CLASSORIGIN="LtmPoolMemberStat" />
+			<GKES:PROPERTY NAME="serverPktsOut" TYPE="long"
+					CLASSORIGIN="LtmPoolMemberStat" />
+			<GKES:PROPERTY NAME="serverBytesOut" TYPE="long"
+					CLASSORIGIN="LtmPoolMemberStat" />
+			<GKES:PROPERTY NAME="serverMaxConns" TYPE="long"
+					CLASSORIGIN="LtmPoolMemberStat" />
+			<GKES:PROPERTY NAME="serverTotConns" TYPE="long"
+					CLASSORIGIN="LtmPoolMemberStat" />
+			<GKES:PROPERTY NAME="serverCurConns" TYPE="long"
+					CLASSORIGIN="LtmPoolMemberStat" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="pvaPktsIn" TYPE="long"
+					CLASSORIGIN="LtmPoolMemberStat" />
+			<GKES:PROPERTY NAME="pvaBytesIn" TYPE="long"
+					CLASSORIGIN="LtmPoolMemberStat" />
+			<GKES:PROPERTY NAME="pvaPktsOut" TYPE="long"
+					CLASSORIGIN="LtmPoolMemberStat" />
+			<GKES:PROPERTY NAME="pvaBytesOut" TYPE="long"
+					CLASSORIGIN="LtmPoolMemberStat" />
+			<GKES:PROPERTY NAME="pvaMaxConns" TYPE="long"
+					CLASSORIGIN="LtmPoolMemberStat" />
+			<GKES:PROPERTY NAME="pvaTotConns" TYPE="long"
+					CLASSORIGIN="LtmPoolMemberStat" />
+			<GKES:PROPERTY NAME="pvaCurConns" TYPE="long"
+					CLASSORIGIN="LtmPoolMemberStat" />
+			<GKES:PROPERTY NAME="totRequests" TYPE="long"
+					CLASSORIGIN="LtmPoolMemberStat" />
+			<GKES:PROPERTY NAME="totPvaAssistConn" TYPE="long"
+					CLASSORIGIN="LtmPoolMemberStat" />
+			<GKES:PROPERTY NAME="currPvaAssistConn" TYPE="long"
+					CLASSORIGIN="LtmPoolMemberStat" />
+		</GKES:CLASS>
+
+		<!--
+			- LtmVirtualServTable
+		-->
+		<GKES:CLASS NAME="LtmVirtualServ" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="name" TYPE="string"
+					CLASSORIGIN="LtmVirtualServ" MAXLEN="1024" />
+			<GKES:PROPERTY NAME="idx" TYPE="string"
+					CLASSORIGIN="LtmVirtualServ" MAXLEN="4000" />
+			<GKES:PROPERTY NAME="addrType" TYPE="int"
+					CLASSORIGIN="LtmVirtualServ" />
+			<GKES:PROPERTY NAME="addr" TYPE="string"
+					CLASSORIGIN="LtmVirtualServ" MAXLEN="255" />
+			<GKES:PROPERTY NAME="wildmaskType" TYPE="int"
+					CLASSORIGIN="LtmVirtualServ" />
+			<GKES:PROPERTY NAME="wildmask" TYPE="string"
+					CLASSORIGIN="LtmVirtualServ" MAXLEN="255" />
+			<GKES:PROPERTY NAME="port" TYPE="int"
+					CLASSORIGIN="LtmVirtualServ" />
+			<GKES:PROPERTY NAME="ipProto" TYPE="int"
+					CLASSORIGIN="LtmVirtualServ" />
+			<GKES:PROPERTY NAME="listedEnabledVlans" TYPE="int"
+					CLASSORIGIN="LtmVirtualServ" />
+			<GKES:PROPERTY NAME="enabled" TYPE="int"
+					CLASSORIGIN="LtmVirtualServ" />
+			<GKES:PROPERTY NAME="connLimit" TYPE="int"
+					CLASSORIGIN="LtmVirtualServ" />
+			<GKES:PROPERTY NAME="rclass" TYPE="string"
+					CLASSORIGIN="LtmVirtualServ" MAXLEN="1024" />
+			<GKES:PROPERTY NAME="sfFlags" TYPE="int"
+					CLASSORIGIN="LtmVirtualServ" />
+			<GKES:PROPERTY NAME="translateAddr" TYPE="int"
+					CLASSORIGIN="LtmVirtualServ" />
+			<GKES:PROPERTY NAME="translatePort" TYPE="int"
+					CLASSORIGIN="LtmVirtualServ" />
+			<GKES:PROPERTY NAME="type" TYPE="int"
+					CLASSORIGIN="LtmVirtualServ" />
+			<GKES:PROPERTY NAME="snatType" TYPE="int"
+					CLASSORIGIN="LtmVirtualServ" />
+			<GKES:PROPERTY NAME="lasthopPoolName" TYPE="string"
+					CLASSORIGIN="LtmVirtualServ" MAXLEN="1024" />
+			<GKES:PROPERTY NAME="snatpoolName" TYPE="string"
+					CLASSORIGIN="LtmVirtualServ" MAXLEN="1024" />
+			<GKES:PROPERTY NAME="defaultPool" TYPE="string"
+					CLASSORIGIN="LtmVirtualServ" MAXLEN="1024" />
+			<GKES:PROPERTY NAME="fallbackPersist" TYPE="string"
+					CLASSORIGIN="LtmVirtualServ" MAXLEN="1024" />
+			<GKES:PROPERTY NAME="actualPvaAccel" TYPE="int"
+					CLASSORIGIN="LtmVirtualServ" />
+			<GKES:PROPERTY NAME="availabilityState" TYPE="int"
+					CLASSORIGIN="LtmVirtualServ" />
+			<GKES:PROPERTY NAME="enabledState" TYPE="int"
+					CLASSORIGIN="LtmVirtualServ" />
+			<GKES:PROPERTY NAME="disabledParentType" TYPE="int"
+					CLASSORIGIN="LtmVirtualServ" />
+			<GKES:PROPERTY NAME="statusReason" TYPE="string"
+					CLASSORIGIN="LtmVirtualServ" MAXLEN="1024" />
+		</GKES:CLASS>
+
+		<!--
+			- LtmVirtualServStatTable
+		-->
+		<GKES:CLASS NAME="LtmVirtualServStat" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="name" TYPE="string"
+					CLASSORIGIN="LtmVirtualServStat" MAXLEN="1024" />
+			<GKES:PROPERTY NAME="idx" TYPE="string"
+					CLASSORIGIN="LtmVirtualServStat" MAXLEN="4000" />
+			<GKES:PROPERTY NAME="csMinConnDur" TYPE="long"
+					CLASSORIGIN="LtmVirtualServStat" />
+			<GKES:PROPERTY NAME="csMaxConnDur" TYPE="long"
+					CLASSORIGIN="LtmVirtualServStat" />
+			<GKES:PROPERTY NAME="csMeanConnDur" TYPE="long"
+					CLASSORIGIN="LtmVirtualServStat" />
+			<GKES:PROPERTY NAME="noNodesErrors" TYPE="long"
+					CLASSORIGIN="LtmVirtualServStat" />
+			<GKES:PROPERTY NAME="clientPktsIn" TYPE="long"
+					CLASSORIGIN="LtmVirtualServStat" />
+			<GKES:PROPERTY NAME="clientBytesIn" TYPE="long"
+					CLASSORIGIN="LtmVirtualServStat" />
+			<GKES:PROPERTY NAME="clientPktsOut" TYPE="long"
+					CLASSORIGIN="LtmVirtualServStat" />
+			<GKES:PROPERTY NAME="clientBytesOut" TYPE="long"
+					CLASSORIGIN="LtmVirtualServStat" />
+			<GKES:PROPERTY NAME="clientMaxConns" TYPE="long"
+					CLASSORIGIN="LtmVirtualServStat" />
+			<GKES:PROPERTY NAME="clientTotConns" TYPE="long"
+					CLASSORIGIN="LtmVirtualServStat" />
+			<GKES:PROPERTY NAME="clientCurConns" TYPE="long"
+					CLASSORIGIN="LtmVirtualServStat" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="ephemeralPktsIn" TYPE="long"
+					CLASSORIGIN="LtmVirtualServStat" />
+			<GKES:PROPERTY NAME="ephemeralBytesIn" TYPE="long"
+					CLASSORIGIN="LtmVirtualServStat" />
+			<GKES:PROPERTY NAME="ephemeralPktsOut" TYPE="long"
+					CLASSORIGIN="LtmVirtualServStat" />
+			<GKES:PROPERTY NAME="ephemeralBytesOut" TYPE="long"
+					CLASSORIGIN="LtmVirtualServStat" />
+			<GKES:PROPERTY NAME="ephemeralMaxConns" TYPE="long"
+					CLASSORIGIN="LtmVirtualServStat" />
+			<GKES:PROPERTY NAME="ephemeralTotConns" TYPE="long"
+					CLASSORIGIN="LtmVirtualServStat" />
+			<GKES:PROPERTY NAME="ephemeralCurConns" TYPE="long"
+					CLASSORIGIN="LtmVirtualServStat" />
+			<GKES:PROPERTY NAME="pvaPktsIn" TYPE="long"
+					CLASSORIGIN="LtmVirtualServStat" />
+			<GKES:PROPERTY NAME="pvaBytesIn" TYPE="long"
+					CLASSORIGIN="LtmVirtualServStat" />
+			<GKES:PROPERTY NAME="pvaPktsOut" TYPE="long"
+					CLASSORIGIN="LtmVirtualServStat" />
+			<GKES:PROPERTY NAME="pvaBytesOut" TYPE="long"
+					CLASSORIGIN="LtmVirtualServStat" />
+			<GKES:PROPERTY NAME="pvaMaxConns" TYPE="long"
+					CLASSORIGIN="LtmVirtualServStat" />
+			<GKES:PROPERTY NAME="pvaTotConns" TYPE="long"
+					CLASSORIGIN="LtmVirtualServStat" />
+			<GKES:PROPERTY NAME="pvaCurConns" TYPE="long"
+					CLASSORIGIN="LtmVirtualServStat" />
+			<GKES:PROPERTY NAME="totRequests" TYPE="long"
+					CLASSORIGIN="LtmVirtualServStat" />
+			<GKES:PROPERTY NAME="totPvaAssistConn" TYPE="long"
+					CLASSORIGIN="LtmVirtualServStat" />
+			<GKES:PROPERTY NAME="currPvaAssistConn" TYPE="long"
+					CLASSORIGIN="LtmVirtualServStat" />
+		</GKES:CLASS>
+
+
+		<!--
+			- NetscalerServerTable
+		-->
+		<GKES:CLASS NAME="NetscalerServer" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="serverName" TYPE="string"
+					CLASSORIGIN="NetscalerServer" MAXLEN="128" />
+			<GKES:PROPERTY NAME="idx" TYPE="string"
+					CLASSORIGIN="NetscalerServer" MAXLEN="4000" />
+			<GKES:PROPERTY NAME="ipAddress" TYPE="string"
+					CLASSORIGIN="NetscalerServer" MAXLEN="15" />
+			<GKES:PROPERTY NAME="state" TYPE="int"
+					CLASSORIGIN="NetscalerServer" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="delay" TYPE="int"
+					CLASSORIGIN="NetscalerServer" />
+			<GKES:PROPERTY NAME="fullName" TYPE="string"
+					CLASSORIGIN="NetscalerServer" MAXLEN="128" />
+			<GKES:PROPERTY NAME="inetAddressType" TYPE="int"
+					CLASSORIGIN="NetscalerServer" />
+			<GKES:PROPERTY NAME="inetAddress" TYPE="string"
+					CLASSORIGIN="NetscalerServer" MAXLEN="255" />
+			<GKES:PROPERTY NAME="tdId" TYPE="int"
+					CLASSORIGIN="NetscalerServer" />
+		</GKES:CLASS>
+
+		<!--
+			- NetscalerServiceTable
+		-->
+		<GKES:CLASS NAME="NSService" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="svcServiceName" TYPE="string"
+					CLASSORIGIN="NSService" MAXLEN="128" />
+			<GKES:PROPERTY NAME="idx" TYPE="string"
+					CLASSORIGIN="NSService" MAXLEN="4000" />
+			<GKES:PROPERTY NAME="ipAddress" TYPE="string"
+					CLASSORIGIN="NSService" MAXLEN="15" />
+			<GKES:PROPERTY NAME="port" TYPE="int"
+					CLASSORIGIN="NSService" />
+			<GKES:PROPERTY NAME="serviceType" TYPE="int"
+					CLASSORIGIN="NSService" />
+			<GKES:PROPERTY NAME="state" TYPE="int"
+					CLASSORIGIN="NSService" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="maxReqPerConn" TYPE="int"
+					CLASSORIGIN="NSService" />
+			<GKES:PROPERTY NAME="avgTransactionTime" TYPE="int"
+					CLASSORIGIN="NSService" />
+			<GKES:PROPERTY NAME="establishedConn" TYPE="long"
+					CLASSORIGIN="NSService" />
+			<GKES:PROPERTY NAME="activeConn" TYPE="long"
+					CLASSORIGIN="NSService" />
+			<GKES:PROPERTY NAME="surgeCount" TYPE="long"
+					CLASSORIGIN="NSService" />
+			<GKES:PROPERTY NAME="totalRequests" TYPE="long"
+					CLASSORIGIN="NSService" />
+			<GKES:PROPERTY NAME="totalRequestBytes" TYPE="long"
+					CLASSORIGIN="NSService" />
+			<GKES:PROPERTY NAME="totalResponses" TYPE="long"
+					CLASSORIGIN="NSService" />
+			<GKES:PROPERTY NAME="totalResponseBytes" TYPE="long"
+					CLASSORIGIN="NSService" />
+			<GKES:PROPERTY NAME="totalPktsRecvd" TYPE="long"
+					CLASSORIGIN="NSService" />
+			<GKES:PROPERTY NAME="totalPktsSent" TYPE="long"
+					CLASSORIGIN="NSService" />
+			<GKES:PROPERTY NAME="totalSynsRecvd" TYPE="long"
+					CLASSORIGIN="NSService" />
+			<GKES:PROPERTY NAME="gslbSiteName" TYPE="string"
+					CLASSORIGIN="NSService" MAXLEN="128" />
+			<GKES:PROPERTY NAME="avgSvrTTFB" TYPE="long"
+					CLASSORIGIN="NSService" />
+			<GKES:PROPERTY NAME="totalJsTransactions" TYPE="long"
+					CLASSORIGIN="NSService" />
+			<GKES:PROPERTY NAME="dosQDepth" TYPE="long"
+					CLASSORIGIN="NSService" />
+			<GKES:PROPERTY NAME="curClntConnections" TYPE="long"
+					CLASSORIGIN="NSService" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="requestRate" TYPE="string"
+					CLASSORIGIN="NSService" MAXLEN="20" />
+			<GKES:PROPERTY NAME="rxBytesRate" TYPE="string"
+					CLASSORIGIN="NSService" MAXLEN="20" />
+			<GKES:PROPERTY NAME="txBytesRate" TYPE="string"
+					CLASSORIGIN="NSService" MAXLEN="20" />
+			<GKES:PROPERTY NAME="synfloodRate" TYPE="string"
+					CLASSORIGIN="NSService" MAXLEN="20" />
+			<GKES:PROPERTY NAME="ticksSinceLastStateChange" TYPE="long"
+					CLASSORIGIN="NSService" />
+			<GKES:PROPERTY NAME="totalClients" TYPE="long"
+					CLASSORIGIN="NSService" />
+			<GKES:PROPERTY NAME="totalServers" TYPE="long"
+					CLASSORIGIN="NSService" />
+			<GKES:PROPERTY NAME="maxClients" TYPE="int"
+					CLASSORIGIN="NSService" />
+			<GKES:PROPERTY NAME="activeTransactions" TYPE="long"
+					CLASSORIGIN="NSService" />
+			<GKES:PROPERTY NAME="serviceFullName" TYPE="string"
+					CLASSORIGIN="NSService" MAXLEN="128" />
+			<GKES:PROPERTY NAME="inetAddressType" TYPE="int"
+					CLASSORIGIN="NSService" />
+			<GKES:PROPERTY NAME="inetAddress" TYPE="string"
+					CLASSORIGIN="NSService" MAXLEN="255" />
+			<GKES:PROPERTY NAME="tdId" TYPE="int"
+					CLASSORIGIN="NSService" />
+		</GKES:CLASS>
+
+		<!--
+			- NetscalerVserverTable
+		-->
+		<GKES:CLASS NAME="NetscalerVserver" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="vsvrName" TYPE="string"
+					CLASSORIGIN="NetscalerVserver" MAXLEN="128" />
+			<GKES:PROPERTY NAME="idx" TYPE="string"
+					CLASSORIGIN="NetscalerVserver" MAXLEN="4000" />
+			<GKES:PROPERTY NAME="ipAddress" TYPE="string"
+					CLASSORIGIN="NetscalerVserver" MAXLEN="15" />
+			<GKES:PROPERTY NAME="port" TYPE="int"
+					CLASSORIGIN="NetscalerVserver" />
+			<GKES:PROPERTY NAME="type" TYPE="int"
+					CLASSORIGIN="NetscalerVserver" />
+			<GKES:PROPERTY NAME="state" TYPE="int"
+					CLASSORIGIN="NetscalerVserver" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="curClntConnections" TYPE="long"
+					CLASSORIGIN="NetscalerVserver" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="curSrvrConnections" TYPE="long"
+					CLASSORIGIN="NetscalerVserver" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="surgeCount" TYPE="long"
+					CLASSORIGIN="NetscalerVserver" />
+			<GKES:PROPERTY NAME="totalRequests" TYPE="long"
+					CLASSORIGIN="NetscalerVserver" />
+			<GKES:PROPERTY NAME="totalRequestBytes" TYPE="long"
+					CLASSORIGIN="NetscalerVserver" />
+			<GKES:PROPERTY NAME="totalResponses" TYPE="long"
+					CLASSORIGIN="NetscalerVserver" />
+			<GKES:PROPERTY NAME="totalResponseBytes" TYPE="long"
+					CLASSORIGIN="NetscalerVserver" />
+			<GKES:PROPERTY NAME="totalPktsRecvd" TYPE="long"
+					CLASSORIGIN="NetscalerVserver" />
+			<GKES:PROPERTY NAME="totalPktsSent" TYPE="long"
+					CLASSORIGIN="NetscalerVserver" />
+			<GKES:PROPERTY NAME="totalSynsRecvd" TYPE="long"
+					CLASSORIGIN="NetscalerVserver" />
+			<GKES:PROPERTY NAME="curServicesDown" TYPE="long"
+					CLASSORIGIN="NetscalerVserver" />
+			<GKES:PROPERTY NAME="curServicesUnKnown" TYPE="long"
+					CLASSORIGIN="NetscalerVserver" />
+			<GKES:PROPERTY NAME="curServicesOutOfSvc" TYPE="long"
+					CLASSORIGIN="NetscalerVserver" />
+			<GKES:PROPERTY NAME="curServicesTransToOutOfSvc" TYPE="long"
+					CLASSORIGIN="NetscalerVserver" />
+			<GKES:PROPERTY NAME="curServicesUp" TYPE="long"
+					CLASSORIGIN="NetscalerVserver" />
+			<GKES:PROPERTY NAME="totMiss" TYPE="long"
+					CLASSORIGIN="NetscalerVserver" />
+			<GKES:PROPERTY NAME="requestRate" TYPE="string"
+					CLASSORIGIN="NetscalerVserver" MAXLEN="20" />
+			<GKES:PROPERTY NAME="rxBytesRate" TYPE="string"
+					CLASSORIGIN="NetscalerVserver" MAXLEN="20" />
+			<GKES:PROPERTY NAME="txBytesRate" TYPE="string"
+					CLASSORIGIN="NetscalerVserver" MAXLEN="20" />
+			<GKES:PROPERTY NAME="synfloodRate" TYPE="string"
+					CLASSORIGIN="NetscalerVserver" MAXLEN="20" />
+			<GKES:PROPERTY NAME="ip6Address" TYPE="string"
+					CLASSORIGIN="NetscalerVserver" MAXLEN="23" />
+			<GKES:PROPERTY NAME="totHits" TYPE="long"
+					CLASSORIGIN="NetscalerVserver" />
+			<GKES:PROPERTY NAME="totSpillOvers" TYPE="long"
+					CLASSORIGIN="NetscalerVserver" />
+			<GKES:PROPERTY NAME="totalClients" TYPE="long"
+					CLASSORIGIN="NetscalerVserver" />
+			<GKES:PROPERTY NAME="clientConnOpenRate" TYPE="string"
+					CLASSORIGIN="NetscalerVserver" MAXLEN="20" />
+			<GKES:PROPERTY NAME="fullName" TYPE="string"
+					CLASSORIGIN="NetscalerVserver" MAXLEN="128" />
+			<GKES:PROPERTY NAME="curSslVpnUsers" TYPE="long"
+					CLASSORIGIN="NetscalerVserver" />
+			<GKES:PROPERTY NAME="totalServicesBound" TYPE="long"
+					CLASSORIGIN="NetscalerVserver" />
+			<GKES:PROPERTY NAME="health" TYPE="int"
+					CLASSORIGIN="NetscalerVserver" ISINDICATION="true" />
+			<GKES:PROPERTY NAME="ticksSinceLastStateChange" TYPE="long"
+					CLASSORIGIN="NetscalerVserver" />
+			<GKES:PROPERTY NAME="entityType" TYPE="int"
+					CLASSORIGIN="NetscalerVserver" />
+			<GKES:PROPERTY NAME="totalServers" TYPE="long"
+					CLASSORIGIN="NetscalerVserver" />
+			<GKES:PROPERTY NAME="activeActiveState" TYPE="int"
+					CLASSORIGIN="NetscalerVserver" />
+			<GKES:PROPERTY NAME="invalidRequestResponse" TYPE="long"
+					CLASSORIGIN="NetscalerVserver" />
+			<GKES:PROPERTY NAME="invalidRequestResponseDropped" TYPE="long"
+					CLASSORIGIN="NetscalerVserver" />
+			<GKES:PROPERTY NAME="tdId" TYPE="int"
+					CLASSORIGIN="NetscalerVserver" />
+			<GKES:PROPERTY NAME="establishedConn" TYPE="long"
+					CLASSORIGIN="NetscalerVserver" />
+		</GKES:CLASS>
+
+		<!--
+			- NetscalerVserverServiceTable
+		-->
+		<GKES:CLASS NAME="NetscalerVserverService" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="vsvrName" TYPE="string"
+					CLASSORIGIN="NetscalerVserverService" MAXLEN="128" />
+			<GKES:PROPERTY NAME="vsvrServiceName" TYPE="string"
+					CLASSORIGIN="NetscalerVserverService" MAXLEN="128" />
+			<GKES:PROPERTY NAME="idx" TYPE="string"
+					CLASSORIGIN="NetscalerVserverService" MAXLEN="4000" />
+			<GKES:PROPERTY NAME="vsvrServiceHits" TYPE="long"
+					CLASSORIGIN="NetscalerVserverService" />
+			<GKES:PROPERTY NAME="servicePersistentHits" TYPE="long"
+					CLASSORIGIN="NetscalerVserverService" />
+			<GKES:PROPERTY NAME="serviceWeight" TYPE="int"
+					CLASSORIGIN="NetscalerVserverService" />
+			<GKES:PROPERTY NAME="vsvrServiceFullName" TYPE="string"
+					CLASSORIGIN="NetscalerVserverService" MAXLEN="128" />
+			<GKES:PROPERTY NAME="vserverFullName" TYPE="string"
+					CLASSORIGIN="NetscalerVserverService" MAXLEN="128" />
+			<GKES:PROPERTY NAME="vsvrServiceEntityType" TYPE="int"
+					CLASSORIGIN="NetscalerVserverService" />
+		</GKES:CLASS>
+
+		<!--
+			- NetscalerLbvserverTable
+		-->
+		<GKES:CLASS NAME="NetscalerLbvserver" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="vsvrName" TYPE="string"
+					CLASSORIGIN="NetscalerLbvserver" MAXLEN="128" />
+			<GKES:PROPERTY NAME="idx" TYPE="string"
+					CLASSORIGIN="NetscalerLbvserver" MAXLEN="4000" />
+			<GKES:PROPERTY NAME="lBMethod" TYPE="int"
+					CLASSORIGIN="NetscalerLbvserver" />
+			<GKES:PROPERTY NAME="persistanceType" TYPE="int"
+					CLASSORIGIN="NetscalerLbvserver" />
+			<GKES:PROPERTY NAME="persistenceTimeOut" TYPE="int"
+					CLASSORIGIN="NetscalerLbvserver" />
+			<GKES:PROPERTY NAME="activeConn" TYPE="long"
+					CLASSORIGIN="NetscalerLbvserver" />
+			<GKES:PROPERTY NAME="avgSvrTTFB" TYPE="long"
+					CLASSORIGIN="NetscalerLbvserver" />
+			<GKES:PROPERTY NAME="rdpCookieParsed" TYPE="long"
+					CLASSORIGIN="NetscalerLbvserver" />
+		</GKES:CLASS>
+
+		<!-- SP : Summary Performance -->
+		<GKES:CLASS NAME="SP" PARENT="LogicalDevice"
+									ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="idx" TYPE="string" CLASSORIGIN="SP" MAXLEN="32" />
+			<GKES:PROPERTY NAME="cpuUsage" TYPE="double" CLASSORIGIN="SP"  />
+			<GKES:PROPERTY NAME="memoryUsage" TYPE="double" CLASSORIGIN="SP"  />
+			<GKES:PROPERTY NAME="temperature" TYPE="double" CLASSORIGIN="SP"  />
+		</GKES:CLASS>
+
+		<GKES:CLASS NAME="SPJuniper" PARENT="SP"
+									ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="cpuUsage1MAvg" TYPE="double" CLASSORIGIN="SPJuniper"  />
+			<GKES:PROPERTY NAME="cpuUsage5MAvg" TYPE="double" CLASSORIGIN="SPJuniper"  />
+			<GKES:PROPERTY NAME="cpuUsage15MAvg" TYPE="double" CLASSORIGIN="SPJuniper"	/>
+			<GKES:PROPERTY NAME="memTotalSizeMB" TYPE="double" CLASSORIGIN="SPJuniper" />
+			<GKES:PROPERTY NAME="engineidx" TYPE="string"
+								CLASSORIGIN="SPJuniper" MAXLEN="32" />
+		</GKES:CLASS>
+
+		<GKES:CLASS NAME="SPCitrix" PARENT="SP"
+									ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="temp_idx" TYPE="string" CLASSORIGIN="SPCitrix" MAXLEN="128" />
+			<GKES:PROPERTY NAME="memTotalSizeMB" TYPE="double" CLASSORIGIN="SPCitrix" />
+			<GKES:PROPERTY NAME="memUsedSizeMB" TYPE="double" CLASSORIGIN="SPCitrix" />
+			<GKES:PROPERTY NAME="memFreeSizeMB" TYPE="double" CLASSORIGIN="SPCitrix" />
+		</GKES:CLASS>
+
+		<GKES:CLASS NAME="SPFoundry" PARENT="SP"
+									ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="cpuUsage1MAvg" TYPE="double" CLASSORIGIN="SPFoundry"  />
+			<GKES:PROPERTY NAME="memTotalSizeMB" TYPE="double" CLASSORIGIN="SPFoundry" />
+			<GKES:PROPERTY NAME="memFreeSizeMB" TYPE="double" CLASSORIGIN="SPFoundry" />
+		</GKES:CLASS>
+
+		<GKES:CLASS NAME="HpCpu" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="entPhysicalIndex" TYPE="int"
+					CLASSORIGIN="HpCpu" />
+			<GKES:PROPERTY NAME="entPhysicalName" TYPE="string"
+					CLASSORIGIN="HpCpu" MAXLEN="255"/>
+			<GKES:PROPERTY NAME="entPhysicalDescr" TYPE="string"
+					CLASSORIGIN="HpCpu" MAXLEN="255"/>
+			<GKES:PROPERTY NAME="cpuUsage1Min" TYPE="int"
+					CLASSORIGIN="HpCpu" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="cpuUsage5Min" TYPE="int"
+					CLASSORIGIN="HpCpu" ISINDICATION="true"/>
+		</GKES:CLASS>
+
+		<GKES:CLASS NAME="HpMem" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="entPhysicalIndex" TYPE="int"
+					CLASSORIGIN="HpMem" />
+			<GKES:PROPERTY NAME="type" TYPE="int"
+					CLASSORIGIN="HpMem" />
+			<GKES:PROPERTY NAME="name" TYPE="string"
+					CLASSORIGIN="HpMem" MAXLEN="255"/>
+			<GKES:PROPERTY NAME="used" TYPE="long"
+					CLASSORIGIN="HpMem" />
+			<GKES:PROPERTY NAME="free" TYPE="long"
+					CLASSORIGIN="HpMem" />
+			<GKES:PROPERTY NAME="hpMemoryUsage" TYPE="int"
+					CLASSORIGIN="HpMem" ISINDICATION="true"/>
+		</GKES:CLASS>
+
+		<GKES:CLASS NAME="HpTemp" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="entPhysicalIndex" TYPE="int"
+					CLASSORIGIN="HpTemp" />
+			<GKES:PROPERTY NAME="entPhysicalDescr" TYPE="string"
+					CLASSORIGIN="HpTemp" MAXLEN="255"/>
+			<GKES:PROPERTY NAME="tempValue" TYPE="int"
+					CLASSORIGIN="HpTemp" />
+			<GKES:PROPERTY NAME="tempThreshold" TYPE="int"
+					CLASSORIGIN="HpTemp" />
+			<GKES:PROPERTY NAME="tempStatus" TYPE="int"
+					CLASSORIGIN="HpTemp" />
+		</GKES:CLASS>
+
+		<GKES:CLASS NAME="Station" PARENT="LogicalDevice"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="idx" TYPE="string"
+					CLASSORIGIN="Station" MAXLEN="20" />
+			<GKES:PROPERTY NAME="name" TYPE="string"
+					CLASSORIGIN="Station" MAXLEN="50" />
+			<GKES:PROPERTY NAME="ipAddr" TYPE="string"
+					CLASSORIGIN="Station" MAXLEN="20" />
+			<GKES:PROPERTY NAME="userId" TYPE="string"
+					CLASSORIGIN="Station" MAXLEN="20" />
+			<GKES:PROPERTY NAME="MAC" TYPE="string"
+					CLASSORIGIN="Station" MAXLEN="20" />
+			<GKES:PROPERTY NAME="authMode" TYPE="string"
+					CLASSORIGIN="Station" MAXLEN="50" />
+			<GKES:PROPERTY NAME="upTime" TYPE="string"
+					CLASSORIGIN="Station" MAXLEN="50" />
+			<GKES:PROPERTY NAME="apId" TYPE="string"
+					CLASSORIGIN="Station" MAXLEN="20" />
+			<GKES:PROPERTY NAME="sysClass" TYPE="string"
+					CLASSORIGIN="Station" MAXLEN="40" />
+			<GKES:PROPERTY NAME="sysLocation" TYPE="string"
+					CLASSORIGIN="Station" MAXLEN="100" />
+			<GKES:PROPERTY NAME="rxBps" TYPE="long" ISINDICATION = "true"
+					CLASSORIGIN="Station" />
+			<GKES:PROPERTY NAME="txBps" TYPE="long" ISINDICATION = "true"
+					CLASSORIGIN="Station" />
+			<GKES:PROPERTY NAME="ctrlVendorOid" TYPE="string"
+				CLASSORIGIN="Station"  MAXLEN="50"/>
+			<GKES:PROPERTY NAME="ssid" TYPE="string"
+				CLASSORIGIN="Station"  MAXLEN="50"/>
+			<GKES:PROPERTY NAME="rfBand" TYPE="string"
+				CLASSORIGIN="Station"  MAXLEN="50"/>
+		</GKES:CLASS>
+
+	</GKES:MODELCLASS>
+
+	<GKES:MODELASSOCIATION>
+		<GKES:ASSOCIATION NAME="HaveIPAddress"
+				TYPE="REFERENCE" ISCORE="true" >
+			<GKES:FIRSTCLASS NAME="Interface"
+					ROLE="haveIPAdress"
+					MULTIPLICITY="1"/>
+			<GKES:SECONDCLASS NAME="IpAddr"
+					ROLE="containedByInterface"
+					MULTIPLICITY="*"/>
+		</GKES:ASSOCIATION>
+		<GKES:ASSOCIATION NAME="SlbCurCfgMember"
+				TYPE="CONTAINMENT" ISCORE="true" >
+			<GKES:FIRSTCLASS NAME="SlbCurCfgGroup"
+					ROLE="groupOfMember"
+					MULTIPLICITY="1"/>
+			<GKES:SECONDCLASS NAME="SlbCurCfgRealServer"
+					ROLE="memberOfGroup"
+					MULTIPLICITY="*"/>
+		</GKES:ASSOCIATION>
+		<GKES:ASSOCIATION NAME="Connected"
+				TYPE="CONTAINMENT" ISCORE="true" >
+			<GKES:FIRSTCLASS NAME="AccessPoint"
+					ROLE="accessPoint"
+					MULTIPLICITY="1"/>
+			<GKES:SECONDCLASS NAME="Station"
+					ROLE="connectedTo"
+					MULTIPLICITY="*"/>
+		</GKES:ASSOCIATION>
+	</GKES:MODELASSOCIATION>
+</GKES:EXT_MODEL>

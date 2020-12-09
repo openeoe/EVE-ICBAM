@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE GKES:EXT_MODEL SYSTEM "resource/mi/model/ext_model.dtd">
+<GKES:EXT_MODEL
+	xmlns:GKES="http://www.gkes.co.kr">
+	<GKES:MODELCLASS>
+		<!--
+			- ComputerSystem
+		-->
+		<GKES:CLASS NAME="ComputerSystem" PARENT="System"
+				ISINDICATION ="true" ISABSTRACT="true">
+			<GKES:PROPERTY NAME="processCount" TYPE="int"
+					CLASSORIGIN="ComputerSystem" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="sysUpTime" TYPE="long"
+					CLASSORIGIN="ComputerSystem" />
+			<GKES:PROPERTY NAME="networkIOPerSec" TYPE="double"
+					CLASSORIGIN="ComputerSystem" />
+			<GKES:PROPERTY NAME="accounting" TYPE="boolean"
+					CLASSORIGIN="ComputerSystem" />
+			<GKES:PROPERTY NAME="loginHistory" TYPE="boolean"
+					CLASSORIGIN="ComputerSystem" />
+			<GKES:PROPERTY NAME="machineType" TYPE="string"
+					CLASSORIGIN="ComputerSystem" MAXLEN="20"/>
+			<GKES:PROPERTY NAME="perfAll" TYPE="int"
+					CLASSORIGIN="ComputerSystem"/>
+			<GKES:PROPERTY NAME="cpuCapacity" TYPE="string"
+					CLASSORIGIN="ComputerSystem" MAXLEN="20"/>
+			<GKES:PROPERTY NAME="memoryCapacity" TYPE="string"
+					CLASSORIGIN="ComputerSystem" MAXLEN="20"/>
+			<GKES:PROPERTY NAME="diskCapacity" TYPE="string"
+					CLASSORIGIN="ComputerSystem" MAXLEN="20"/>
+			<GKES:PROPERTY NAME="swapCapacity" TYPE="string"
+					CLASSORIGIN="ComputerSystem" MAXLEN="20"/>
+			<GKES:PROPERTY NAME="sysCloseWaitSession" TYPE="int"
+					CLASSORIGIN="ComputerSystem" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="sysLWPsNum" TYPE="int"
+					CLASSORIGIN="ComputerSystem" ISINDICATION="true"/>
+			<GKES:PROPERTY NAME="secondIpAddr" TYPE="string"
+					CLASSORIGIN="ComputerSystem" MAXLEN="20" />
+			<GKES:PROPERTY NAME="checkScriptName" TYPE="string"
+					CLASSORIGIN="ComputerSystem" MAXLEN="30"/>
+			<GKES:PROPERTY NAME="backupScriptName" TYPE="string"
+					CLASSORIGIN="ComputerSystem" MAXLEN="30"/>
+			<GKES:PROPERTY NAME="checkTerminal" TYPE="string"
+					CLASSORIGIN="ComputerSystem" MAXLEN="30"/>
+			<GKES:PROPERTY NAME="checkPort" TYPE="int"
+					CLASSORIGIN="ComputerSystem" />
+
+		</GKES:CLASS>
+
+		<!--
+			- Pc
+		-->
+		<GKES:CLASS NAME="Pc" PARENT="ComputerSystem"
+				ISINDICATION ="true" />
+
+		<!--
+			- Nt
+		-->
+		<GKES:CLASS NAME="Nt" PARENT="ComputerSystem"
+				ISINDICATION ="true" />
+
+		<!--
+			- Unix
+		-->
+		<GKES:CLASS NAME="Unix" PARENT="ComputerSystem"
+				ISINDICATION ="true" />
+
+		<!--
+			- Storage
+		-->
+		<GKES:CLASS NAME="Storage" PARENT="ComputerSystem"
+				ISINDICATION ="true" />
+		<!--
+			- NetworkSystem
+		-->
+		<GKES:CLASS NAME="NetworkSystem" PARENT="System"
+				ISINDICATION ="true" ISABSTRACT="true">
+			<GKES:PROPERTY NAME="sysUpTime" TYPE="long"
+					CLASSORIGIN="NetworkSystem" />
+			<GKES:PROPERTY NAME="serviceATM" TYPE="boolean"
+					CLASSORIGIN="NetworkSystem" />
+				<GKES:PROPERTY NAME="loginId" TYPE="string"
+					CLASSORIGIN="NetworkSystem" MAXLEN="20"/>
+				<GKES:PROPERTY NAME="passWd" TYPE="string"
+					CLASSORIGIN="NetworkSystem" MAXLEN="20"/>
+				<GKES:PROPERTY NAME="enPassWd" TYPE="string"
+					CLASSORIGIN="NetworkSystem" MAXLEN="20"/>
+			<GKES:PROPERTY NAME="checkScriptName" TYPE="string"
+					CLASSORIGIN="NetworkSystem" MAXLEN="30"/>
+			<GKES:PROPERTY NAME="backupScriptName" TYPE="string"
+					CLASSORIGIN="NetworkSystem" MAXLEN="30"/>
+			<GKES:PROPERTY NAME="checkTerminal" TYPE="string"
+					CLASSORIGIN="NetworkSystem" MAXLEN="30"/>
+			<GKES:PROPERTY NAME="checkPort" TYPE="int"
+					CLASSORIGIN="NetworkSystem" />
+
+		</GKES:CLASS>
+
+		<!--
+			- Router
+		-->
+		<GKES:CLASS NAME="Router" PARENT="NetworkSystem"
+				ISINDICATION ="true" />
+
+		<!--
+			- BBRouter
+		-->
+		<GKES:CLASS NAME="BBRouter" PARENT="Router"
+				ISINDICATION ="true" />
+
+		<!--
+			- ATMRouter
+		-->
+		<GKES:CLASS NAME="ATMRouter" PARENT="Router"
+				ISINDICATION ="true" />
+
+		<!--
+			- SwitchRouter
+		-->
+		<GKES:CLASS NAME="SwitchRouter" PARENT="Router"
+				ISINDICATION ="true" />
+
+		<!--
+			- Switch
+		-->
+		<GKES:CLASS NAME="Switch" PARENT="NetworkSystem"
+				ISINDICATION ="true" />
+
+		<!--
+			- SwitchHub
+		-->
+		<GKES:CLASS NAME="SwitchHub" PARENT="Switch"
+				ISINDICATION ="true" />
+
+		<!--
+			- L2 Switch
+		-->
+		<GKES:CLASS NAME="L2Switch" PARENT="Switch"
+				ISINDICATION ="true" />
+
+		<!--
+			- L3 Switch
+		-->
+		<GKES:CLASS NAME="L3Switch" PARENT="Switch"
+				ISINDICATION ="true" />
+
+		<!--
+			- L4 Switch
+		-->
+		<GKES:CLASS NAME="L4Switch" PARENT="Switch"
+				ISINDICATION ="true" />
+
+		<!--
+			- WGSwitch
+		-->
+		<GKES:CLASS NAME="WGSwitch" PARENT="Switch"
+				ISINDICATION ="true" />
+
+		<!--
+			- BBSwitch
+		-->
+		<GKES:CLASS NAME="BBSwitch" PARENT="Switch"
+				ISINDICATION ="true" />
+
+		<!--
+			- ATMSwitch
+		-->
+		<GKES:CLASS NAME="ATMSwitch" PARENT="Switch"
+				ISINDICATION ="true" />
+
+		<!--
+			- VPN
+		-->
+		<GKES:CLASS NAME="VPN" PARENT="NetworkSystem"
+				ISINDICATION ="true" />
+
+		<!--
+			- Hub
+		-->
+		<GKES:CLASS NAME="Hub" PARENT="NetworkSystem"
+				ISINDICATION ="true" />
+
+		<GKES:CLASS NAME="Peripheral" PARENT="NetworkSystem"
+				ISINDICATION ="true" />
+
+		<!-- IRTU  -->
+		<GKES:CLASS NAME="IRTU" PARENT="NetworkSystem"
+				ISINDICATION ="true" />
+
+		<!--
+			- MSPP
+		-->
+		<GKES:CLASS NAME="MSPP" PARENT="NetworkSystem"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="tid" TYPE="string"
+					CLASSORIGIN="MSPP" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="RTid" TYPE="string"
+					CLASSORIGIN="MSPP" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="Ringid" TYPE="string"
+					CLASSORIGIN="MSPP" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="MSPPType" TYPE="string"
+					CLASSORIGIN="MSPP" MAXLEN="50"/>
+		</GKES:CLASS>
+
+		<!--
+			- TMS
+		-->
+		<GKES:CLASS NAME="TMS" PARENT="NetworkSystem"
+				ISINDICATION ="true" />
+
+		<!--
+			- MUX
+		-->
+		<GKES:CLASS NAME="MUX" PARENT="NetworkSystem"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="tid" TYPE="string"
+					CLASSORIGIN="MUX" MAXLEN="50"/>
+		</GKES:CLASS>
+
+		<!--
+			- DOTS
+		-->
+		<GKES:CLASS NAME="DOTS" PARENT="NetworkSystem"
+				ISINDICATION ="true" />
+
+		<GKES:CLASS NAME="QOS" PARENT="NetworkSystem"
+				ISINDICATION ="true" />
+		<GKES:CLASS NAME="IPS" PARENT="NetworkSystem"
+				ISINDICATION ="true" />
+		<GKES:CLASS NAME="DDoS" PARENT="NetworkSystem"
+				ISINDICATION ="true" />
+		<GKES:CLASS NAME="FW" PARENT="NetworkSystem"
+				ISINDICATION ="true" />
+		<GKES:CLASS NAME="WebFW" PARENT="NetworkSystem"
+				ISINDICATION ="true" />
+		<GKES:CLASS NAME="SANSwitch" PARENT="Switch"
+				ISINDICATION ="true" />
+
+		<GKES:CLASS NAME="UTM" PARENT="NetworkSystem"
+				ISINDICATION ="true" />
+
+		<GKES:CLASS NAME="IPPBX" PARENT="NetworkSystem"
+				ISINDICATION ="true" />
+		<GKES:CLASS NAME="VoiceGW" PARENT="NetworkSystem"
+				ISINDICATION ="true" />
+		<GKES:CLASS NAME="AnalogGW" PARENT="NetworkSystem"
+				ISINDICATION ="true" />
+		<GKES:CLASS NAME="IPCamera" PARENT="NetworkSystem"
+				ISINDICATION ="true" />
+		<GKES:CLASS NAME="PoESwitch" PARENT="Switch"
+				ISINDICATION ="true" />
+		<GKES:CLASS NAME="STB" PARENT="ComputerSystem"
+				ISINDICATION ="true" />
+
+		<GKES:CLASS NAME="WController" PARENT="NetworkSystem"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="MAC" TYPE="string"
+				CLASSORIGIN="WController" MAXLEN="20"/>
+			<GKES:PROPERTY NAME="version" TYPE="string"
+				CLASSORIGIN="WController" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="opStatus" TYPE="string" ISINDICATION ="true"
+				CLASSORIGIN="WController" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="rxBps" TYPE="long" ISINDICATION ="true"
+				CLASSORIGIN="WController" />
+			<GKES:PROPERTY NAME="txBps" TYPE="long" ISINDICATION ="true"
+				CLASSORIGIN="WController" />
+			<GKES:PROPERTY NAME="conApCnt" TYPE="int" ISINDICATION ="true"
+				CLASSORIGIN="WController" />
+			<GKES:PROPERTY NAME="conStationCnt" TYPE="int" ISINDICATION ="true"
+				CLASSORIGIN="WController" />
+			<GKES:PROPERTY NAME="ctrlVendorOid" TYPE="string"
+				CLASSORIGIN="WController"  MAXLEN="50"/>
+			<GKES:PROPERTY NAME="ifIdx" TYPE="string"
+				CLASSORIGIN="WController"  MAXLEN="100"/>
+			<GKES:PROPERTY NAME="perfIdx" TYPE="string"
+				CLASSORIGIN="WController"  MAXLEN="100"/>
+			<GKES:PROPERTY NAME="cpuIdx0" TYPE="string"
+				CLASSORIGIN="WController"  MAXLEN="50"/>
+			<GKES:PROPERTY NAME="cpuIdx1" TYPE="string"
+				CLASSORIGIN="WController"  MAXLEN="50"/>
+			<GKES:PROPERTY NAME="cpuIdx2" TYPE="string"
+				CLASSORIGIN="WController"  MAXLEN="50"/>
+			<GKES:PROPERTY NAME="cpuIdx3" TYPE="string"
+				CLASSORIGIN="WController"  MAXLEN="50"/>
+			<GKES:PROPERTY NAME="cpuIdx4" TYPE="string"
+				CLASSORIGIN="WController"  MAXLEN="50"/>
+			<GKES:PROPERTY NAME="cpuIdx5" TYPE="string"
+				CLASSORIGIN="WController"  MAXLEN="50"/>
+			<GKES:PROPERTY NAME="cpuIdx6" TYPE="string"
+				CLASSORIGIN="WController"  MAXLEN="50"/>
+			<GKES:PROPERTY NAME="cpuIdx7" TYPE="string"
+				CLASSORIGIN="WController"  MAXLEN="50"/>
+		</GKES:CLASS>
+		<GKES:CLASS NAME="AccessPoint" PARENT="NetworkSystem"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="idx" TYPE="string"
+				CLASSORIGIN="AccessPoint" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="MAC" TYPE="string"
+				CLASSORIGIN="AccessPoint" MAXLEN="20"/>
+			<GKES:PROPERTY NAME="apId" TYPE="string"
+				CLASSORIGIN="AccessPoint" MAXLEN="20"/>
+			<GKES:PROPERTY NAME="version" TYPE="string"
+				CLASSORIGIN="AccessPoint" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="opStatus" TYPE="string" ISINDICATION ="true"
+				CLASSORIGIN="AccessPoint" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="address" TYPE="string"
+				CLASSORIGIN="AccessPoint" MAXLEN="100"/>
+			<GKES:PROPERTY NAME="address_en" TYPE="string"
+				CLASSORIGIN="AccessPoint" MAXLEN="100"/>
+			<GKES:PROPERTY NAME="name_en" TYPE="string"
+				CLASSORIGIN="AccessPoint" MAXLEN="100"/>
+			<GKES:PROPERTY NAME="detailAddress" TYPE="string"
+				CLASSORIGIN="AccessPoint" MAXLEN="100"/>
+			<GKES:PROPERTY NAME="radioType" TYPE="string"
+				CLASSORIGIN="AccessPoint" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="apMode" TYPE="string"
+				CLASSORIGIN="AccessPoint" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="ownerType" TYPE="string"
+				CLASSORIGIN="AccessPoint" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="ispCode" TYPE="string"
+				CLASSORIGIN="AccessPoint" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="ispType" TYPE="string"
+				CLASSORIGIN="AccessPoint" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="latitude" TYPE="string"
+				CLASSORIGIN="AccessPoint" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="longitude" TYPE="string"
+				CLASSORIGIN="AccessPoint" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="isSetSecurity" TYPE="boolean"
+				CLASSORIGIN="AccessPoint"/>
+			<GKES:PROPERTY NAME="installType" TYPE="string"
+				CLASSORIGIN="AccessPoint" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="installDate" TYPE="string"
+				CLASSORIGIN="AccessPoint" MAXLEN="8"/>
+			<GKES:PROPERTY NAME="rxBps" TYPE="long"
+				CLASSORIGIN="AccessPoint" />
+			<GKES:PROPERTY NAME="txBps" TYPE="long"
+				CLASSORIGIN="AccessPoint" />
+			<GKES:PROPERTY NAME="ctrlVendorOid" TYPE="string"
+				CLASSORIGIN="AccessPoint"  MAXLEN="50"/>
+			<GKES:PROPERTY NAME="ifIdx" TYPE="string"
+				CLASSORIGIN="AccessPoint"  MAXLEN="100"/>
+			<GKES:PROPERTY NAME="bandIdx1" TYPE="string"
+				CLASSORIGIN="AccessPoint"  MAXLEN="50"/>
+			<GKES:PROPERTY NAME="bandIdx2" TYPE="string"
+				CLASSORIGIN="AccessPoint"  MAXLEN="50"/>
+		</GKES:CLASS>
+		<GKES:CLASS NAME="WIPS" PARENT="NetworkSystem"
+				ISINDICATION ="true" />
+
+		<GKES:CLASS NAME="MPLS" PARENT="NetworkSystem"
+				ISINDICATION ="true" />
+		<GKES:CLASS NAME="NAC" PARENT="NetworkSystem"
+				ISINDICATION ="true" />
+		<GKES:CLASS NAME="COT" PARENT="NetworkSystem"
+				ISINDICATION ="true" />
+		<GKES:CLASS NAME="WDM" PARENT="NetworkSystem"
+				ISINDICATION ="true" />
+	</GKES:MODELCLASS>
+
+	<GKES:MODELASSOCIATION>
+		<GKES:ASSOCIATION NAME="ControlledBy"
+				TYPE="CONTAINMENT" ISCORE="true" >
+			<GKES:FIRSTCLASS NAME="WController"
+					ROLE="controll"
+					MULTIPLICITY="1"/>
+			<GKES:SECONDCLASS NAME="AccessPoint"
+					ROLE="controlledBy"
+					MULTIPLICITY="*"/>
+		</GKES:ASSOCIATION>
+		<GKES:ASSOCIATION NAME="SystemApplicationElement"
+				TYPE="REFERENCE" ISCORE="true">
+			<GKES:FIRSTCLASS NAME="ComputerSystem"
+					ROLE="applicationElementTargetSystem"
+					MULTIPLICITY="1"/>
+			<GKES:SECONDCLASS NAME="ApplicationElement"
+					ROLE="applicationElementOfSystem"
+					MULTIPLICITY="*"/>
+		</GKES:ASSOCIATION>
+	</GKES:MODELASSOCIATION>
+</GKES:EXT_MODEL>

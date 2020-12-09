@@ -1,0 +1,433 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE GKES:EXT_MODEL SYSTEM "resource/mi/model/ext_model.dtd">
+<GKES:EXT_MODEL
+	xmlns:GKES="http://www.gkes.co.kr">
+	<GKES:MODELCLASS>
+		<!--
+			- SW(SoftWare) Class
+		-->
+		<GKES:CLASS NAME="SW" PARENT="LogicalElement"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="name" TYPE="string"
+					CLASSORIGIN="SW" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="vendor" TYPE="string"
+					CLASSORIGIN="SW" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="type" TYPE="int"
+					CLASSORIGIN="SW" />
+			<GKES:PROPERTY NAME="installDate" TYPE="long"
+					CLASSORIGIN="SW" />
+			<GKES:PROPERTY NAME="version" TYPE="string"
+					CLASSORIGIN="SW" MAXLEN="50"/>
+		</GKES:CLASS>
+
+		<!--
+			- LogFile
+		-->
+		<GKES:CLASS NAME="LogFile" PARENT="LogicalElement"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="path" TYPE="string"
+					CLASSORIGIN="LogFile" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="lastLine" TYPE="int"
+					CLASSORIGIN="LogFile" />
+			<GKES:PROPERTY NAME="fileSize" TYPE="int"
+					CLASSORIGIN="LogFile" />
+			<GKES:PROPERTY NAME="lastUpdateTime" TYPE="long"
+					CLASSORIGIN="LogFile" />
+			<GKES:PROPERTY NAME="ipAddr" TYPE="string"
+					CLASSORIGIN="LogFile" MAXLEN="30"/>
+		</GKES:CLASS>
+
+		<!--
+			- File
+		-->
+		<GKES:CLASS NAME="File" PARENT="LogicalElement"
+				ISINDICATION ="true" >
+			<GKES:PROPERTY NAME="name" TYPE="string"
+					CLASSORIGIN="File" MAXLEN="256"/>
+			<GKES:PROPERTY NAME="pathName" TYPE="string"
+					CLASSORIGIN="File" MAXLEN="256"/>
+			<GKES:PROPERTY NAME="fileSize" TYPE="int"
+					CLASSORIGIN="File" />
+			<GKES:PROPERTY NAME="creationTime" TYPE="long"
+					CLASSORIGIN="File" />
+			<GKES:PROPERTY NAME="lastUpdateTime" TYPE="long"
+					CLASSORIGIN="File" />
+			<GKES:PROPERTY NAME="fileMode" TYPE="int"
+					CLASSORIGIN="File" />
+			<GKES:PROPERTY NAME="fileType" TYPE="int"
+					CLASSORIGIN="File" />
+		</GKES:CLASS>
+
+		<!--
+			- ServiceAccessPoint
+		-->
+		<GKES:CLASS NAME="ServiceAccessPoint" PARENT="LogicalElement"
+				ISABSTRACT="true"/>
+
+		<!--
+			- Application Class
+		-->
+		<GKES:CLASS NAME="Application" PARENT="LogicalElement">
+			<GKES:PROPERTY NAME="name" TYPE="string"
+				CLASSORIGIN="Application" MAXLEN="100"/>
+			<GKES:PROPERTY NAME="descr" TYPE="string"
+				CLASSORIGIN="Application" MAXLEN="255"/>
+			<GKES:PROPERTY NAME="cpuUsage" TYPE="int"
+				CLASSORIGIN="Application" />
+			<GKES:PROPERTY NAME="memoryUsage" TYPE="int"
+				CLASSORIGIN="Application" />
+			<GKES:PROPERTY NAME="ipAddr" TYPE="string"
+				CLASSORIGIN="Application" MAXLEN="30"/>
+		</GKES:CLASS>
+
+		<!--
+			- ManagementAccessPoint
+		-->
+		<GKES:CLASS NAME="ManagementAccessPoint" PARENT="ServiceAccessPoint"
+				ISABSTRACT="true">
+			<GKES:PROPERTY NAME="target" TYPE="string"
+					CLASSORIGIN="ManagementAccessPoint" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="bindTarget" TYPE="string"
+					CLASSORIGIN="ManagementAccessPoint" MAXLEN="50"/>
+		</GKES:CLASS>
+
+		<!--
+			- SNMP
+		-->
+		<GKES:CLASS NAME="SNMP" PARENT="ManagementAccessPoint">
+			<GKES:PROPERTY NAME="SNMPName" TYPE="string"
+					CLASSORIGIN="SNMP" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="sysName" TYPE="string"
+					CLASSORIGIN="SNMP" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="enterprise" TYPE="string"
+					CLASSORIGIN="SNMP" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="version" TYPE="int"
+					CLASSORIGIN="SNMP" />
+			<GKES:PROPERTY NAME="community" TYPE="string"
+					CLASSORIGIN="SNMP" MAXLEN="20"/>
+			<GKES:PROPERTY NAME="port" TYPE="int"
+					CLASSORIGIN="SNMP" >
+				<GKES:VALUE>161</GKES:VALUE>
+			</GKES:PROPERTY>
+			<GKES:PROPERTY NAME="isExternal" TYPE="int"
+					CLASSORIGIN="SNMP">
+				<GKES:VALUE>0</GKES:VALUE>
+			</GKES:PROPERTY>
+			<GKES:PROPERTY NAME="authUser" TYPE="string"
+					CLASSORIGIN="SNMP" MAXLEN="30"/>
+			<GKES:PROPERTY NAME="authProtocol" TYPE="string"
+					CLASSORIGIN="SNMP" MAXLEN="30"/>
+			<GKES:PROPERTY NAME="authPassword" TYPE="string"
+					CLASSORIGIN="SNMP" MAXLEN="30"/>
+			<GKES:PROPERTY NAME="privProtocol" TYPE="string"
+					CLASSORIGIN="SNMP" MAXLEN="30"/>
+			<GKES:PROPERTY NAME="privPassword" TYPE="string"
+					CLASSORIGIN="SNMP" MAXLEN="30"/>
+
+
+		</GKES:CLASS>
+
+		<!--
+			- ICMP
+		-->
+		<GKES:CLASS NAME="ICMP" PARENT="ManagementAccessPoint">
+			<GKES:PROPERTY NAME="ICMPName" TYPE="string"
+					CLASSORIGIN="ICMP" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="isExternal" TYPE="int"
+					CLASSORIGIN="ICMP">
+				<GKES:VALUE>0</GKES:VALUE>
+			</GKES:PROPERTY>
+		</GKES:CLASS>
+
+		<!--
+			- CP
+		-->
+		<GKES:CLASS NAME="CP" PARENT="ManagementAccessPoint">
+			<GKES:PROPERTY NAME="port" TYPE="int"
+					CLASSORIGIN="CP" />
+			<GKES:PROPERTY NAME="version" TYPE="int"
+					CLASSORIGIN="CP" />
+		</GKES:CLASS>
+
+		<!--
+			- RMI
+		-->
+		<GKES:CLASS NAME="RMI" PARENT="ManagementAccessPoint">
+			<GKES:PROPERTY NAME="port" TYPE="int"
+					CLASSORIGIN="RMI" />
+		</GKES:CLASS>
+
+		<!--
+			- SQL
+		-->
+		<GKES:CLASS NAME="SQL" PARENT="ManagementAccessPoint">
+			<GKES:PROPERTY NAME="dbVersion" TYPE="string"
+					CLASSORIGIN="SQL" MAXLEN="20"/>
+			<GKES:PROPERTY NAME="SQLName" TYPE="string"
+					CLASSORIGIN="SQL" MAXLEN="20"/>
+			<GKES:PROPERTY NAME="port" TYPE="int"
+					CLASSORIGIN="SQL" />
+			<GKES:PROPERTY NAME="sId" TYPE="string"
+					CLASSORIGIN="SQL" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="userName" TYPE="string"
+					CLASSORIGIN="SQL" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="userPasswd" TYPE="string"
+					CLASSORIGIN="SQL" MAXLEN="50"/>
+		</GKES:CLASS>
+
+
+		<!--
+			- LONTALK :	 Lonworks Protocol
+		-->
+		<GKES:CLASS NAME="LONTALK" PARENT="ManagementAccessPoint">
+			<GKES:PROPERTY NAME="name" TYPE="string"
+					CLASSORIGIN="LONTALK" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="port" TYPE="int"
+					CLASSORIGIN="LONTALK" />
+			<GKES:PROPERTY NAME="isExternal" TYPE="int"
+					CLASSORIGIN="LONTALK">
+				<GKES:VALUE>0</GKES:VALUE>
+			</GKES:PROPERTY>
+		</GKES:CLASS>
+
+		<!--
+			- Discovery Class
+		-->
+		<GKES:CLASS NAME="Discovery" PARENT="LogicalElement">
+			<GKES:PROPERTY NAME="properties" TYPE="string" ISLIST="true"
+					CLASSORIGIN="Discovery" />
+			<GKES:PROPERTY NAME="intervalSec" TYPE="int"
+					CLASSORIGIN="Discovery" />
+			<GKES:PROPERTY NAME="timerid" TYPE="int"
+					CLASSORIGIN="Discovery" />
+			<GKES:PROPERTY NAME="protocol" TYPE="string"
+					CLASSORIGIN="Discovery" MAXLEN="20" />
+		</GKES:CLASS>
+
+		<!--
+			- Transaction Class
+		-->
+		<GKES:CLASS NAME="Transaction" PARENT="LogicalElement">
+			<GKES:PROPERTY NAME="controlIndex" TYPE="int"
+					CLASSORIGIN="Transaction"/>
+			<GKES:PROPERTY NAME="transportProtocol" TYPE="int"
+					CLASSORIGIN="Transaction"/>
+			<GKES:PROPERTY NAME="clientAddress" TYPE="string"
+					CLASSORIGIN="Transaction" MAXLEN="100"/>
+			<GKES:PROPERTY NAME="serverAddress" TYPE="string"
+					CLASSORIGIN="Transaction" MAXLEN="100"/>
+			<GKES:PROPERTY NAME="transactionId" TYPE="string"
+					CLASSORIGIN="Transaction" MAXLEN="200"/>
+			<GKES:PROPERTY NAME="clientTimeAvg" TYPE="int"
+					CLASSORIGIN="Transaction" />
+			<GKES:PROPERTY NAME="clientTimeSum" TYPE="int"
+					CLASSORIGIN="Transaction" />
+			<GKES:PROPERTY NAME="clientTimeSumSqr" TYPE="long"
+					CLASSORIGIN="Transaction" />
+			<GKES:PROPERTY NAME="serverTimeAvg" TYPE="int"
+					CLASSORIGIN="Transaction" />
+			<GKES:PROPERTY NAME="serverTimeSum" TYPE="int"
+					CLASSORIGIN="Transaction" />
+			<GKES:PROPERTY NAME="serverTimeSqr" TYPE="long"
+					CLASSORIGIN="Transaction" />
+			<GKES:PROPERTY NAME="serverResponseTimeAvg" TYPE="int"
+					CLASSORIGIN="Transaction" />
+			<GKES:PROPERTY NAME="serverResponseTimeSum" TYPE="int"
+					CLASSORIGIN="Transaction" />
+			<GKES:PROPERTY NAME="serverResponseTimeSumSqr" TYPE="long"
+					CLASSORIGIN="Transaction" />
+			<GKES:PROPERTY NAME="responseNetworkTimeAvg" TYPE="int"
+					CLASSORIGIN="Transaction" />
+			<GKES:PROPERTY NAME="responseNetworkTimeSum" TYPE="int"
+					CLASSORIGIN="Transaction" />
+			<GKES:PROPERTY NAME="responseNetworkTimeSumSqr" TYPE="long"
+					CLASSORIGIN="Transaction" />
+			<GKES:PROPERTY NAME="transactionTimeAvg" TYPE="int"
+					CLASSORIGIN="Transaction" />
+			<GKES:PROPERTY NAME="transactionTimeSum" TYPE="int"
+					CLASSORIGIN="Transaction" />
+			<GKES:PROPERTY NAME="transactionTimeSumSqr" TYPE="long"
+					CLASSORIGIN="Transaction" />
+			<GKES:PROPERTY NAME="numSuccessful" TYPE="int"
+					CLASSORIGIN="Transaction" />
+			<GKES:PROPERTY NAME="numFailed" TYPE="int"
+					CLASSORIGIN="Transaction" />
+			<GKES:PROPERTY NAME="inOctetsPerSec" TYPE="double"
+					CLASSORIGIN="Transaction" />
+			<GKES:PROPERTY NAME="outOctetsPerSec" TYPE="double"
+					CLASSORIGIN="Transaction" />
+		</GKES:CLASS>
+
+		<!--
+			- URL Class
+		-->
+		<GKES:CLASS NAME="URL" PARENT="LogicalElement">
+			<GKES:PROPERTY NAME="serverAddress" TYPE="string"
+					CLASSORIGIN="URL" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="clientTime" TYPE="int"
+					CLASSORIGIN="URL" />
+			<GKES:PROPERTY NAME="method" TYPE="int"
+					CLASSORIGIN="URL" />
+			<GKES:PROPERTY NAME="version" TYPE="int"
+					CLASSORIGIN="URL" />
+			<GKES:PROPERTY NAME="packetType" TYPE="int"
+					CLASSORIGIN="URL" />
+			<GKES:PROPERTY NAME="url" TYPE="string"
+					CLASSORIGIN="URL" MAXLEN="100"/>
+			<GKES:PROPERTY NAME="controlIndex" TYPE="int"
+					CLASSORIGIN="URL"/>
+			<GKES:PROPERTY NAME="controlStatus" TYPE="int"
+					CLASSORIGIN="URL"/>
+			<GKES:PROPERTY NAME="sampleInterval" TYPE="int"
+					CLASSORIGIN="URL"/>
+			<GKES:PROPERTY NAME="controlIP" TYPE="string"
+					CLASSORIGIN="URL" MAXLEN="20"/>
+			<GKES:PROPERTY NAME="availability" TYPE="int"
+					CLASSORIGIN="URL" />
+			<GKES:PROPERTY NAME="responseTime" TYPE="int"
+					CLASSORIGIN="URL" />
+			<GKES:PROPERTY NAME="throughput" TYPE="int"
+					CLASSORIGIN="URL" />
+			<GKES:PROPERTY NAME="transactionTime" TYPE="int"
+					CLASSORIGIN="URL" />
+		</GKES:CLASS>
+
+		<!--
+			- Connector
+		-->
+		<GKES:CLASS NAME="Connector" PARENT="LogicalElement" ISABSTRACT="true">
+			<GKES:PROPERTY NAME="name" TYPE="string"
+					CLASSORIGIN="Connector" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="point1" TYPE="string"
+					CLASSORIGIN="Connector" MAXLEN="100"/>
+			<GKES:PROPERTY NAME="point2" TYPE="string"
+					CLASSORIGIN="Connector" MAXLEN="100"/>
+		</GKES:CLASS>
+
+		<!--
+			- LogicalCircuit
+		-->
+		<GKES:CLASS NAME="LogicalCircuit" PARENT="Connector">
+			<GKES:PROPERTY NAME="type" TYPE="int"
+					CLASSORIGIN="LogicalCircuit"/>
+			<GKES:PROPERTY NAME="distance" TYPE="int"
+					CLASSORIGIN="LogicalCircuit"/>
+		</GKES:CLASS>
+
+		<!--
+			- Menu
+		-->
+		<GKES:CLASS NAME="Menu" PARENT="LogicalElement">
+			<GKES:PROPERTY NAME="name" TYPE="string"
+					CLASSORIGIN="Menu" MAXLEN="50"/>
+			<GKES:PROPERTY NAME="category1" TYPE="int"
+					CLASSORIGIN="Menu"/>
+			<GKES:PROPERTY NAME="category2" TYPE="int"
+					CLASSORIGIN="Menu"/>
+			<GKES:PROPERTY NAME="descr" TYPE="string"
+					CLASSORIGIN="Menu" MAXLEN="50"/>
+		</GKES:CLASS>
+
+		<!--
+			- PMComp
+		-->
+		<GKES:CLASS NAME="PMComp" PARENT="LogicalElement"
+				ISABSTRACT="true"/>
+
+		<!--
+			- FMComp
+		-->
+		<GKES:CLASS NAME="FMComp" PARENT="LogicalElement"
+				ISABSTRACT="true"/>
+
+		<!--
+			- IpAddr
+		-->
+		<GKES:CLASS NAME="IpAddr" PARENT="LogicalElement">
+			<GKES:PROPERTY NAME="ip" TYPE="string"
+					CLASSORIGIN="IpAddr" MAXLEN="20"/>
+		</GKES:CLASS>
+
+		<!--
+			- ApplicationElement
+		-->
+		<GKES:CLASS NAME="ApplicationElement" PARENT="LogicalElement"
+				ISABSTRACT="true" />
+
+	</GKES:MODELCLASS>
+
+	<GKES:MODELASSOCIATION>
+
+		<GKES:ASSOCIATION NAME="ManagedBy"
+				TYPE="REFERENCE" ISCORE="true" ISINDICATION="true">
+			<GKES:FIRSTCLASS NAME="ManagedSystemElement"
+					ROLE="targetSystem"
+					MULTIPLICITY="1"/>
+			<GKES:SECONDCLASS NAME="ManagementAccessPoint"
+					ROLE="accessPointOfSystem"
+					MULTIPLICITY="*"/>
+		</GKES:ASSOCIATION>
+
+		<GKES:ASSOCIATION NAME="RunningOn"
+				TYPE="REFERENCE" ISCORE="true" >
+			<GKES:FIRSTCLASS NAME="ComputerSystem"
+					ROLE="systemOfRunningApplication"
+					MULTIPLICITY="*"/>
+			<GKES:SECONDCLASS NAME="Application"
+					ROLE="runningApplicationOnSystem"
+					MULTIPLICITY="*"/>
+		</GKES:ASSOCIATION>
+
+		<GKES:ASSOCIATION NAME="InstalledSW"
+				TYPE="REFERENCE" ISCORE="true" >
+			<GKES:FIRSTCLASS NAME="ComputerSystem"
+					ROLE="haveSW"
+					MULTIPLICITY="*"/>
+			<GKES:SECONDCLASS NAME="SW"
+					ROLE="installed"
+					MULTIPLICITY="*"/>
+		</GKES:ASSOCIATION>
+
+		<GKES:ASSOCIATION NAME="ApplicationSW"
+				TYPE="REFERENCE" ISCORE="true" >
+			<GKES:FIRSTCLASS NAME="Application"
+					ROLE="elementOfSw"
+					MULTIPLICITY="1"/>
+			<GKES:SECONDCLASS NAME="SW"
+					ROLE="applicationSW"
+					MULTIPLICITY="*"/>
+		</GKES:ASSOCIATION>
+
+		<GKES:ASSOCIATION NAME="ApplicationLog"
+				TYPE="REFERENCE" ISCORE="true" >
+			<GKES:FIRSTCLASS NAME="Application"
+					ROLE="writeLog"
+					MULTIPLICITY="1"/>
+			<GKES:SECONDCLASS NAME="LogFile"
+					ROLE="logOfApplication"
+					MULTIPLICITY="*"/>
+		</GKES:ASSOCIATION>
+
+		<GKES:ASSOCIATION NAME="ApplicationFile"
+				TYPE="REFERENCE" ISCORE="true" >
+			<GKES:FIRSTCLASS NAME="Application"
+					ROLE="hasFiles"
+					MULTIPLICITY="*"/>
+			<GKES:SECONDCLASS NAME="File"
+					ROLE="fileOfApplicationes"
+					MULTIPLICITY="*"/>
+		</GKES:ASSOCIATION>
+
+		<GKES:ASSOCIATION NAME="SubMenu"
+				TYPE="REFERENCE" ISCORE="true" >
+			<GKES:FIRSTCLASS NAME="Menu"
+					ROLE="contain"
+					MULTIPLICITY="1"/>
+			<GKES:SECONDCLASS NAME="Menu"
+					ROLE="elementOf"
+					MULTIPLICITY="*"/>
+		</GKES:ASSOCIATION>
+
+	</GKES:MODELASSOCIATION>
+
+</GKES:EXT_MODEL>
