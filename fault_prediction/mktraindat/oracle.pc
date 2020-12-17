@@ -1,0 +1,2083 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <signal.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <pgtypes_numeric.h>
+
+#include "mktrain.h"
+
+EXEC SQL INCLUDE sqlca;
+
+extern RAWDATA gdat[];
+extern float gavg[];
+extern int gnum[];
+
+extern void init_STATDATA();
+extern void init_RAWDATA(char* fromdate);
+
+static ltpTcl_HashTable* init_Hash();
+RAWDATA* find_RAWDATA(ltpTcl_HashTable* tbl, char* date);
+static int insert_RESINFO_Hash(ltpTcl_HashTable* IF_TBL, char* sub_inst, char* containment);
+static int insert_RAWDATA_Hash(ltpTcl_HashTable* RAW_TBL, char* coldate, float value);
+static ltpTcl_HashTable* traffic_in_hash(char* sub_inst, char* fromdate);
+static ltpTcl_HashTable* traffic_out_hash(char* sub_inst, char* fromdate);
+static ltpTcl_HashTable* resource_mem_unix_hash(char* sub_inst, char* fromdate);
+static ltpTcl_HashTable* resource_mem_nt_hash(char* sub_inst, char* fromdate);
+static ltpTcl_HashTable* resource_swap_hash(char* sub_inst, char* fromdate);
+static ltpTcl_HashTable* resource_fs_hash(char* sub_inst, char* fromdate);
+static ltpTcl_HashTable* environment_temp_hash(char* sub_inst, char* fromdate);
+static ltpTcl_HashTable* apc_cpu_hash(char* sub_inst, char* fromdate);
+static ltpTcl_HashTable* apc_mem_hash(char* sub_inst, char* fromdate);
+static ltpTcl_HashTable* apcluster_const_hash(char* sub_inst, char* fromdate);
+static void dump_RAWDATA_File(FILE* fp);
+static int get_hour(char* strtime);
+
+void select_traffic(char* db_dir, int in_out, RESINFO* resinfo, char* today, char* fromdate);
+void select_resource_mem(char* inst, RESINFO* resinfo, char* today, char* fromdate);
+void select_resource_swap(char* db_dir, RESINFO* resinfo, char* today, char* fromdate);
+void select_resource_fsusage(char* db_dir, RESINFO* resinfo, char* today, char* fromdate);
+void select_environment_temp(char* db_dir, RESINFO* resinfo, char* today, char* fromdate);
+
+void select_apc_resource_cpu(char* inst, RESINFO* resinfo, char* today, char* fromdate);
+void select_apc_resource_mem(char* inst, RESINFO* resinfo, char* today, char* fromdate);
+void select_apcluster_const(char* inst, RESINFO* resinfo, char* today, char* fromdate);
+
+
+int loginOracle(char* site, char* dbname, char* user, char* passwd)
+{
+EXEC SQL BEGIN DECLARE SECTION;
+    varchar _user[32];
+    varchar _passwd[32];
+    varchar _dbname[64];
+EXEC SQL END DECLARE SECTION;
+
+	if (user == NULL || passwd == NULL || dbname == NULL) {
+		LOGG(L_ERROR, "Database login failed: invalid user, passwd or dbname");
+		return (-1);
+	}
+
+	STRCPY(_user, user);
+	STRCPY(_passwd, passwd);
+	STRCPY(_dbname, dbname);
+
+	EXEC SQL CONNECT TO :_dbname USER :_user USING :_passwd;
+
+	if (ISORAERROR) {
+		LOGG(L_ERROR, "Database login failed: site=[%s,%s], code=[%d]", 
+			site, dbname, sqlca.sqlcode);
+		return (sqlca.sqlcode);
+	}
+
+	LOGG(L_DEBUG, "Postgresql Login [%s,%s]\n", site, dbname);
+
+	return 0;
+}
+
+
+int logoutOracle()
+{
+	EXEC SQL DISCONNECT ALL;
+
+	if (ISORAERROR) {
+		LOGG(L_ERROR, "Database logout failed: code=[%d]", sqlca.sqlcode);
+		return (sqlca.sqlcode);
+	}
+
+	LOGG(L_DEBUG, "Postgresql Logout"); 
+
+	return 0;
+}
+
+
+int commitOracle()
+{
+	EXEC SQL COMMIT;
+
+	if (ISORAERROR) {
+		LOGG(L_ERROR, "err_code=[%d]", sqlca.sqlcode);
+		return (sqlca.sqlcode);
+	}
+
+	return 0;
+}
+
+
+static ltpTcl_HashTable* init_Hash()
+{
+	ltpTcl_HashTable* IF_TBL = NULL;
+
+	IF_TBL = (ltpTcl_HashTable*)malloc(sizeof(ltpTcl_HashTable));
+	if (IF_TBL == (ltpTcl_HashTable*)NULL) {
+		LOGG(L_ERROR, "init_HashTable: malloc(IF_TBL) failed\n");
+		return NULL;
+	}
+
+	ltpTcl_InitHashTable(IF_TBL, TCL_STRING_KEYS);
+	return IF_TBL;
+}
+
+
+static int insert_RESINFO_Hash(ltpTcl_HashTable* IF_TBL, char* sub_inst, char* containment)
+{
+	int isnew = 0;
+	RESINFO* resinfo = NULL;
+	ltpTcl_HashEntry* ent = NULL;
+
+	resinfo = (RESINFO*)malloc(sizeof(RESINFO));
+	if (resinfo == (RESINFO*)NULL) {
+		LOGG(L_ERROR, "insert_RESINFO_Hash: malloc failed\n");
+		return 0;
+	}
+
+	memset(resinfo, 0x00, sizeof(RESINFO));
+
+	strncpy(resinfo->sub_inst, sub_inst, 255);
+	strncpy(resinfo->containment, containment, 255);
+
+	ent = ltpTcl_CreateHashEntry(IF_TBL, resinfo->sub_inst, &isnew);
+	if (ent == NULL) {
+		LOGG(L_ERROR, "insert_RESINFO_Hash: CreateHashEntry failed, sub_inst=[%s]\n", resinfo->sub_inst);
+		return 0;
+	}
+
+	ltpTcl_SetHashValue(ent, (void*)resinfo);
+	return (1);
+}
+
+
+static int insert_RAWDATA_Hash(ltpTcl_HashTable* RAW_TBL, char* coldate, float value)
+{
+	int hour = 0;
+	int isnew = 0;
+	RAWDATA* rdat = NULL;
+	ltpTcl_HashEntry* ent = NULL;
+
+	hour = get_hour(coldate);
+	gavg[hour] += value;
+	gnum[hour] += 1;
+
+	rdat = (RAWDATA*)malloc(sizeof(RAWDATA));
+	if (rdat == (RAWDATA*)NULL) {
+		LOGG(L_ERROR, "insert_RAWDATA_Hash: malloc failed\n");
+		return (0);
+	}
+
+	memset(rdat, 0x00, sizeof(RAWDATA));
+
+	strncpy(rdat->coldate, coldate, 10);
+	rdat->value = value;
+
+	ent = ltpTcl_CreateHashEntry(RAW_TBL, rdat->coldate, &isnew);
+	if (ent == NULL) {
+		LOGG(L_ERROR, "insert_RAWDATA_Hash: CreateHashEntry failed, coldate=[%s]\n", coldate);
+		return 0;
+	}
+
+	ltpTcl_SetHashValue(ent, (void*)rdat);
+	return (1);
+}
+
+
+RAWDATA* find_RAWDATA(ltpTcl_HashTable* tbl, char* date)
+{
+	RAWDATA* rdat = NULL;
+	ltpTcl_HashEntry* ent = NULL;
+
+	ent = ltpTcl_FindHashEntry(tbl, date);
+	if (ent) {
+		rdat = (RAWDATA*)ltpTcl_GetHashValue(ent);	
+		return rdat;
+	}
+
+	return (RAWDATA*)NULL;
+}
+
+
+static int get_hour(char* strtime)
+{
+	int hour = 1;
+
+	hour = atoi(&strtime[8]);
+
+	return hour;
+}
+
+
+static void dump_RAWDATA_File(FILE* fp)
+{
+	int i = 0;
+
+	for (i = 0; i < NUM_RAWDATA - 1; i++) {
+		if (gdat[i].flag == VALID_DATA) {
+			fprintf(fp, "%s, %.1f\n", gdat[i].coldate, gdat[i].value);
+		} else {
+			fprintf(fp, "%s, %.1f\n", gdat[i].coldate, gdat[i].value);
+		}
+	}
+}
+
+
+int dump_traffic(char* db_dir, int in_out, char* today, char* fromdate)
+{
+EXEC SQL BEGIN DECLARE SECTION;
+	varchar _containment[256+1];
+	varchar _sub_inst[128+1];
+EXEC SQL END DECLARE SECTION;
+
+	int ret = 0;
+	int num_if = 0;
+	ltpTcl_HashTable* IF_TBL = NULL;
+	ltpTcl_HashEntry* ent = NULL;
+	ltpTcl_HashSearch search;
+	RESINFO* resinfo = NULL;
+
+	IF_TBL = init_Hash();
+	if (IF_TBL == (ltpTcl_HashTable*)NULL) {
+		LOGG(L_ERROR, "dump_traffic_in: malloc(IF_TBL) failed\n");
+		return -1;
+	}
+
+	EXEC SQL DECLARE DUMP_TRAFFIC_IN_CURSOR_1 CURSOR FOR
+	SELECT SC.MONAME, INTF.CONTAINMENT FROM MI_SCHEDULE SC, MI_INTERFACE INTF
+		WHERE SC.SCHEDULETYPE='collecting' and SC.ATTRNAME='perfAll'
+		AND SC.MONAME = INTF.INSTANCENAME;
+
+	EXEC SQL OPEN DUMP_TRAFFIC_IN_CURSOR_1;
+
+	while( 1 ) {
+		MEMSET(_sub_inst);
+		MEMSET(_containment);
+
+		EXEC SQL FETCH DUMP_TRAFFIC_IN_CURSOR_1 INTO :_sub_inst, :_containment;
+
+		if (ISORAERROR) {
+			if (PGNOTFOUND) {
+				break;
+			} else {
+				LOGG(L_DEBUG, "dump_traffic_in: select failed=[%d][%s]\n", ORAERROR, sqlca.sqlerrm.sqlerrmc);
+				break;
+			}
+		}
+
+		ADDNULL(_sub_inst);
+		ADDNULL(_containment);
+
+		ret = insert_RESINFO_Hash(IF_TBL, _sub_inst.arr, _containment.arr);
+
+		if (ret == 0) {
+			EXEC SQL CLOSE DUMP_TRAFFIC_IN_CURSOR_1;
+		} else {
+			num_if += ret;
+		}
+	}
+
+	EXEC SQL CLOSE DUMP_TRAFFIC_IN_CURSOR_1;
+
+	FOR_EACH_HASH_ELT(ent, IF_TBL, search) {
+		resinfo = (RESINFO*)ltpTcl_GetHashValue(ent);
+		LOGG(L_DEBUG, "dump_traffic_in: select_traffic_in(%s, %s)\n", resinfo->sub_inst, resinfo->containment);
+		select_traffic(db_dir, in_out, resinfo, today, fromdate);
+	}
+
+	return num_if;
+}
+
+
+void select_traffic(char* db_dir, int in_out, RESINFO* resinfo, char* today, char* fromdate)
+{
+	int i = 0;
+	int hour = 0;
+	FILE* fp = NULL;
+	char fname[256];
+	char sub_inst[256];
+	RAWDATA* rdat = NULL;
+	ltpTcl_HashTable* RAW_TBL = NULL;
+
+	memset(fname, 0x00, sizeof(fname));
+	memset(sub_inst, 0x00, sizeof(sub_inst));
+
+	strncpy(sub_inst, resinfo->sub_inst, 255);
+
+	sub_inst[14] = '_';
+
+	if (in_out == 1) {
+		sprintf(fname, "%s/%s/in/%s.dat", db_dir, today, sub_inst);
+	} else {
+		sprintf(fname, "%s/%s/out/%s.dat", db_dir, today, sub_inst);
+	}
+
+	fp = fopen(fname, "w");
+
+	if (fp == NULL) {
+		LOGG(L_ERROR, "select_traffic: fopen(%s) failed\n", fname);
+		return;
+	}
+
+	fprintf(fp, "%s %s\n", resinfo->sub_inst, resinfo->containment);
+
+	init_STATDATA();
+
+	init_RAWDATA(fromdate);
+
+	if (in_out == 1) {
+		RAW_TBL = traffic_in_hash(resinfo->sub_inst, fromdate);
+	} else {
+		RAW_TBL = traffic_out_hash(resinfo->sub_inst, fromdate);
+	}
+
+	if (RAW_TBL == (ltpTcl_HashTable*)NULL) {
+		LOGG(L_ERROR, "select_traffic: malloc(RAW_TBL) failed\n");
+		return;
+	}
+
+	for (i = 0; i < 24; i++) {
+		if (gnum[i] == 0) {
+			gavg[i] = 0.0;
+		} else {
+			gavg[i] = gavg[i] / gnum[i];
+		}
+	}
+
+	LOGG(L_DEBUG, "select_traffic: %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f\n",
+		gavg[0], gavg[2], gavg[4], gavg[6], gavg[8], gavg[10],
+		gavg[12], gavg[14], gavg[16], gavg[18], gavg[20], gavg[22]);
+
+	for (i = 0; i < NUM_RAWDATA; i++) {
+		rdat = find_RAWDATA(RAW_TBL, gdat[i].coldate);
+		if (rdat) {
+			gdat[i].value = rdat->value;
+			gdat[i].flag = VALID_DATA;
+		} else {
+			hour = get_hour(gdat[i].coldate);
+			gdat[i].value = gavg[hour];
+		}
+	}
+
+	dump_RAWDATA_File(fp);
+
+	fclose(fp);
+}
+
+
+static ltpTcl_HashTable* traffic_in_hash(char* sub_inst, char* fromdate)
+{
+EXEC SQL BEGIN DECLARE SECTION;
+	varchar _sub_inst[128+1];
+
+	varchar	_coldate[65];
+	varchar	_fromdate[65];
+	varchar _format[65];
+
+	float	_inusage;
+EXEC SQL END DECLARE SECTION;
+
+	int ret = 0;
+	ltpTcl_HashTable* RAW_TBL = NULL;
+
+	STRCPY(_sub_inst, sub_inst);
+	STRCPY(_fromdate, fromdate);
+	STRCPY(_format, "YYYYMMDDHH24");
+
+	RAW_TBL = init_Hash();
+	if (RAW_TBL == (ltpTcl_HashTable*)NULL) {
+		LOGG(L_ERROR, "traffic_in_hash: malloc(RAW_TBL) failed\n");
+		return NULL;
+	}
+
+	EXEC SQL DECLARE HASH_TRAFFIC_IN_CURSOR_1 CURSOR FOR
+	SELECT TO_CHAR(COL_DATE, :_format), ROUND(MAX_INUSAGE/10, 2) 
+		FROM FACT_SYS_INTERFACE_HOUR
+		WHERE SUB_INSTANCENAME = :_sub_inst
+		AND TO_CHAR(COL_DATE, :_format) > :_fromdate
+		ORDER BY COL_DATE;
+
+	EXEC SQL OPEN HASH_TRAFFIC_IN_CURSOR_1;
+
+	while( 1 ) {
+		MEMSET(_coldate);
+		_inusage = 0.0;
+
+		EXEC SQL FETCH HASH_TRAFFIC_IN_CURSOR_1 INTO :_coldate, :_inusage;
+
+		if (ISORAERROR) {
+			if (PGNOTFOUND) {
+				break;
+			} else {
+				LOGG(L_ERROR, "traffic_in_hash: select failed=[%d][%s]\n", ORAERROR, sqlca.sqlerrm.sqlerrmc);
+				break;
+			}
+		}
+
+		ADDNULL(_coldate);
+
+		ret = insert_RAWDATA_Hash(RAW_TBL, _coldate.arr, _inusage);
+
+		if (ret == 0) {
+			LOGG(L_ERROR, "traffic_in_hash: insert_RAWDATA_Hash() failed\n");
+		}
+	}
+
+	EXEC SQL CLOSE HASH_TRAFFIC_IN_CURSOR_1;
+
+	return RAW_TBL;
+}
+
+
+static ltpTcl_HashTable* traffic_out_hash(char* sub_inst, char* fromdate)
+{
+EXEC SQL BEGIN DECLARE SECTION;
+	varchar _sub_inst[128+1];
+
+	varchar	_coldate[65];
+	varchar	_fromdate[65];
+	varchar _format[65];
+
+	float	_outusage;
+EXEC SQL END DECLARE SECTION;
+
+	int ret = 0;
+	ltpTcl_HashTable* RAW_TBL = NULL;
+
+	STRCPY(_sub_inst, sub_inst);
+	STRCPY(_fromdate, fromdate);
+	STRCPY(_format, "YYYYMMDDHH24");
+
+	RAW_TBL = init_Hash();
+	if (RAW_TBL == (ltpTcl_HashTable*)NULL) {
+		LOGG(L_ERROR, "traffic_out_hash: malloc(RAW_TBL) failed\n");
+		return NULL;
+	}
+
+	EXEC SQL DECLARE HASH_TRAFFIC_OUT_CURSOR_1 CURSOR FOR
+	SELECT TO_CHAR(COL_DATE, :_format), ROUND(MAX_OUTUSAGE/10, 2) 
+		FROM FACT_SYS_INTERFACE_HOUR
+		WHERE SUB_INSTANCENAME = :_sub_inst
+		AND TO_CHAR(COL_DATE, :_format) > :_fromdate
+		ORDER BY COL_DATE;
+
+	EXEC SQL OPEN HASH_TRAFFIC_OUT_CURSOR_1;
+
+	while( 1 ) {
+		MEMSET(_coldate);
+		_outusage = 0.0;
+
+		EXEC SQL FETCH HASH_TRAFFIC_OUT_CURSOR_1 INTO :_coldate, :_outusage;
+
+		if (ISORAERROR) {
+			if (PGNOTFOUND) {
+				break;
+			} else {
+				LOGG(L_ERROR, "traffic_out_hash: select failed=[%d][%s]\n", ORAERROR, sqlca.sqlerrm.sqlerrmc);
+				break;
+			}
+		}
+
+		ADDNULL(_coldate);
+
+		ret = insert_RAWDATA_Hash(RAW_TBL, _coldate.arr, _outusage);
+
+		if (ret == 0) {
+			LOGG(L_ERROR, "traffic_out_hash: insert_RAWDATA_Hash() failed\n");
+		}
+	}
+
+	EXEC SQL CLOSE HASH_TRAFFIC_OUT_CURSOR_1;
+
+	return RAW_TBL;
+}
+
+
+static ltpTcl_HashTable* resource_mem_unix_hash(char* sub_inst, char* fromdate)
+{
+EXEC SQL BEGIN DECLARE SECTION;
+	varchar _sub_inst[128+1];
+
+	varchar	_coldate[65];
+	varchar	_fromdate[65];
+	varchar _format[65];
+
+	float	_memusage;
+EXEC SQL END DECLARE SECTION;
+
+	int ret = 0;
+	ltpTcl_HashTable* RAW_TBL = NULL;
+
+	STRCPY(_sub_inst, sub_inst);
+	STRCPY(_fromdate, fromdate);
+	STRCPY(_format, "YYYYMMDDHH24");
+
+	RAW_TBL = init_Hash();
+	if (RAW_TBL == (ltpTcl_HashTable*)NULL) {
+		LOGG(L_ERROR, "resource_mem_unix_hash: malloc(RAW_TBL) failed\n");
+		return NULL;
+	}
+
+	EXEC SQL DECLARE HASH_RESOURCE_MEM_CURSOR_1 CURSOR FOR
+	SELECT TO_CHAR(COL_DATE, :_format), ROUND(MAX_MEMORYUSAGE/10, 2) 
+		FROM FACT_SYS_UNIX_HOUR
+		WHERE SUB_INSTANCENAME = :_sub_inst
+		AND TO_CHAR(COL_DATE, :_format) > :_fromdate
+		ORDER BY COL_DATE;
+
+	EXEC SQL OPEN HASH_RESOURCE_MEM_CURSOR_1;
+
+	while( 1 ) {
+		MEMSET(_coldate);
+		_memusage = 0.0;
+
+		EXEC SQL FETCH HASH_RESOURCE_MEM_CURSOR_1 INTO :_coldate, :_memusage;
+
+		if (ISORAERROR) {
+			if (PGNOTFOUND) {
+				break;
+			} else {
+				LOGG(L_ERROR, "resource_mem_unix_hash: select failed=[%d][%s]\n", ORAERROR, sqlca.sqlerrm.sqlerrmc);
+				break;
+			}
+		}
+
+		ADDNULL(_coldate);
+
+		ret = insert_RAWDATA_Hash(RAW_TBL, _coldate.arr, _memusage);
+
+		if (ret == 0) {
+			LOGG(L_ERROR, "resource_mem_unix_hash: insert_RAWDATA_Hash() failed\n");
+		}
+	}
+
+	EXEC SQL CLOSE HASH_RESOURCE_MEM_CURSOR_1;
+
+	return RAW_TBL;
+}
+
+
+static ltpTcl_HashTable* resource_mem_nt_hash(char* sub_inst, char* fromdate)
+{
+EXEC SQL BEGIN DECLARE SECTION;
+	varchar _sub_inst[128+1];
+
+	varchar	_coldate[65];
+	varchar	_fromdate[65];
+	varchar _format[65];
+
+	float	_memusage;
+EXEC SQL END DECLARE SECTION;
+
+	int ret = 0;
+	ltpTcl_HashTable* RAW_TBL = NULL;
+
+	STRCPY(_sub_inst, sub_inst);
+	STRCPY(_fromdate, fromdate);
+	STRCPY(_format, "YYYYMMDDHH24");
+
+	RAW_TBL = init_Hash();
+	if (RAW_TBL == (ltpTcl_HashTable*)NULL) {
+		LOGG(L_ERROR, "resource_mem_nt_hash: malloc(RAW_TBL) failed\n");
+		return NULL;
+	}
+
+	EXEC SQL DECLARE HASH_RESOURCE_MEM_CURSOR_2 CURSOR FOR
+	SELECT TO_CHAR(COL_DATE, :_format), ROUND(MAX_MEMORYUSAGE/10, 2) 
+		FROM FACT_SYS_NT_HOUR
+		WHERE SUB_INSTANCENAME = :_sub_inst
+		AND TO_CHAR(COL_DATE, :_format) > :_fromdate
+		ORDER BY COL_DATE;
+
+	EXEC SQL OPEN HASH_RESOURCE_MEM_CURSOR_2;
+
+	while( 1 ) {
+		MEMSET(_coldate);
+		_memusage = 0.0;
+
+		EXEC SQL FETCH HASH_RESOURCE_MEM_CURSOR_2 INTO :_coldate, :_memusage;
+
+		if (ISORAERROR) {
+			if (PGNOTFOUND) {
+				break;
+			} else {
+				LOGG(L_ERROR, "resource_mem_nt_hash: select failed=[%d][%s]\n", ORAERROR, sqlca.sqlerrm.sqlerrmc);
+				break;
+			}
+		}
+
+		ADDNULL(_coldate);
+
+		ret = insert_RAWDATA_Hash(RAW_TBL, _coldate.arr, _memusage);
+
+		if (ret == 0) {
+			LOGG(L_ERROR, "resource_mem_nt_hash: insert_RAWDATA_Hash() failed\n");
+		}
+	}
+
+	EXEC SQL CLOSE HASH_RESOURCE_MEM_CURSOR_2;
+
+	return RAW_TBL;
+}
+
+
+static ltpTcl_HashTable* resource_swap_hash(char* sub_inst, char* fromdate)
+{
+EXEC SQL BEGIN DECLARE SECTION;
+	varchar _sub_inst[128+1];
+
+	varchar	_coldate[65];
+	varchar	_fromdate[65];
+	varchar _format[65];
+
+	float	_swapusage;
+EXEC SQL END DECLARE SECTION;
+
+	int ret = 0;
+	ltpTcl_HashTable* RAW_TBL = NULL;
+
+	STRCPY(_sub_inst, sub_inst);
+	STRCPY(_fromdate, fromdate);
+	STRCPY(_format, "YYYYMMDDHH24");
+
+	RAW_TBL = init_Hash();
+	if (RAW_TBL == (ltpTcl_HashTable*)NULL) {
+		LOGG(L_ERROR, "resource_swap_hash: malloc(RAW_TBL) failed\n");
+		return NULL;
+	}
+
+	EXEC SQL DECLARE HASH_RESOURCE_SWAP_CURSOR_1 CURSOR FOR
+	SELECT TO_CHAR(COL_DATE, :_format), ROUND(MAX_SWAPUSAGE/10, 2) 
+		FROM FACT_SYS_SWAP_HOUR
+		WHERE SUB_INSTANCENAME = :_sub_inst
+		AND TO_CHAR(COL_DATE, :_format) > :_fromdate
+		ORDER BY COL_DATE;
+
+	EXEC SQL OPEN HASH_RESOURCE_SWAP_CURSOR_1;
+
+	while( 1 ) {
+		MEMSET(_coldate);
+		_swapusage = 0.0;
+
+		EXEC SQL FETCH HASH_RESOURCE_SWAP_CURSOR_1 INTO :_coldate, :_swapusage;
+
+		if (ISORAERROR) {
+			if (PGNOTFOUND) {
+				break;
+			} else {
+				LOGG(L_ERROR, "resource_swap_hash: select failed=[%d][%s]\n", ORAERROR, sqlca.sqlerrm.sqlerrmc);
+				break;
+			}
+		}
+
+		ADDNULL(_coldate);
+
+		ret = insert_RAWDATA_Hash(RAW_TBL, _coldate.arr, _swapusage);
+
+		if (ret == 0) {
+			LOGG(L_ERROR, "resource_swap_hash: insert_RAWDATA_Hash() failed\n");
+		}
+	}
+
+	EXEC SQL CLOSE HASH_RESOURCE_SWAP_CURSOR_1;
+
+	return RAW_TBL;
+}
+
+
+static ltpTcl_HashTable* resource_fs_hash(char* sub_inst, char* fromdate)
+{
+EXEC SQL BEGIN DECLARE SECTION;
+	varchar _sub_inst[128+1];
+
+	varchar	_coldate[65];
+	varchar	_fromdate[65];
+	varchar _format[65];
+
+	float	_fsusage;
+EXEC SQL END DECLARE SECTION;
+
+	int ret = 0;
+	ltpTcl_HashTable* RAW_TBL = NULL;
+
+	STRCPY(_sub_inst, sub_inst);
+	STRCPY(_fromdate, fromdate);
+	STRCPY(_format, "YYYYMMDDHH24");
+
+	RAW_TBL = init_Hash();
+	if (RAW_TBL == (ltpTcl_HashTable*)NULL) {
+		LOGG(L_ERROR, "resource_fs_hash: malloc(RAW_TBL) failed\n");
+		return NULL;
+	}
+
+	EXEC SQL DECLARE HASH_RESOURCE_FS_CURSOR_1 CURSOR FOR
+	SELECT TO_CHAR(COL_DATE, :_format), ROUND(MAX_FSUSAGE/10, 2) 
+		FROM FACT_SYS_FILESYSTEM_HOUR
+		WHERE SUB_INSTANCENAME = :_sub_inst
+		AND TO_CHAR(COL_DATE, :_format) > :_fromdate
+		ORDER BY COL_DATE;
+
+	EXEC SQL OPEN HASH_RESOURCE_FS_CURSOR_1;
+
+	while( 1 ) {
+		MEMSET(_coldate);
+		_fsusage = 0.0;
+
+		EXEC SQL FETCH HASH_RESOURCE_FS_CURSOR_1 INTO :_coldate, :_fsusage;
+
+		if (ISORAERROR) {
+			if (PGNOTFOUND) {
+				break;
+			} else {
+				LOGG(L_ERROR, "resource_fs_hash: select failed=[%d][%s]\n", ORAERROR, sqlca.sqlerrm.sqlerrmc);
+				break;
+			}
+		}
+
+		ADDNULL(_coldate);
+
+		ret = insert_RAWDATA_Hash(RAW_TBL, _coldate.arr, _fsusage);
+
+		if (ret == 0) {
+			LOGG(L_ERROR, "resource_fs_hash: insert_RAWDATA_Hash() failed\n");
+		}
+	}
+
+	EXEC SQL CLOSE HASH_RESOURCE_FS_CURSOR_1;
+
+	return RAW_TBL;
+}
+
+
+static ltpTcl_HashTable* environment_temp_hash(char* sub_inst, char* fromdate)
+{
+EXEC SQL BEGIN DECLARE SECTION;
+	varchar _sub_inst[128+1];
+
+	varchar	_coldate[65];
+	varchar	_fromdate[65];
+	varchar _format[65];
+
+	float	_temper;
+EXEC SQL END DECLARE SECTION;
+
+	int ret = 0;
+	ltpTcl_HashTable* RAW_TBL = NULL;
+
+	STRCPY(_sub_inst, sub_inst);
+	STRCPY(_fromdate, fromdate);
+	STRCPY(_format, "YYYYMMDDHH24");
+
+	RAW_TBL = init_Hash();
+	if (RAW_TBL == (ltpTcl_HashTable*)NULL) {
+		LOGG(L_ERROR, "environment_temp_hash: malloc(RAW_TBL) failed\n");
+		return NULL;
+	}
+
+	EXEC SQL DECLARE HASH_ENV_TEMP_CURSOR_1 CURSOR FOR
+	SELECT TO_CHAR(COL_DATE, :_format), ROUND(MAX_TEMPER/10, 2) 
+		FROM FACT_SYS_FTHERMOMETER_HOUR
+		WHERE SUB_INSTANCENAME = :_sub_inst
+		AND TO_CHAR(COL_DATE, :_format) > :_fromdate
+		ORDER BY COL_DATE;
+
+	EXEC SQL OPEN HASH_ENV_TEMP_CURSOR_1;
+
+	while( 1 ) {
+		MEMSET(_coldate);
+		_temper = 0.0;
+
+		EXEC SQL FETCH HASH_ENV_TEMP_CURSOR_1 INTO :_coldate, :_temper;
+
+		if (ISORAERROR) {
+			if (PGNOTFOUND) {
+				break;
+			} else {
+				LOGG(L_ERROR, "environment_temp_hash: select failed=[%d][%s]\n", ORAERROR, sqlca.sqlerrm.sqlerrmc);
+				break;
+			}
+		}
+
+		ADDNULL(_coldate);
+
+		ret = insert_RAWDATA_Hash(RAW_TBL, _coldate.arr, _temper);
+
+		if (ret == 0) {
+			LOGG(L_ERROR, "environment_temp_hash: insert_RAWDATA_Hash() failed\n");
+		}
+	}
+
+	EXEC SQL CLOSE HASH_ENV_TEMP_CURSOR_1;
+
+	return RAW_TBL;
+}
+
+
+static ltpTcl_HashTable* apc_cpu_hash(char* sub_inst, char* fromdate)
+{
+EXEC SQL BEGIN DECLARE SECTION;
+	varchar _sub_inst[128+1];
+
+	varchar	_coldate[65];
+	varchar	_fromdate[65];
+	varchar _format[65];
+
+	float	_cpuusage;
+EXEC SQL END DECLARE SECTION;
+
+	int ret = 0;
+	ltpTcl_HashTable* RAW_TBL = NULL;
+
+	STRCPY(_sub_inst, sub_inst);
+	STRCPY(_fromdate, fromdate);
+	STRCPY(_format, "YYYYMMDDHH24");
+
+	RAW_TBL = init_Hash();
+	if (RAW_TBL == (ltpTcl_HashTable*)NULL) {
+		LOGG(L_ERROR, "apc_cpu_hash: malloc(RAW_TBL) failed\n");
+		return NULL;
+	}
+
+	EXEC SQL DECLARE HASH_APC_CPU_CURSOR_1 CURSOR FOR
+	SELECT TO_CHAR(COL_DATE, :_format), ROUND(MAX_CPUUSAGE/10, 2) 
+		FROM FACT_SYS_WCONTROLLER_HOUR
+		WHERE SUB_INSTANCENAME = :_sub_inst
+		AND TO_CHAR(COL_DATE, :_format) > :_fromdate
+		ORDER BY COL_DATE;
+
+	EXEC SQL OPEN HASH_APC_CPU_CURSOR_1;
+
+	while( 1 ) {
+		MEMSET(_coldate);
+		_cpuusage = 0.0;
+
+		EXEC SQL FETCH HASH_APC_CPU_CURSOR_1 INTO :_coldate, :_cpuusage;
+
+		if (ISORAERROR) {
+			if (PGNOTFOUND) {
+				break;
+			} else {
+				LOGG(L_ERROR, "apc_cpu_hash: select failed=[%d][%s]\n", ORAERROR, sqlca.sqlerrm.sqlerrmc);
+				break;
+			}
+		}
+
+		ADDNULL(_coldate);
+
+		ret = insert_RAWDATA_Hash(RAW_TBL, _coldate.arr, _cpuusage);
+
+		if (ret == 0) {
+			LOGG(L_ERROR, "apc_cpu_hash: insert_RAWDATA_Hash() failed\n");
+		}
+	}
+
+	EXEC SQL CLOSE HASH_APC_CPU_CURSOR_1;
+
+	return RAW_TBL;
+}
+
+
+static ltpTcl_HashTable* apc_mem_hash(char* sub_inst, char* fromdate)
+{
+EXEC SQL BEGIN DECLARE SECTION;
+	varchar _sub_inst[128+1];
+
+	varchar	_coldate[65];
+	varchar	_fromdate[65];
+	varchar _format[65];
+
+	float	_memusage;
+EXEC SQL END DECLARE SECTION;
+
+	int ret = 0;
+	ltpTcl_HashTable* RAW_TBL = NULL;
+
+	STRCPY(_sub_inst, sub_inst);
+	STRCPY(_fromdate, fromdate);
+	STRCPY(_format, "YYYYMMDDHH24");
+
+	RAW_TBL = init_Hash();
+	if (RAW_TBL == (ltpTcl_HashTable*)NULL) {
+		LOGG(L_ERROR, "apc_mem_hash: malloc(RAW_TBL) failed\n");
+		return NULL;
+	}
+
+	EXEC SQL DECLARE HASH_APC_MEM_CURSOR_1 CURSOR FOR
+	SELECT TO_CHAR(COL_DATE, :_format), ROUND(MAX_MEMORYUSAGE/10, 2) 
+		FROM FACT_SYS_WCONTROLLER_HOUR
+		WHERE SUB_INSTANCENAME = :_sub_inst
+		AND TO_CHAR(COL_DATE, :_format) > :_fromdate
+		ORDER BY COL_DATE;
+
+	EXEC SQL OPEN HASH_APC_MEM_CURSOR_1;
+
+	while( 1 ) {
+		MEMSET(_coldate);
+		_memusage = 0.0;
+
+		EXEC SQL FETCH HASH_APC_MEM_CURSOR_1 INTO :_coldate, :_memusage;
+
+		if (ISORAERROR) {
+			if (PGNOTFOUND) {
+				break;
+			} else {
+				LOGG(L_ERROR, "apc_mem_hash: select failed=[%d][%s]\n", ORAERROR, sqlca.sqlerrm.sqlerrmc);
+				break;
+			}
+		}
+
+		ADDNULL(_coldate);
+
+		ret = insert_RAWDATA_Hash(RAW_TBL, _coldate.arr, _memusage);
+
+		if (ret == 0) {
+			LOGG(L_ERROR, "apc_mem_hash: insert_RAWDATA_Hash() failed\n");
+		}
+	}
+
+	EXEC SQL CLOSE HASH_APC_MEM_CURSOR_1;
+
+	return RAW_TBL;
+}
+
+
+static ltpTcl_HashTable* apcluster_const_hash(char* sub_inst, char* fromdate)
+{
+EXEC SQL BEGIN DECLARE SECTION;
+	varchar _sub_inst[128+1];
+
+	varchar	_coldate[65];
+	varchar	_fromdate[65];
+	varchar _format[65];
+
+	float	_sumconst;
+EXEC SQL END DECLARE SECTION;
+
+	int ret = 0;
+	ltpTcl_HashTable* RAW_TBL = NULL;
+
+	STRCPY(_sub_inst, sub_inst);
+	STRCPY(_fromdate, fromdate);
+	STRCPY(_format, "YYYYMMDDHH24");
+
+	RAW_TBL = init_Hash();
+	if (RAW_TBL == (ltpTcl_HashTable*)NULL) {
+		LOGG(L_ERROR, "apcluster_const_hash: malloc(RAW_TBL) failed\n");
+		return NULL;
+	}
+
+	EXEC SQL DECLARE HASH_APCLUSTER_CONST_CURSOR_1 CURSOR FOR
+	SELECT TO_CHAR(COL_DATE, :_format), ROUND(SUMCONSTATION/10, 2)
+		FROM FACT_SYS_ACCESSPOINTCLUSTER_HOUR
+		WHERE INSTANCENAME = :_sub_inst
+		AND TO_CHAR(COL_DATE, :_format) > :_fromdate
+		ORDER BY COL_DATE;
+
+	EXEC SQL OPEN HASH_APCLUSTER_CONST_CURSOR_1;
+
+	while( 1 ) {
+		MEMSET(_coldate);
+		_sumconst = 0.0;
+
+		EXEC SQL FETCH HASH_APCLUSTER_CONST_CURSOR_1 INTO :_coldate, :_sumconst;
+
+		if (ISORAERROR) {
+			if (PGNOTFOUND) {
+				break;
+			} else {
+				LOGG(L_ERROR, "apcluster_const_hash: select failed=[%d][%s]\n", ORAERROR, sqlca.sqlerrm.sqlerrmc);
+				break;
+			}
+		}
+
+		ADDNULL(_coldate);
+
+		ret = insert_RAWDATA_Hash(RAW_TBL, _coldate.arr, _sumconst);
+
+		if (ret == 0) {
+			LOGG(L_ERROR, "apcluster_const_hash: insert_RAWDATA_Hash() failed\n");
+		}
+	}
+
+	EXEC SQL CLOSE HASH_APCLUSTER_CONST_CURSOR_1;
+
+	return RAW_TBL;
+}
+
+
+int dump_resource_mem(char* db_dir, char* today, char* fromdate)
+{
+EXEC SQL BEGIN DECLARE SECTION;
+	varchar _containment[256+1];
+	varchar _sub_inst[128+1];
+EXEC SQL END DECLARE SECTION;
+
+	int isnew = 0;
+	int num_if = 0;
+	ltpTcl_HashTable* IF_TBL = NULL;
+	ltpTcl_HashEntry* ent = NULL;
+	ltpTcl_HashSearch search;
+	RESINFO* resinfo = NULL;
+
+	IF_TBL = (ltpTcl_HashTable*)malloc(sizeof(ltpTcl_HashTable));
+	if (IF_TBL == (ltpTcl_HashTable*)NULL) {
+		LOGG(L_ERROR, "dump_resource_mem: malloc(IF_TBL) failed\n");
+		return -1;
+	}
+
+	ltpTcl_InitHashTable(IF_TBL, TCL_STRING_KEYS);
+
+	EXEC SQL DECLARE DUMP_RESOURCE_MEM_CURSOR_1 CURSOR FOR
+	SELECT MONAME FROM MI_SCHEDULE
+		WHERE SCHEDULETYPE='collecting' and ATTRNAME like '%,memoryUsage%';
+
+	EXEC SQL OPEN DUMP_RESOURCE_MEM_CURSOR_1;
+
+	while( 1 ) {
+		MEMSET(_sub_inst);
+		MEMSET(_containment);
+
+		EXEC SQL FETCH DUMP_RESOURCE_MEM_CURSOR_1 INTO :_sub_inst;
+
+		if (ISORAERROR) {
+			if (PGNOTFOUND) {
+				break;
+			} else {
+				LOGG(L_DEBUG, "dump_resource_mem: select failed=[%d][%s]\n", ORAERROR, sqlca.sqlerrm.sqlerrmc);
+				break;
+			}
+		}
+
+		ADDNULL(_sub_inst);
+
+		resinfo = (RESINFO*)malloc(sizeof(RESINFO));
+		if (resinfo == (RESINFO*)NULL) {
+			LOGG(L_ERROR, "dump_resource_mem: malloc failed\n");
+			return num_if;
+		}
+
+		memset(resinfo, 0x00, sizeof(RESINFO));
+
+		strncpy(resinfo->sub_inst, (char*)_sub_inst.arr, 255);
+		strncpy(resinfo->containment, (char*)_sub_inst.arr, 255);
+
+		ent = ltpTcl_CreateHashEntry(IF_TBL, resinfo->sub_inst, &isnew);
+
+		if (ent == NULL) {
+			LOGG(L_ERROR, "dump_resource_mem: CreateHashEntry failed, sub_inst=[%s]\n", resinfo->sub_inst);
+			EXEC SQL CLOSE DUMP_RESOURCE_MEM_CURSOR_1;
+			return num_if;
+		}
+
+		ltpTcl_SetHashValue(ent, (void*)resinfo);
+
+		num_if++;
+	}
+
+	EXEC SQL CLOSE DUMP_RESOURCE_MEM_CURSOR_1;
+
+	FOR_EACH_HASH_ELT(ent, IF_TBL, search) {
+		resinfo = (RESINFO*)ltpTcl_GetHashValue(ent);
+		LOGG(L_DEBUG, "dump_resource_mem: select_resource_mem(%s, %s)\n", resinfo->sub_inst, resinfo->containment);
+		select_resource_mem(db_dir, resinfo, today, fromdate); 
+	}
+
+	return num_if;
+}
+
+
+void select_resource_mem(char* db_dir, RESINFO* resinfo, char* today, char* fromdate)
+{
+	int i = 0;
+	int unix_nt = 1;			/* default is Unix */
+	int hour = 0;
+	char* p = NULL;
+	FILE* fp = NULL;
+	char fname[256];
+	char sub_inst[256];
+	RAWDATA* rdat = NULL;
+	ltpTcl_HashTable* RAW_TBL = NULL;
+
+	memset(fname, 0x00, sizeof(fname));
+	memset(sub_inst, 0x00, sizeof(sub_inst));
+
+	strncpy(sub_inst, resinfo->sub_inst, 255);
+
+	p = strchr(sub_inst, '/');
+
+	if (p != NULL) {
+		*p = '_';
+
+		--p;
+
+		if (*p == 'x') {
+			unix_nt = 1;		/* Unix */
+		} else {
+			unix_nt = 2;		/* Nt */
+		}
+	}
+
+	sprintf(fname, "%s/%s/mem/%s.dat", db_dir, today, sub_inst);
+
+	fp = fopen(fname, "w");
+
+	if (fp == NULL) {
+		LOGG(L_ERROR, "select_resource_mem: fopen(%s) failed\n", fname);
+		return;
+	}
+
+	fprintf(fp, "%s %s\n", resinfo->sub_inst, resinfo->containment);
+
+	init_STATDATA();
+
+	init_RAWDATA(fromdate);
+
+	if (unix_nt == 1)
+		RAW_TBL = resource_mem_unix_hash(resinfo->sub_inst, fromdate);
+	else
+		RAW_TBL = resource_mem_nt_hash(resinfo->sub_inst, fromdate);
+
+	if (RAW_TBL == (ltpTcl_HashTable*)NULL) {
+		LOGG(L_ERROR, "select_resource_mem: malloc(RAW_TBL) failed\n");
+		return;
+	}
+
+	for (i = 0; i < 24; i++) {
+		if (gnum[i] == 0) {
+			gavg[i] = 0.0;
+		} else {
+			gavg[i] = gavg[i] / gnum[i];
+		}
+	}
+
+	LOGG(L_DEBUG, "select_resource_mem: %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f\n",
+		gavg[0], gavg[2], gavg[4], gavg[6], gavg[8], gavg[10],
+		gavg[12], gavg[14], gavg[16], gavg[18], gavg[20], gavg[22]);
+
+	for (i = 0; i < NUM_RAWDATA; i++) {
+		rdat = find_RAWDATA(RAW_TBL, gdat[i].coldate);
+		if (rdat) {
+			gdat[i].value = rdat->value;
+			gdat[i].flag = VALID_DATA;
+		} else {
+			hour = get_hour(gdat[i].coldate);
+			gdat[i].value = gavg[hour];
+		}
+	}
+
+	dump_RAWDATA_File(fp);
+
+	fclose(fp);
+}
+
+
+int dump_resource_swap(char* db_dir, char* today, char* fromdate)
+{
+EXEC SQL BEGIN DECLARE SECTION;
+	varchar _containment[256+1];
+	varchar _sub_inst[128+1];
+EXEC SQL END DECLARE SECTION;
+
+	int isnew = 0;
+	int num_if = 0;
+	ltpTcl_HashTable* IF_TBL = NULL;
+	ltpTcl_HashEntry* ent = NULL;
+	ltpTcl_HashSearch search;
+	RESINFO* resinfo = NULL;
+
+	IF_TBL = (ltpTcl_HashTable*)malloc(sizeof(ltpTcl_HashTable));
+	if (IF_TBL == (ltpTcl_HashTable*)NULL) {
+		LOGG(L_ERROR, "dump_resource_swap: malloc(IF_TBL) failed\n");
+		return -1;
+	}
+
+	ltpTcl_InitHashTable(IF_TBL, TCL_STRING_KEYS);
+
+	EXEC SQL DECLARE DUMP_RESOURCE_SWAP_CURSOR_1 CURSOR FOR
+	SELECT SC.MONAME, SW.CONTAINMENT FROM MI_SCHEDULE SC, MI_SWAP SW
+		WHERE SC.SCHEDULETYPE='collecting' and SC.ATTRNAME='swapUsage'
+		AND SC.MONAME = SW.INSTANCENAME;
+
+	EXEC SQL OPEN DUMP_RESOURCE_SWAP_CURSOR_1;
+
+	while( 1 ) {
+		MEMSET(_sub_inst);
+		MEMSET(_containment);
+
+		EXEC SQL FETCH DUMP_RESOURCE_SWAP_CURSOR_1 INTO :_sub_inst, :_containment;
+
+		if (ISORAERROR) {
+			if (PGNOTFOUND) {
+				break;
+			} else {
+				LOGG(L_DEBUG, "dump_resource_swap: select failed=[%d][%s]\n", ORAERROR, sqlca.sqlerrm.sqlerrmc);
+				break;
+			}
+		}
+
+		ADDNULL(_sub_inst);
+		ADDNULL(_containment);
+
+		resinfo = (RESINFO*)malloc(sizeof(RESINFO));
+		if (resinfo == (RESINFO*)NULL) {
+			LOGG(L_ERROR, "dump_resource_swap: malloc failed\n");
+			return num_if;
+		}
+
+		memset(resinfo, 0x00, sizeof(RESINFO));
+
+		strncpy(resinfo->sub_inst, (char*)_sub_inst.arr, 255);
+		strncpy(resinfo->containment, (char*)_containment.arr, 255);
+
+		ent = ltpTcl_CreateHashEntry(IF_TBL, resinfo->sub_inst, &isnew);
+
+		if (ent == NULL) {
+			LOGG(L_ERROR, "dump_resource_swap: CreateHashEntry failed, sub_inst=[%s]\n", resinfo->sub_inst);
+			EXEC SQL CLOSE DUMP_RESOURCE_SWAP_CURSOR_1;
+			return num_if;
+		}
+
+		ltpTcl_SetHashValue(ent, (void*)resinfo);
+
+		num_if++;
+	}
+
+	EXEC SQL CLOSE DUMP_RESOURCE_SWAP_CURSOR_1;
+
+	FOR_EACH_HASH_ELT(ent, IF_TBL, search) {
+		resinfo = (RESINFO*)ltpTcl_GetHashValue(ent);
+		LOGG(L_DEBUG, "dump_resource_swap: select_resource_swap(%s, %s)\n", resinfo->sub_inst, resinfo->containment);
+		select_resource_swap(db_dir, resinfo, today, fromdate); 
+	}
+
+	return num_if;
+}
+
+
+void select_resource_swap(char* db_dir, RESINFO* resinfo, char* today, char* fromdate)
+{
+	int i = 0;
+	int hour = 0;
+	FILE* fp = NULL;
+	char fname[256];
+	char sub_inst[256];
+	RAWDATA* rdat = NULL;
+	ltpTcl_HashTable* RAW_TBL = NULL;
+
+	memset(fname, 0x00, sizeof(fname));
+	memset(sub_inst, 0x00, sizeof(sub_inst));
+
+	strncpy(sub_inst, resinfo->sub_inst, 255);
+
+	sub_inst[9] = '_';
+
+	sprintf(fname, "%s/%s/swap/%s.dat", db_dir, today, sub_inst);
+
+	fp = fopen(fname, "w");
+
+	if (fp == NULL) {
+		LOGG(L_ERROR, "select_resource_swap: fopen(%s) failed\n", fname);
+		return;
+	}
+
+	fprintf(fp, "%s %s\n", resinfo->sub_inst, resinfo->containment);
+
+	init_STATDATA();
+
+	init_RAWDATA(fromdate);
+
+	RAW_TBL = resource_swap_hash(resinfo->sub_inst, fromdate);
+
+	if (RAW_TBL == (ltpTcl_HashTable*)NULL) {
+		LOGG(L_ERROR, "select_resource_swap: malloc(RAW_TBL) failed\n");
+		return;
+	}
+
+	for (i = 0; i < 24; i++) {
+		if (gnum[i] == 0) {
+			gavg[i] = 0.0;
+		} else {
+			gavg[i] = gavg[i] / gnum[i];
+		}
+	}
+
+	LOGG(L_DEBUG, "select_resource_swap: %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f\n",
+		gavg[0], gavg[2], gavg[4], gavg[6], gavg[8], gavg[10],
+		gavg[12], gavg[14], gavg[16], gavg[18], gavg[20], gavg[22]);
+
+	for (i = 0; i < NUM_RAWDATA; i++) {
+		rdat = find_RAWDATA(RAW_TBL, gdat[i].coldate);
+		if (rdat) {
+			gdat[i].value = rdat->value;
+			gdat[i].flag = VALID_DATA;
+		} else {
+			hour = get_hour(gdat[i].coldate);
+			gdat[i].value = gavg[hour];
+		}
+	}
+
+	dump_RAWDATA_File(fp);
+
+	fclose(fp);
+}
+
+
+int dump_resource_fsusage(char* db_dir, char* today, char* fromdate)
+{
+EXEC SQL BEGIN DECLARE SECTION;
+	varchar _containment[256+1];
+	varchar _sub_inst[128+1];
+EXEC SQL END DECLARE SECTION;
+
+	int isnew = 0;
+	int num_if = 0;
+	ltpTcl_HashTable* IF_TBL = NULL;
+	ltpTcl_HashEntry* ent = NULL;
+	ltpTcl_HashSearch search;
+	RESINFO* resinfo = NULL;
+
+	IF_TBL = (ltpTcl_HashTable*)malloc(sizeof(ltpTcl_HashTable));
+	if (IF_TBL == (ltpTcl_HashTable*)NULL) {
+		LOGG(L_ERROR, "dump_resource_fsusage: malloc(IF_TBL) failed\n");
+		return -1;
+	}
+
+	ltpTcl_InitHashTable(IF_TBL, TCL_STRING_KEYS);
+
+	EXEC SQL DECLARE DUMP_RESOURCE_FSUSAGE_CURSOR_1 CURSOR FOR
+	SELECT SC.MONAME, FS.CONTAINMENT FROM MI_SCHEDULE SC, MI_FILESYSTEM FS, MI_METRICRULE MR
+		WHERE SC.SCHEDULETYPE='collecting' and SC.ATTRNAME='fsUsage'
+		AND SC.MONAME = FS.INSTANCENAME
+		AND MR.MOCLASS = 'Filesystem'
+		AND MR.MOINSTANCE = FS.INSTANCENAME;
+
+	EXEC SQL OPEN DUMP_RESOURCE_FSUSAGE_CURSOR_1;
+
+	while( 1 ) {
+		MEMSET(_sub_inst);
+		MEMSET(_containment);
+
+		EXEC SQL FETCH DUMP_RESOURCE_FSUSAGE_CURSOR_1 INTO :_sub_inst, :_containment;
+
+		if (ISORAERROR) {
+			if (PGNOTFOUND) {
+				break;
+			} else {
+				LOGG(L_DEBUG, "dump_resource_fsusage: select failed=[%d][%s]\n", ORAERROR, sqlca.sqlerrm.sqlerrmc);
+				break;
+			}
+		}
+
+		ADDNULL(_sub_inst);
+		ADDNULL(_containment);
+
+		resinfo = (RESINFO*)malloc(sizeof(RESINFO));
+		if (resinfo == (RESINFO*)NULL) {
+			LOGG(L_ERROR, "dump_resource_fsusage: malloc failed\n");
+			return num_if;
+		}
+
+		memset(resinfo, 0x00, sizeof(RESINFO));
+
+		strncpy(resinfo->sub_inst, (char*)_sub_inst.arr, 255);
+		strncpy(resinfo->containment, (char*)_containment.arr, 255);
+
+		ent = ltpTcl_CreateHashEntry(IF_TBL, resinfo->sub_inst, &isnew);
+
+		if (ent == NULL) {
+			LOGG(L_ERROR, "dump_resource_fsusage: CreateHashEntry failed, sub_inst=[%s]\n", resinfo->sub_inst);
+			EXEC SQL CLOSE DUMP_RESOURCE_FSUSAGE_CURSOR_1;
+			return num_if;
+		}
+
+		ltpTcl_SetHashValue(ent, (void*)resinfo);
+
+		num_if++;
+	}
+
+	EXEC SQL CLOSE DUMP_RESOURCE_FSUSAGE_CURSOR_1;
+
+	FOR_EACH_HASH_ELT(ent, IF_TBL, search) {
+		resinfo = (RESINFO*)ltpTcl_GetHashValue(ent);
+		LOGG(L_DEBUG, "dump_resource_fsusage: select_resource_swap(%s, %s)\n", resinfo->sub_inst, resinfo->containment);
+		select_resource_fsusage(db_dir, resinfo, today, fromdate); 
+	}
+
+	return num_if;
+}
+
+
+void select_resource_fsusage(char* db_dir, RESINFO* resinfo, char* today, char* fromdate)
+{
+	int i = 0;
+	int all_zero = 1;		/* default value is all zero */
+	int hour = 0;
+	FILE* fp = NULL;
+	char fname[256];
+	char sub_inst[256];
+	RAWDATA* rdat = NULL;
+	ltpTcl_HashTable* RAW_TBL = NULL;
+
+	memset(fname, 0x00, sizeof(fname));
+	memset(sub_inst, 0x00, sizeof(sub_inst));
+
+	strncpy(sub_inst, resinfo->sub_inst, 255);
+
+	sub_inst[15] = '_';
+
+	sprintf(fname, "%s/%s/fs/%s.dat", db_dir, today, sub_inst);
+
+	fp = fopen(fname, "w");
+
+	if (fp == NULL) {
+		LOGG(L_ERROR, "select_resource_fsuage: fopen(%s) failed\n", fname);
+		return;
+	}
+
+	fprintf(fp, "%s %s\n", resinfo->sub_inst, resinfo->containment);
+
+	init_STATDATA();
+
+	init_RAWDATA(fromdate);
+
+	RAW_TBL = resource_fs_hash(resinfo->sub_inst, fromdate);
+
+	if (RAW_TBL == (ltpTcl_HashTable*)NULL) {
+		LOGG(L_ERROR, "select_resource_fs: malloc(RAW_TBL) failed\n");
+		return;
+	}
+
+	for (i = 0; i < 24; i++) {
+		if (gnum[i] == 0) {
+			gavg[i] = 0.0;
+		} else {
+			gavg[i] = gavg[i] / gnum[i];
+		}
+	}
+
+	LOGG(L_DEBUG, "select_resource_fs: %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f\n",
+		gavg[0], gavg[2], gavg[4], gavg[6], gavg[8], gavg[10],
+		gavg[12], gavg[14], gavg[16], gavg[18], gavg[20], gavg[22]);
+
+	for (i = 0; i < NUM_RAWDATA; i++) {
+		rdat = find_RAWDATA(RAW_TBL, gdat[i].coldate);
+		if (rdat) {
+			gdat[i].value = rdat->value;
+			gdat[i].flag = VALID_DATA;
+		} else {
+			hour = get_hour(gdat[i].coldate);
+			gdat[i].value = gavg[hour];
+		}
+	}
+
+	for (i = 0; i < NUM_RAWDATA; i++) {
+		if (gdat[i].value != 0.0) {
+			all_zero = 0;
+			break;
+		}
+	}
+
+	dump_RAWDATA_File(fp);
+
+	fclose(fp);
+
+	if (all_zero == 1) {
+		/* delete file */
+	}
+}
+
+
+int dump_environment_temp(char* db_dir, char* today, char* fromdate)
+{
+EXEC SQL BEGIN DECLARE SECTION;
+	varchar _containment[256+1];
+	varchar _sub_inst[128+1];
+EXEC SQL END DECLARE SECTION;
+
+	int isnew = 0;
+	int num_if = 0;
+	ltpTcl_HashTable* IF_TBL = NULL;
+	ltpTcl_HashEntry* ent = NULL;
+	ltpTcl_HashSearch search;
+	RESINFO* resinfo = NULL;
+
+	IF_TBL = (ltpTcl_HashTable*)malloc(sizeof(ltpTcl_HashTable));
+	if (IF_TBL == (ltpTcl_HashTable*)NULL) {
+		LOGG(L_ERROR, "dump_environment_temp: malloc(IF_TBL) failed\n");
+		return -1;
+	}
+
+	ltpTcl_InitHashTable(IF_TBL, TCL_STRING_KEYS);
+
+	EXEC SQL DECLARE DUMP_ENVIRONMENT_TEMP_CURSOR_1 CURSOR FOR
+	SELECT SC.MONAME, FT.CONTAINMENT FROM MI_SCHEDULE SC, MI_FTHERMOMETER FT
+		WHERE SC.SCHEDULETYPE='collecting' and SC.ATTRNAME='temper'
+		AND SC.MONAME = FT.INSTANCENAME;
+
+	EXEC SQL OPEN DUMP_ENVIRONMENT_TEMP_CURSOR_1;
+
+	while( 1 ) {
+		MEMSET(_sub_inst);
+		MEMSET(_containment);
+
+		EXEC SQL FETCH DUMP_ENVIRONMENT_TEMP_CURSOR_1 INTO :_sub_inst, :_containment;
+
+		if (ISORAERROR) {
+			if (PGNOTFOUND) {
+				break;
+			} else {
+				LOGG(L_DEBUG, "dump_environment_temp: select failed=[%d][%s]\n", ORAERROR, sqlca.sqlerrm.sqlerrmc);
+				break;
+			}
+		}
+
+		ADDNULL(_sub_inst);
+		ADDNULL(_containment);
+
+		resinfo = (RESINFO*)malloc(sizeof(RESINFO));
+		if (resinfo == (RESINFO*)NULL) {
+			LOGG(L_ERROR, "dump_environment_temp: malloc failed\n");
+			return num_if;
+		}
+
+		memset(resinfo, 0x00, sizeof(RESINFO));
+
+		strncpy(resinfo->sub_inst, (char*)_sub_inst.arr, 255);
+		strncpy(resinfo->containment, (char*)_containment.arr, 255);
+
+		ent = ltpTcl_CreateHashEntry(IF_TBL, resinfo->sub_inst, &isnew);
+
+		if (ent == NULL) {
+			LOGG(L_ERROR, "dump_environment_temp: CreateHashEntry failed, sub_inst=[%s]\n", resinfo->sub_inst);
+			EXEC SQL CLOSE DUMP_ENVIRONMENT_TEMP_CURSOR_1;
+			return num_if;
+		}
+
+		ltpTcl_SetHashValue(ent, (void*)resinfo);
+
+		num_if++;
+	}
+
+	EXEC SQL CLOSE DUMP_ENVIRONMENT_TEMP_CURSOR_1;
+
+	FOR_EACH_HASH_ELT(ent, IF_TBL, search) {
+		resinfo = (RESINFO*)ltpTcl_GetHashValue(ent);
+		LOGG(L_DEBUG, "dump_environment_temp: select_environment_temp(%s, %s)\n", resinfo->sub_inst, resinfo->containment);
+		select_environment_temp(db_dir, resinfo, today, fromdate); 
+	}
+
+	return num_if;
+}
+
+
+void select_environment_temp(char* db_dir, RESINFO* resinfo, char* today, char* fromdate)
+{
+	int i = 0;
+	int hour = 0;
+	FILE* fp = NULL;
+	char fname[256];
+	char sub_inst[256];
+	RAWDATA* rdat = NULL;
+	ltpTcl_HashTable* RAW_TBL = NULL;
+
+	memset(fname, 0x00, sizeof(fname));
+	memset(sub_inst, 0x00, sizeof(sub_inst));
+
+	strncpy(sub_inst, resinfo->sub_inst, 255);
+
+	sub_inst[17] = '_';
+
+	sprintf(fname, "%s/%s/temp/%s.dat", db_dir, today, sub_inst);
+
+	fp = fopen(fname, "w");
+
+	if (fp == NULL) {
+		LOGG(L_ERROR, "select_environment_temp: fopen(%s) failed\n", fname);
+		return;
+	}
+
+	fprintf(fp, "%s %s\n", resinfo->sub_inst, resinfo->containment);
+
+	init_STATDATA();
+
+	init_RAWDATA(fromdate);
+
+	RAW_TBL = environment_temp_hash(resinfo->sub_inst, fromdate);
+
+	if (RAW_TBL == (ltpTcl_HashTable*)NULL) {
+		LOGG(L_ERROR, "select_environment_temp: malloc(RAW_TBL) failed\n");
+		return;
+	}
+
+	for (i = 0; i < 24; i++) {
+		if (gnum[i] == 0) {
+			gavg[i] = 0.0;
+		} else {
+			gavg[i] = gavg[i] / gnum[i];
+		}
+	}
+
+	LOGG(L_DEBUG, "select_environment_temp: %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f\n",
+		gavg[0], gavg[2], gavg[4], gavg[6], gavg[8], gavg[10],
+		gavg[12], gavg[14], gavg[16], gavg[18], gavg[20], gavg[22]);
+
+	for (i = 0; i < NUM_RAWDATA; i++) {
+		rdat = find_RAWDATA(RAW_TBL, gdat[i].coldate);
+		if (rdat) {
+			gdat[i].value = rdat->value;
+			gdat[i].flag = VALID_DATA;
+		} else {
+			hour = get_hour(gdat[i].coldate);
+			gdat[i].value = gavg[hour];
+		}
+	}
+
+	dump_RAWDATA_File(fp);
+
+	fclose(fp);
+}
+
+
+int dump_apc_cpu(char* db_dir, char* today, char* fromdate)
+{
+EXEC SQL BEGIN DECLARE SECTION;
+	varchar _containment[256+1];
+	varchar _sub_inst[128+1];
+EXEC SQL END DECLARE SECTION;
+
+	int isnew = 0;
+	int num_if = 0;
+	ltpTcl_HashTable* IF_TBL = NULL;
+	ltpTcl_HashEntry* ent = NULL;
+	ltpTcl_HashSearch search;
+	RESINFO* resinfo = NULL;
+
+	IF_TBL = (ltpTcl_HashTable*)malloc(sizeof(ltpTcl_HashTable));
+	if (IF_TBL == (ltpTcl_HashTable*)NULL) {
+		LOGG(L_ERROR, "dump_apc_cpu: malloc(IF_TBL) failed\n");
+		return -1;
+	}
+
+	ltpTcl_InitHashTable(IF_TBL, TCL_STRING_KEYS);
+
+	EXEC SQL DECLARE DUMP_APC_CPU_CURSOR_1 CURSOR FOR
+	SELECT SC.MONAME FROM MI_SCHEDULE SC, MI_WCONTROLLER WC
+		WHERE SC.SCHEDULETYPE='collecting' and SC.ATTRNAME LIKE '%cpuUsage%'
+		AND SC.MONAME = WC.INSTANCENAME;
+
+	EXEC SQL OPEN DUMP_APC_CPU_CURSOR_1;
+
+	while( 1 ) {
+		MEMSET(_sub_inst);
+		MEMSET(_containment);
+
+		EXEC SQL FETCH DUMP_APC_CPU_CURSOR_1 INTO :_sub_inst;
+
+		if (ISORAERROR) {
+			if (PGNOTFOUND) {
+				break;
+			} else {
+				LOGG(L_DEBUG, "dump_apc_cpu: select failed=[%d][%s]\n", ORAERROR, sqlca.sqlerrm.sqlerrmc);
+				break;
+			}
+		}
+
+		ADDNULL(_sub_inst);
+		ADDNULL(_containment);
+
+		resinfo = (RESINFO*)malloc(sizeof(RESINFO));
+		if (resinfo == (RESINFO*)NULL) {
+			LOGG(L_ERROR, "dump_apc_cpu: malloc failed\n");
+			return num_if;
+		}
+
+		memset(resinfo, 0x00, sizeof(RESINFO));
+
+		strncpy(resinfo->sub_inst, (char*)_sub_inst.arr, 255);
+		strncpy(resinfo->containment, (char*)_sub_inst.arr, 255);
+
+		ent = ltpTcl_CreateHashEntry(IF_TBL, resinfo->sub_inst, &isnew);
+
+		if (ent == NULL) {
+			LOGG(L_ERROR, "dump_apc_cpu: CreateHashEntry failed, sub_inst=[%s]\n", resinfo->sub_inst);
+			EXEC SQL CLOSE DUMP_APC_CPU_CURSOR_1;
+			return num_if;
+		}
+
+		ltpTcl_SetHashValue(ent, (void*)resinfo);
+
+		num_if++;
+	}
+
+	EXEC SQL CLOSE DUMP_APC_CPU_CURSOR_1;
+
+	FOR_EACH_HASH_ELT(ent, IF_TBL, search) {
+		resinfo = (RESINFO*)ltpTcl_GetHashValue(ent);
+		LOGG(L_DEBUG, "dump_apc_cpu: select_apc_resource_cpu(%s, %s)\n", resinfo->sub_inst, resinfo->containment);
+		select_apc_resource_cpu(db_dir, resinfo, today, fromdate); 
+	}
+
+	return num_if;
+}
+
+
+void select_apc_resource_cpu(char* db_dir, RESINFO* resinfo, char* today, char* fromdate)
+{
+	int i = 0;
+	int hour = 0;
+	FILE* fp = NULL;
+	char fname[256];
+	char sub_inst[256];
+	RAWDATA* rdat = NULL;
+	ltpTcl_HashTable* RAW_TBL = NULL;
+
+	memset(fname, 0x00, sizeof(fname));
+	memset(sub_inst, 0x00, sizeof(sub_inst));
+
+	strncpy(sub_inst, resinfo->sub_inst, 255);
+
+	sub_inst[16] = '_';
+
+	sprintf(fname, "%s/%s/apccpu/%s.dat", db_dir, today, sub_inst);
+
+	fp = fopen(fname, "w");
+
+	if (fp == NULL) {
+		LOGG(L_ERROR, "select_apc_resource_cpu: fopen(%s) failed\n", fname);
+		return;
+	}
+
+	fprintf(fp, "%s %s\n", resinfo->sub_inst, resinfo->containment);
+
+	init_STATDATA();
+
+	init_RAWDATA(fromdate);
+
+	RAW_TBL = apc_cpu_hash(resinfo->sub_inst, fromdate);
+
+	if (RAW_TBL == (ltpTcl_HashTable*)NULL) {
+		LOGG(L_ERROR, "select_apc_resource_cpu: malloc(RAW_TBL) failed\n");
+		return;
+	}
+
+	for (i = 0; i < 24; i++) {
+		if (gnum[i] == 0) {
+			gavg[i] = 0.0;
+		} else {
+			gavg[i] = gavg[i] / gnum[i];
+		}
+	}
+
+	LOGG(L_DEBUG, "select_apc_resource_cpu: %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f\n",
+		gavg[0], gavg[2], gavg[4], gavg[6], gavg[8], gavg[10],
+		gavg[12], gavg[14], gavg[16], gavg[18], gavg[20], gavg[22]);
+
+	for (i = 0; i < NUM_RAWDATA; i++) {
+		rdat = find_RAWDATA(RAW_TBL, gdat[i].coldate);
+		if (rdat) {
+			gdat[i].value = rdat->value;
+			gdat[i].flag = VALID_DATA;
+		} else {
+			hour = get_hour(gdat[i].coldate);
+			gdat[i].value = gavg[hour];
+		}
+	}
+
+	dump_RAWDATA_File(fp);
+
+	fclose(fp);
+}
+
+
+int dump_apc_mem(char* db_dir, char* today, char* fromdate)
+{
+EXEC SQL BEGIN DECLARE SECTION;
+	varchar _containment[256+1];
+	varchar _sub_inst[128+1];
+EXEC SQL END DECLARE SECTION;
+
+	int isnew = 0;
+	int num_if = 0;
+	ltpTcl_HashTable* IF_TBL = NULL;
+	ltpTcl_HashEntry* ent = NULL;
+	ltpTcl_HashSearch search;
+	RESINFO* resinfo = NULL;
+
+	IF_TBL = (ltpTcl_HashTable*)malloc(sizeof(ltpTcl_HashTable));
+	if (IF_TBL == (ltpTcl_HashTable*)NULL) {
+		LOGG(L_ERROR, "dump_apc_mem: malloc(IF_TBL) failed\n");
+		return -1;
+	}
+
+	ltpTcl_InitHashTable(IF_TBL, TCL_STRING_KEYS);
+
+	EXEC SQL DECLARE DUMP_APC_MEM_CURSOR_1 CURSOR FOR
+	SELECT SC.MONAME FROM MI_SCHEDULE SC, MI_WCONTROLLER WC
+		WHERE SC.SCHEDULETYPE='collecting' and SC.ATTRNAME LIKE '%memoryUsage%'
+		AND SC.MONAME = WC.INSTANCENAME;
+
+	EXEC SQL OPEN DUMP_APC_MEM_CURSOR_1;
+
+	while( 1 ) {
+		MEMSET(_sub_inst);
+		MEMSET(_containment);
+
+		EXEC SQL FETCH DUMP_APC_MEM_CURSOR_1 INTO :_sub_inst;
+
+		if (ISORAERROR) {
+			if (PGNOTFOUND) {
+				break;
+			} else {
+				LOGG(L_DEBUG, "dump_apc_mem: select failed=[%d][%s]\n", ORAERROR, sqlca.sqlerrm.sqlerrmc);
+				break;
+			}
+		}
+
+		ADDNULL(_sub_inst);
+		ADDNULL(_containment);
+
+		resinfo = (RESINFO*)malloc(sizeof(RESINFO));
+		if (resinfo == (RESINFO*)NULL) {
+			LOGG(L_ERROR, "dump_apc_mem: malloc failed\n");
+			return num_if;
+		}
+
+		memset(resinfo, 0x00, sizeof(RESINFO));
+
+		strncpy(resinfo->sub_inst, (char*)_sub_inst.arr, 255);
+		strncpy(resinfo->containment, (char*)_sub_inst.arr, 255);
+
+		ent = ltpTcl_CreateHashEntry(IF_TBL, resinfo->sub_inst, &isnew);
+
+		if (ent == NULL) {
+			LOGG(L_ERROR, "dump_apc_mem: CreateHashEntry failed, sub_inst=[%s]\n", resinfo->sub_inst);
+			EXEC SQL CLOSE DUMP_APC_MEM_CURSOR_1;
+			return num_if;
+		}
+
+		ltpTcl_SetHashValue(ent, (void*)resinfo);
+
+		num_if++;
+	}
+
+	EXEC SQL CLOSE DUMP_APC_MEM_CURSOR_1;
+
+	FOR_EACH_HASH_ELT(ent, IF_TBL, search) {
+		resinfo = (RESINFO*)ltpTcl_GetHashValue(ent);
+		LOGG(L_DEBUG, "dump_apc_mem: select_apc_resource_mem(%s, %s)\n", resinfo->sub_inst, resinfo->containment);
+		select_apc_resource_mem(db_dir, resinfo, today, fromdate); 
+	}
+
+	return num_if;
+}
+
+
+void select_apc_resource_mem(char* db_dir, RESINFO* resinfo, char* today, char* fromdate)
+{
+	int i = 0;
+	int hour = 0;
+	FILE* fp = NULL;
+	char fname[256];
+	char sub_inst[256];
+	RAWDATA* rdat = NULL;
+	ltpTcl_HashTable* RAW_TBL = NULL;
+
+	memset(fname, 0x00, sizeof(fname));
+	memset(sub_inst, 0x00, sizeof(sub_inst));
+
+	strncpy(sub_inst, resinfo->sub_inst, 255);
+
+	sub_inst[16] = '_';
+
+	sprintf(fname, "%s/%s/apcmem/%s.dat", db_dir, today, sub_inst);
+
+	fp = fopen(fname, "w");
+
+	if (fp == NULL) {
+		LOGG(L_ERROR, "select_apc_resource_mem: fopen(%s) failed\n", fname);
+		return;
+	}
+
+	fprintf(fp, "%s %s\n", resinfo->sub_inst, resinfo->containment);
+
+	init_STATDATA();
+
+	init_RAWDATA(fromdate);
+
+	RAW_TBL = apc_mem_hash(resinfo->sub_inst, fromdate);
+
+	if (RAW_TBL == (ltpTcl_HashTable*)NULL) {
+		LOGG(L_ERROR, "select_apc_resource_mem: malloc(RAW_TBL) failed\n");
+		return;
+	}
+
+	for (i = 0; i < 24; i++) {
+		if (gnum[i] == 0) {
+			gavg[i] = 0.0;
+		} else {
+			gavg[i] = gavg[i] / gnum[i];
+		}
+	}
+
+	LOGG(L_DEBUG, "select_apc_resource_mem: %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f\n",
+		gavg[0], gavg[2], gavg[4], gavg[6], gavg[8], gavg[10],
+		gavg[12], gavg[14], gavg[16], gavg[18], gavg[20], gavg[22]);
+
+	for (i = 0; i < NUM_RAWDATA; i++) {
+		rdat = find_RAWDATA(RAW_TBL, gdat[i].coldate);
+		if (rdat) {
+			gdat[i].value = rdat->value;
+			gdat[i].flag = VALID_DATA;
+		} else {
+			hour = get_hour(gdat[i].coldate);
+			gdat[i].value = gavg[hour];
+		}
+	}
+
+	dump_RAWDATA_File(fp);
+
+	fclose(fp);
+}
+
+
+int dump_apcluster_const(char* db_dir, char* today, char* fromdate)
+{
+EXEC SQL BEGIN DECLARE SECTION;
+	varchar _sub_inst[128+1];
+EXEC SQL END DECLARE SECTION;
+
+	int isnew = 0;
+	int num_if = 0;
+	ltpTcl_HashTable* IF_TBL = NULL;
+	ltpTcl_HashEntry* ent = NULL;
+	ltpTcl_HashSearch search;
+	RESINFO* resinfo = NULL;
+
+	IF_TBL = (ltpTcl_HashTable*)malloc(sizeof(ltpTcl_HashTable));
+	if (IF_TBL == (ltpTcl_HashTable*)NULL) {
+		LOGG(L_ERROR, "dump_apcluster_const: malloc(IF_TBL) failed\n");
+		return -1;
+	}
+
+	ltpTcl_InitHashTable(IF_TBL, TCL_STRING_KEYS);
+
+	EXEC SQL DECLARE DUMP_APCLUSTER_CONST_CURSOR_1 CURSOR FOR
+	SELECT INSTANCENAME FROM MI_ACCESSPOINTCLUSTER;
+
+	EXEC SQL OPEN DUMP_APCLUSTER_CONST_CURSOR_1;
+
+	while( 1 ) {
+		MEMSET(_sub_inst);
+
+		EXEC SQL FETCH DUMP_APCLUSTER_CONST_CURSOR_1 INTO :_sub_inst;
+
+		if (ISORAERROR) {
+			if (PGNOTFOUND) {
+				break;
+			} else {
+				LOGG(L_DEBUG, "dump_apcluster_const: select failed=[%d][%s]\n", ORAERROR, sqlca.sqlerrm.sqlerrmc);
+				break;
+			}
+		}
+
+		ADDNULL(_sub_inst);
+
+		resinfo = (RESINFO*)malloc(sizeof(RESINFO));
+		if (resinfo == (RESINFO*)NULL) {
+			LOGG(L_ERROR, "dump_apcluster_const: malloc failed\n");
+			return num_if;
+		}
+
+		memset(resinfo, 0x00, sizeof(RESINFO));
+
+		strncpy(resinfo->sub_inst, (char*)_sub_inst.arr, 255);
+		strncpy(resinfo->containment, (char*)_sub_inst.arr, 255);
+
+		ent = ltpTcl_CreateHashEntry(IF_TBL, resinfo->sub_inst, &isnew);
+
+		if (ent == NULL) {
+			LOGG(L_ERROR, "dump_apcluster_const: CreateHashEntry failed, sub_inst=[%s]\n", resinfo->sub_inst);
+			EXEC SQL CLOSE DUMP_APC_MEM_CURSOR_1;
+			return num_if;
+		}
+
+		ltpTcl_SetHashValue(ent, (void*)resinfo);
+
+		num_if++;
+	}
+
+	EXEC SQL CLOSE DUMP_APCLUSTER_CONST_CURSOR_1;
+
+	FOR_EACH_HASH_ELT(ent, IF_TBL, search) {
+		resinfo = (RESINFO*)ltpTcl_GetHashValue(ent);
+		LOGG(L_DEBUG, "dump_apcluster_const: select_apcluster_const(%s)\n", resinfo->sub_inst);
+		select_apcluster_const(db_dir, resinfo, today, fromdate); 
+	}
+
+	return num_if;
+}
+
+
+void select_apcluster_const(char* db_dir, RESINFO* resinfo, char* today, char* fromdate)
+{
+	int i = 0;
+	int hour = 0;
+	FILE* fp = NULL;
+	char fname[256];
+	char sub_inst[256];
+	RAWDATA* rdat = NULL;
+	ltpTcl_HashTable* RAW_TBL = NULL;
+
+	memset(fname, 0x00, sizeof(fname));
+	memset(sub_inst, 0x00, sizeof(sub_inst));
+
+	strncpy(sub_inst, resinfo->sub_inst, 255);
+
+	sub_inst[23] = '_';
+
+	sprintf(fname, "%s/%s/const/%s.dat", db_dir, today, sub_inst);
+
+	fp = fopen(fname, "w");
+
+	if (fp == NULL) {
+		LOGG(L_ERROR, "select_apcluster_const: fopen(%s) failed\n", fname);
+		return;
+	}
+
+	fprintf(fp, "%s %s\n", resinfo->sub_inst, resinfo->sub_inst);
+
+	init_STATDATA();
+
+	init_RAWDATA(fromdate);
+
+	RAW_TBL = apcluster_const_hash(resinfo->sub_inst, fromdate);
+
+	if (RAW_TBL == (ltpTcl_HashTable*)NULL) {
+		LOGG(L_ERROR, "select_apcluster_const: malloc(RAW_TBL) failed\n");
+		return;
+	}
+
+	for (i = 0; i < 24; i++) {
+		if (gnum[i] == 0) {
+			gavg[i] = 0.0;
+		} else {
+			gavg[i] = gavg[i] / gnum[i];
+		}
+	}
+
+	LOGG(L_DEBUG, "select_apcluster_const: %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f, %.1f\n",
+		gavg[0], gavg[2], gavg[4], gavg[6], gavg[8], gavg[10],
+		gavg[12], gavg[14], gavg[16], gavg[18], gavg[20], gavg[22]);
+
+	for (i = 0; i < NUM_RAWDATA; i++) {
+		rdat = find_RAWDATA(RAW_TBL, gdat[i].coldate);
+		if (rdat) {
+			gdat[i].value = rdat->value;
+			gdat[i].flag = VALID_DATA;
+		} else {
+			hour = get_hour(gdat[i].coldate);
+			gdat[i].value = gavg[hour];
+		}
+	}
+
+	dump_RAWDATA_File(fp);
+
+	fclose(fp);
+}

@@ -1,0 +1,1374 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <signal.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/time.h>
+#include <pgtypes_numeric.h>
+
+#include "inspred.h"
+
+#define FORECAST_TRAFFIC_IN		1
+#define FORECAST_TRAFFIC_OUT	2
+#define FORECAST_MEM			3
+#define FORECAST_SWAP			4
+#define FORECAST_FSUSAGE		5
+#define FORECAST_FTHERMO		6
+
+#define FORECAST_APCCPU			7
+#define FORECAST_APCMEM			8
+#define FORECAST_CONST			9
+
+EXEC SQL INCLUDE sqlca;
+
+static void split_instancename(char* buf, char* sub, char* containment);
+
+void lookupEquip(char* syskey, char* ipaddr, char* loccode, char* locname, char* equipname);
+void insertForelog(char* syskey, char* subkey, float rmse, int foretype);
+
+void select_traffic_in(char* db_dir, RESINFO* resinfo, char* today, char* fromdate);
+void select_traffic_out(char* db_dir, RESINFO* resinfo, char* today, char* fromdate);
+void select_resource_mem(char* inst, RESINFO* resinfo, char* today, char* fromdate);
+void select_resource_swap(char* db_dir, RESINFO* resinfo, char* today, char* fromdate);
+void select_resource_fsusage(char* db_dir, RESINFO* resinfo, char* today, char* fromdate);
+void select_environment_temp(char* db_dir, RESINFO* resinfo, char* today, char* fromdate);
+
+void select_apc_cpu(char* db_dir, RESINFO* resinfo, char* today, char* fromdate);
+void select_apc_mem(char* db_dir, RESINFO* resinfo, char* today, char* fromdate);
+void select_apcluster_const(char* db_dir, RESINFO* resinfo, char* today, char* fromdate);
+
+
+static void split_instancename(char* buf, char* sub, char* containment)
+{
+	char* p = NULL;
+	char* s = NULL;
+
+	p = buf;
+	s = sub;
+
+	while(*p != ' ' && *p != '\0') {
+		*s++ = *p++;
+	}
+
+	p++;
+	s = containment;
+
+	while (*p != '\n' && *p != '\0') {
+		*s++ = *p++;
+	}
+}
+
+
+int loginOracle(char* site, char* dbname, char* user, char* passwd)
+{
+EXEC SQL BEGIN DECLARE SECTION;
+    varchar _user[32];
+    varchar _passwd[32];
+    varchar _dbname[64];
+EXEC SQL END DECLARE SECTION;
+
+	if (user == NULL || passwd == NULL || dbname == NULL) {
+		LOGG(L_ERROR, "Database login failed: invalid user, passwd or dbname");
+		return (-1);
+	}
+
+	STRCPY(_user, user);
+	STRCPY(_passwd, passwd);
+	STRCPY(_dbname, dbname);
+
+	EXEC SQL CONNECT TO :_dbname USER :_user USING :_passwd;
+
+	if (ISORAERROR) {
+		LOGG(L_ERROR, "Database login failed: site=[%s,%s], code=[%d]", 
+			site, dbname, sqlca.sqlcode);
+		return (sqlca.sqlcode);
+	}
+
+	LOGG(L_DEBUG, "Postgresql Login [%s,%s]\n", site, dbname);
+
+	return 0;
+}
+
+
+int logoutOracle()
+{
+	EXEC SQL DISCONNECT ALL;
+
+	if (ISORAERROR) {
+		LOGG(L_ERROR, "Database logout failed: code=[%d]", sqlca.sqlcode);
+		return (sqlca.sqlcode);
+	}
+
+	LOGG(L_DEBUG, "Postgresql Logout"); 
+
+	return 0;
+}
+
+
+int commitOracle()
+{
+	EXEC SQL COMMIT;
+
+	if (ISORAERROR) {
+		LOGG(L_ERROR, "err_code=[%d]", sqlca.sqlcode);
+		return (sqlca.sqlcode);
+	}
+
+	return 0;
+}
+
+
+void lookupEquip(char* syskey, char* ipaddr, char* loccode, char* locname, char* equipname)
+{
+EXEC SQL BEGIN DECLARE SECTION;
+	varchar _orgcode[64+1];
+	varchar _orgname[64+1];
+    varchar _sysname[32+1];
+    varchar _syskey[256+1];
+    varchar _ipaddr[32+1];
+EXEC SQL END DECLARE SECTION;
+
+	STRCPY(_syskey, syskey);
+
+	LOGG(L_DEBUG, "lookupEquip: [%s][%d]\n", _syskey.arr, _syskey.len);
+
+	EXEC SQL DECLARE LOOKUP_EQUIP_CURSOR_1 CURSOR FOR
+	SELECT O.ORGCODE, O.NAME, R.NAME, R.IPADDR FROM MI_NT R, MI_ORGNODE O WHERE R.INSTANCENAME = :_syskey AND O.INSTANCENAME=R.SYSLOCATION
+UNION SELECT O.ORGCODE, O.NAME, R.NAME, R.IPADDR FROM MI_UNIX R, MI_ORGNODE O WHERE R.INSTANCENAME = :_syskey AND O.INSTANCENAME=R.SYSLOCATION
+UNION SELECT O.ORGCODE, O.NAME, R.NAME, R.IPADDR FROM MI_MSPP R, MI_ORGNODE O WHERE R.INSTANCENAME = :_syskey AND O.INSTANCENAME=R.SYSLOCATION
+UNION SELECT O.ORGCODE, O.NAME, R.NAME, R.IPADDR FROM MI_IRTU R, MI_ORGNODE O WHERE R.INSTANCENAME = :_syskey AND O.INSTANCENAME=R.SYSLOCATION
+UNION SELECT O.ORGCODE, O.NAME, R.NAME, R.IPADDR FROM MI_ROUTER R, MI_ORGNODE O WHERE R.INSTANCENAME = :_syskey AND O.INSTANCENAME=R.SYSLOCATION
+UNION SELECT O.ORGCODE, O.NAME, R.NAME, R.IPADDR FROM MI_SWITCHHUB R, MI_ORGNODE O WHERE R.INSTANCENAME = :_syskey AND O.INSTANCENAME=R.SYSLOCATION
+UNION SELECT O.ORGCODE, O.NAME, R.NAME, R.IPADDR FROM MI_HUB R, MI_ORGNODE O WHERE R.INSTANCENAME = :_syskey AND O.INSTANCENAME=R.SYSLOCATION
+UNION SELECT O.ORGCODE, O.NAME, R.NAME, R.IPADDR FROM MI_SWITCHROUTER R, MI_ORGNODE O WHERE R.INSTANCENAME = :_syskey AND O.INSTANCENAME=R.SYSLOCATION
+UNION SELECT O.ORGCODE, O.NAME, R.NAME, R.IPADDR FROM MI_ATMROUTER R, MI_ORGNODE O WHERE R.INSTANCENAME = :_syskey AND O.INSTANCENAME=R.SYSLOCATION
+UNION SELECT O.ORGCODE, O.NAME, R.NAME, R.IPADDR FROM MI_BBROUTER R, MI_ORGNODE O WHERE R.INSTANCENAME = :_syskey AND O.INSTANCENAME=R.SYSLOCATION
+UNION SELECT O.ORGCODE, O.NAME, R.NAME, R.IPADDR FROM MI_SWITCH R, MI_ORGNODE O WHERE R.INSTANCENAME = :_syskey AND O.INSTANCENAME=R.SYSLOCATION
+UNION SELECT O.ORGCODE, O.NAME, R.NAME, R.IPADDR FROM MI_ATMSWITCH R, MI_ORGNODE O WHERE R.INSTANCENAME = :_syskey AND O.INSTANCENAME=R.SYSLOCATION
+UNION SELECT O.ORGCODE, O.NAME, R.NAME, R.IPADDR FROM MI_BBSWITCH R, MI_ORGNODE O WHERE R.INSTANCENAME = :_syskey AND O.INSTANCENAME=R.SYSLOCATION
+UNION SELECT O.ORGCODE, O.NAME, R.NAME, R.IPADDR FROM MI_WGSWITCH R, MI_ORGNODE O WHERE R.INSTANCENAME = :_syskey AND O.INSTANCENAME=R.SYSLOCATION
+UNION SELECT O.ORGCODE, O.NAME, R.NAME, R.IPADDR FROM MI_L4SWITCH R, MI_ORGNODE O WHERE R.INSTANCENAME = :_syskey AND O.INSTANCENAME=R.SYSLOCATION
+UNION SELECT O.ORGCODE, O.NAME, R.NAME, R.IPADDR FROM MI_L3SWITCH R, MI_ORGNODE O WHERE R.INSTANCENAME = :_syskey AND O.INSTANCENAME=R.SYSLOCATION
+UNION SELECT O.ORGCODE, O.NAME, R.NAME, R.IPADDR FROM MI_L2SWITCH R, MI_ORGNODE O WHERE R.INSTANCENAME = :_syskey AND O.INSTANCENAME=R.SYSLOCATION
+UNION SELECT O.ORGCODE, O.NAME, R.NAME, R.IPADDR FROM MI_VPN R, MI_ORGNODE O WHERE R.INSTANCENAME = :_syskey AND O.INSTANCENAME=R.SYSLOCATION
+UNION SELECT O.ORGCODE, O.NAME, R.NAME, R.IPADDR FROM MI_UTM R, MI_ORGNODE O WHERE R.INSTANCENAME = :_syskey AND O.INSTANCENAME=R.SYSLOCATION
+UNION SELECT O.ORGCODE, O.NAME, R.NAME, R.IPADDR FROM MI_FW R, MI_ORGNODE O WHERE R.INSTANCENAME = :_syskey AND O.INSTANCENAME=R.SYSLOCATION
+UNION SELECT O.ORGCODE, O.NAME, R.NAME, R.IPADDR FROM MI_STORAGE R, MI_ORGNODE O WHERE R.INSTANCENAME = :_syskey AND O.INSTANCENAME=R.SYSLOCATION
+UNION SELECT O.ORGCODE, O.NAME, R.NAME, R.IPADDR FROM MI_IPPBX R, MI_ORGNODE O WHERE R.INSTANCENAME = :_syskey AND O.INSTANCENAME=R.SYSLOCATION
+UNION SELECT O.ORGCODE, O.NAME, R.NAME, R.IPADDR FROM MI_POESWITCH R, MI_ORGNODE O WHERE R.INSTANCENAME = :_syskey AND O.INSTANCENAME=R.SYSLOCATION
+UNION SELECT O.ORGCODE, O.NAME, R.NAME, R.IPADDR FROM MI_SANSWITCH R, MI_ORGNODE O WHERE R.INSTANCENAME = :_syskey AND O.INSTANCENAME=R.SYSLOCATION
+UNION SELECT O.ORGCODE, O.NAME, R.NAME, R.IPADDR FROM MI_VOICEGW R, MI_ORGNODE O WHERE R.INSTANCENAME = :_syskey AND O.INSTANCENAME=R.SYSLOCATION
+UNION SELECT O.ORGCODE, O.NAME, R.NAME, R.IPADDR FROM MI_ANALOGGW R, MI_ORGNODE O WHERE R.INSTANCENAME = :_syskey AND O.INSTANCENAME=R.SYSLOCATION
+UNION SELECT O.ORGCODE, O.NAME, R.NAME, R.IPADDR FROM MI_TMS R, MI_ORGNODE O WHERE R.INSTANCENAME = :_syskey AND O.INSTANCENAME=R.SYSLOCATION
+UNION SELECT O.ORGCODE, O.NAME, R.NAME, R.IPADDR FROM MI_STB R, MI_ORGNODE O WHERE R.INSTANCENAME = :_syskey AND O.INSTANCENAME=R.SYSLOCATION
+UNION SELECT O.ORGCODE, O.NAME, R.NAME, R.IPADDR FROM MI_WCONTROLLER R, MI_ORGNODE O WHERE R.INSTANCENAME = :_syskey AND O.INSTANCENAME=R.SYSLOCATION;
+	
+	EXEC SQL OPEN LOOKUP_EQUIP_CURSOR_1;
+
+	while( 1 ) {
+		MEMSET(_orgcode);
+		MEMSET(_orgname);
+		MEMSET(_sysname);
+		MEMSET(_ipaddr);
+
+		EXEC SQL FETCH LOOKUP_EQUIP_CURSOR_1
+			INTO :_orgcode, :_orgname, :_sysname, :_ipaddr;
+
+		if (ISORAERROR) {
+			LOGG(L_ERROR, "lookupEquip failed: [%d][%s]\n", sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
+			if (PGNOTFOUND) {
+				strcpy((char*)_orgcode.arr, "Unknown"); _orgcode.len = strlen((char*)_orgcode.arr);
+				strcpy((char*)_orgname.arr, "Unknown"); _orgname.len = strlen((char*)_orgname.arr);
+				strcpy((char*)_sysname.arr, "Unknown"); _sysname.len = strlen((char*)_sysname.arr);
+				strcpy((char*)_ipaddr.arr,  "1.1.1.1"); _ipaddr.len  = strlen((char*)_ipaddr.arr);
+				break;
+			}
+		}
+
+		ADDNULL(_orgcode);
+		ADDNULL(_orgname);
+		ADDNULL(_sysname);
+		ADDNULL(_ipaddr);
+
+		LOGG(L_DEBUG, ">>[%s] [%s] [%s] [%s]\n", _orgcode.arr, _orgname.arr, _sysname.arr, _ipaddr.arr);
+
+		break;
+	}
+
+	strcpy(ipaddr, (char*)_ipaddr.arr);
+	strcpy(loccode, (char*)_orgcode.arr);
+	strcpy(locname, (char*)_orgname.arr);
+	strcpy(equipname, (char*)_sysname.arr);
+
+	EXEC SQL CLOSE LOOKUP_EQUIP_CURSOR_1;
+}
+
+
+void insertForelog(char* syskey, char* subkey, float rmse, int foretype)
+{
+EXEC SQL BEGIN DECLARE SECTION;
+	varchar _id[32+1];
+	varchar _orgcode[64+1];
+	varchar _orgname[64+1];
+    varchar _sysname[32+1];
+    varchar _syskey[256+1];
+    varchar _subkey[256+1];
+    varchar _ipaddr[32+1];
+    varchar _msg[256];
+	numeric* _rtime;
+	numeric* _mul;
+	numeric* _result;
+	int _isfault;
+	float _rmse;
+EXEC SQL END DECLARE SECTION;
+	
+	time_t now = 0;
+
+	struct timeval tv;
+
+	MEMSET(_id);
+	MEMSET(_syskey);
+	MEMSET(_subkey);
+	MEMSET(_ipaddr);
+	MEMSET(_orgcode);
+	MEMSET(_orgname);
+	MEMSET(_sysname);
+
+	time(&now);
+	gettimeofday(&tv, NULL);
+
+	lookupEquip(syskey, (char*)_ipaddr.arr, (char*)_orgcode.arr, (char*)_orgname.arr, (char*)_sysname.arr);
+
+	_ipaddr.len = strlen((char*)_ipaddr.arr);
+	_orgcode.len = strlen((char*)_orgcode.arr);
+	_orgname.len = strlen((char*)_orgname.arr);
+	_sysname.len = strlen((char*)_sysname.arr);
+
+	ADDNULL(_ipaddr);
+	ADDNULL(_orgcode);
+	ADDNULL(_orgname);
+	ADDNULL(_sysname);
+
+	STRCPY(_syskey, syskey);
+	STRCPY(_subkey, subkey);
+
+	sprintf(_id.arr, "%10d.%06d", (int)tv.tv_sec, (int)tv.tv_usec);
+	_id.len = strlen(_id.arr);
+
+	_rmse = rmse;
+	_isfault = 0;
+
+	if (foretype == FORECAST_TRAFFIC_IN) {
+		sprintf(_msg.arr, "정확도 %.2f%%의 트래픽 입력률 예측 데이터가 생성되었습니다", rmse);
+	} else if (foretype == FORECAST_TRAFFIC_OUT) {
+		sprintf(_msg.arr, "정확도 %.2f%%의 트래픽 출력률 예측 데이터가 생성되었습니다", rmse);
+	} else if (foretype == FORECAST_MEM) {
+		sprintf(_msg.arr, "정확도 %.2f%%의 메모리 사용률 예측 데이터가 생성되었습니다", rmse);
+	} else if (foretype == FORECAST_SWAP) {
+		sprintf(_msg.arr, "정확도 %.2f%%의 스왑 사용률 예측 데이터가 생성되었습니다", rmse);
+	} else if (foretype == FORECAST_FSUSAGE) {
+		sprintf(_msg.arr, "정확도 %.2f%%의 파일시스템 사용률 예측 데이터가 생성되었습니다", rmse);
+	} else if (foretype == FORECAST_FTHERMO) {
+		sprintf(_msg.arr, "정확도 %.2f%%의 온도 예측 데이터가 생성되었습니다", rmse);
+	} else if (foretype == FORECAST_APCCPU) {
+		sprintf(_msg.arr, "정확도 %.2f%%의 APC CPU 사용률 예측 데이터가 생성되었습니다", rmse);
+	} else if (foretype == FORECAST_APCMEM) {
+		sprintf(_msg.arr, "정확도 %.2f%%의 APC Memory 사용률 예측 데이터가 생성되었습니다", rmse);
+	} else if (foretype == FORECAST_CONST) {
+		sprintf(_msg.arr, "정확도 %.2f%%의 학교별 접속단말수 예측 데이터가 생성되었습니다", rmse);
+	} else {
+		sprintf(_msg.arr, "정확도 이력 생성에 실패하였습니다");
+	}
+	_msg.len = strlen(_msg.arr);
+
+	_rtime = PGTYPESnumeric_new();
+	_mul = PGTYPESnumeric_new();
+	_result = PGTYPESnumeric_new();
+
+	PGTYPESnumeric_from_int(now, _rtime);
+	PGTYPESnumeric_from_int(1000, _mul);
+	PGTYPESnumeric_mul(_rtime, _mul, _result);
+
+	EXEC SQL 
+	INSERT INTO FM_FORELOG(ID, MESSAGE, LOCCODE, LOCNAME, SYSIPADDR, SYSNAME, SYSKEY, SUBKEY, TIME1, RMSE, ISFAULT)
+		VALUES(:_id, :_msg, :_orgcode, :_orgname, :_ipaddr, :_sysname, :_syskey, :_subkey, :_result, :_rmse, :_isfault);
+
+	if (ISORAERROR) {
+		LOGG(L_ERROR, "insertForelog failed: [%d][%s]", sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
+	} else {
+		commitOracle();
+	}
+
+	PGTYPESnumeric_free(_rtime);
+	PGTYPESnumeric_free(_mul);
+	PGTYPESnumeric_free(_result);
+}
+
+
+void insert_traffic_in(char* db_dir, char* today, char* foredat)
+{
+EXEC SQL BEGIN DECLARE SECTION;
+	char _yyyy[5];
+	char _yyyymm[3];
+	char _yyyymmdd[3];
+	char _hour[3];
+
+	varchar _containment[128+1];
+	varchar _sub_inst[128+1];
+
+	varchar	_coldate[65];
+	varchar _format[65];
+
+	float	_inusage;
+EXEC SQL END DECLARE SECTION;
+
+	FILE* fp = NULL;
+	char fname[256];
+	char buf[256];
+	char* p = NULL;
+	int hour = 0;
+	int len = 0;
+	float rmse = 0.0;
+
+	memset(_yyyy, 0x00, sizeof(_yyyy));
+	memset(_yyyymm, 0x00, sizeof(_yyyymm));
+	memset(_yyyymmdd, 0x00, sizeof(_yyyymmdd));
+	memset(_hour, 0x00, sizeof(_hour));
+
+	memset(fname, 0x00, sizeof(fname));
+	memset(buf, 0x00, sizeof(buf));
+
+	MEMSET(_containment);
+	MEMSET(_sub_inst);
+
+	STRCPY(_format, "YYYYMMDDHH24MISS");
+
+	strncpy(_yyyy,   &today[0], 4);
+	strncpy(_yyyymm, &today[4], 2);
+	strncpy(_yyyymmdd, &today[6], 2);
+
+	sprintf(fname, "%s/%s/in/%s", db_dir, today, foredat);
+
+	if ((fp = fopen(fname, "r")) == NULL) {
+		LOGG(L_ERROR, "insert_traffic_in: fopen(%s) failed\n", fname);
+		return;
+	}
+
+	if ((p = fgets(buf, 256, fp)) == NULL) {
+		LOGG(L_ERROR, "insert_traffic_in: fgets(instancename) failed\n");
+		return;
+	}
+
+	split_instancename(buf, _sub_inst.arr, _containment.arr);
+	_sub_inst.len = strlen((char*)_sub_inst.arr);
+	_containment.len = strlen((char*)_containment.arr);
+
+	if ((p = fgets(buf, 256, fp)) == NULL) {
+		LOGG(L_ERROR, "insert_traffic_in: fgets(rmse) failed\n");
+		return;
+	}
+
+	len = strlen(buf);
+	if (buf[len-1] == '\n')
+		buf[len-1] = '\0';
+
+	rmse = atof(buf);
+
+	LOGG(L_DEBUG, "insert_traffic_in: [%s][%s][%f]\n", _sub_inst.arr, _containment.arr, rmse);
+
+	while((p = fgets(buf, 256, fp)) != NULL) {
+		MEMSET(_coldate);
+		memset(_hour, 0x00, sizeof(_hour));
+
+		len = strlen(buf);
+		if (buf[len-1] == '\n')
+			buf[len-1] = '\0';
+
+		_inusage = atof(buf) * 10;
+/*
+		LOGG(L_DEBUG, "insert_traffic_in: [%s]\n", buf);
+*/
+		sprintf(_coldate.arr, "%s%02d0000", today, hour);
+		_coldate.len = strlen((char*)_coldate.arr);
+
+		sprintf(_hour, "%02d", hour);
+
+		LOGG(L_DEBUG, "insert_traffic_in: %s, %s, %.2f\n", _coldate.arr, _hour, _inusage);
+
+		EXEC SQL
+		INSERT INTO FORE_SYS_INTERFACE_HOUR(INSTANCENAME, SUB_INSTANCENAME, 
+			YYYY, YYYYMM, YYYYMMDD, HOUR, COL_DATE, INUSAGE)
+		VALUES(:_containment, :_sub_inst, 
+			:_yyyy, :_yyyymm, :_yyyymmdd, :_hour, to_timestamp(:_coldate, :_format), :_inusage);
+
+		if (ISORAERROR) {
+			LOGG(L_ERROR, "insert_traffic_in: insert failed, code=[%d][%s]\n", 
+				sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
+			LOGG(L_ERROR, "insert_traffic_in: [%s][%s][%s][%s][%s][%s][%s][%f]\n",
+				_containment.arr, _sub_inst.arr, _yyyy, _yyyymm, _yyyymmdd, _hour, _coldate.arr, _inusage);
+			break;
+		} else {
+			commitOracle();
+		}
+
+		memset(buf, 0x00, sizeof(buf));
+		hour += 2;
+	}
+
+	fclose(fp);
+
+	insertForelog(_containment.arr, _sub_inst.arr, rmse, FORECAST_TRAFFIC_IN);
+}
+
+
+void insert_traffic_out(char* db_dir, char* today, char* foredat)
+{
+EXEC SQL BEGIN DECLARE SECTION;
+	char _yyyy[5];
+	char _yyyymm[3];
+	char _yyyymmdd[3];
+	char _hour[3];
+
+	varchar _containment[128+1];
+	varchar _sub_inst[128+1];
+
+	varchar	_coldate[65];
+	varchar _format[65];
+
+	float	_outusage;
+EXEC SQL END DECLARE SECTION;
+
+	FILE* fp = NULL;
+	char fname[256];
+	char buf[256];
+	char* p = NULL;
+	int hour = 0;
+	int len = 0;
+	float rmse = 0.0;
+
+	memset(_yyyy, 0x00, sizeof(_yyyy));
+	memset(_yyyymm, 0x00, sizeof(_yyyymm));
+	memset(_yyyymmdd, 0x00, sizeof(_yyyymmdd));
+	memset(_hour, 0x00, sizeof(_hour));
+
+	memset(fname, 0x00, sizeof(fname));
+	memset(buf, 0x00, sizeof(buf));
+
+	MEMSET(_containment);
+	MEMSET(_sub_inst);
+
+	STRCPY(_format, "YYYYMMDDHH24MISS");
+
+	strncpy(_yyyy,   &today[0], 4);
+	strncpy(_yyyymm, &today[4], 2);
+	strncpy(_yyyymmdd, &today[6], 2);
+
+	sprintf(fname, "%s/%s/out/%s", db_dir, today, foredat);
+
+	if ((fp = fopen(fname, "r")) == NULL) {
+		LOGG(L_ERROR, "insert_traffic_out: fopen(%s) failed\n", fname);
+		return;
+	}
+
+	if ((p = fgets(buf, 256, fp)) == NULL) {
+		LOGG(L_ERROR, "insert_traffic_out: fgets(instancename) failed\n");
+		return;
+	}
+
+	split_instancename(buf, _sub_inst.arr, _containment.arr);
+	_sub_inst.len = strlen((char*)_sub_inst.arr);
+	_containment.len = strlen((char*)_containment.arr);
+
+	if ((p = fgets(buf, 256, fp)) == NULL) {
+		LOGG(L_ERROR, "insert_traffic_out: fgets(rmse) failed\n");
+		return;
+	}
+
+	len = strlen(buf);
+	if (buf[len-1] == '\n')
+		buf[len-1] = '\0';
+
+	rmse = atof(buf);
+
+	LOGG(L_DEBUG, "insert_traffic_out: [%s][%s][%f]\n", _sub_inst.arr, _containment.arr, rmse);
+
+	while((p = fgets(buf, 256, fp)) != NULL) {
+		MEMSET(_coldate);
+		memset(_hour, 0x00, sizeof(_hour));
+
+		len = strlen(buf);
+		if (buf[len-1] == '\n')
+			buf[len-1] = '\0';
+
+		_outusage = atof(buf) * 10;
+/*
+		LOGG(L_DEBUG, "insert_traffic_out: [%s]\n", buf);
+*/
+		sprintf(_coldate.arr, "%s%02d0000", today, hour);
+		_coldate.len = strlen((char*)_coldate.arr);
+
+		sprintf(_hour, "%02d", hour);
+
+		LOGG(L_DEBUG, "insert_traffic_out: %s, %s, %.2f\n", _coldate.arr, _hour, _outusage);
+
+		EXEC SQL
+		UPDATE FORE_SYS_INTERFACE_HOUR
+			SET OUTUSAGE = :_outusage
+		WHERE INSTANCENAME = :_containment
+			AND SUB_INSTANCENAME = :_sub_inst
+			AND COL_DATE = to_timestamp(:_coldate, :_format);
+
+		if (ISORAERROR) {
+			LOGG(L_ERROR, "insert_traffic_out: insert failed, code=[%d][%s]\n", 
+				sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
+			LOGG(L_ERROR, "insert_traffic_out: [%s][%s][%s][%s][%s][%s][%s][%f]\n",
+				_containment.arr, _sub_inst.arr, _yyyy, _yyyymm, _yyyymmdd, _hour, _coldate.arr, _outusage);
+			break;
+		} else {
+			commitOracle();
+		}
+
+		memset(buf, 0x00, sizeof(buf));
+		hour += 2;
+	}
+
+	fclose(fp);
+
+	insertForelog(_containment.arr, _sub_inst.arr, rmse, FORECAST_TRAFFIC_OUT);
+}
+
+
+void insert_resource_mem(char* db_dir, char* today, char* foredat)
+{
+EXEC SQL BEGIN DECLARE SECTION;
+	char _yyyy[5];
+	char _yyyymm[3];
+	char _yyyymmdd[3];
+	char _hour[3];
+
+	varchar _containment[128+1];
+	varchar _sub_inst[128+1];
+
+	varchar	_coldate[65];
+	varchar _format[65];
+
+	float	_memusage;
+EXEC SQL END DECLARE SECTION;
+
+	FILE* fp = NULL;
+	char* p = NULL;
+	char fname[256];
+	char buf[256];
+	int hour = 0;
+	int len = 0;
+	int unix_nt = 1;		/* default is Unix */
+	float rmse = 0.0;
+
+	memset(_yyyy, 0x00, sizeof(_yyyy));
+	memset(_yyyymm, 0x00, sizeof(_yyyymm));
+	memset(_yyyymmdd, 0x00, sizeof(_yyyymmdd));
+	memset(_hour, 0x00, sizeof(_hour));
+
+	memset(fname, 0x00, sizeof(fname));
+	memset(buf, 0x00, sizeof(buf));
+
+	MEMSET(_containment);
+	MEMSET(_sub_inst);
+
+	STRCPY(_format, "YYYYMMDDHH24MISS");
+
+	strncpy(_yyyy,   &today[0], 4);
+	strncpy(_yyyymm, &today[4], 2);
+	strncpy(_yyyymmdd, &today[6], 2);
+
+	p = strchr(foredat, '_');
+
+	if (p != NULL) {
+		--p;
+
+		if (*p == 'x') {
+			unix_nt = 1;		/* Unix */
+		} else {
+			unix_nt = 2;		/* Nt */
+		}
+	}
+
+	sprintf(fname, "%s/%s/mem/%s", db_dir, today, foredat);
+
+	if ((fp = fopen(fname, "r")) == NULL) {
+		LOGG(L_ERROR, "insert_resource_mem: fopen(%s) failed\n", fname);
+		return;
+	}
+
+	if ((p = fgets(buf, 256, fp)) == NULL) {
+		LOGG(L_ERROR, "insert_resource_mem: fgets(instancename) failed\n");
+		return;
+	}
+
+	split_instancename(buf, _sub_inst.arr, _containment.arr);
+	_sub_inst.len = strlen((char*)_sub_inst.arr);
+	_containment.len = strlen((char*)_containment.arr);
+
+	if ((p = fgets(buf, 256, fp)) == NULL) {
+		LOGG(L_ERROR, "insert_resource_mem: fgets(rmse) failed\n");
+		return;
+	}
+
+	len = strlen(buf);
+	if (buf[len-1] == '\n')
+		buf[len-1] = '\0';
+
+	rmse = atof(buf);
+
+	LOGG(L_DEBUG, "insert_resource_mem: [%s][%s][%f]\n", _sub_inst.arr, _containment.arr, rmse);
+
+	while((p = fgets(buf, 256, fp)) != NULL) {
+		MEMSET(_coldate);
+		memset(_hour, 0x00, sizeof(_hour));
+
+		len = strlen(buf);
+		if (buf[len-1] == '\n')
+			buf[len-1] = '\0';
+
+		_memusage = atof(buf) * 10;
+/*
+		LOGG(L_DEBUG, "insert_resource_mem: [%s]\n", buf);
+*/
+		sprintf(_coldate.arr, "%s%02d0000", today, hour);
+		_coldate.len = strlen((char*)_coldate.arr);
+
+		sprintf(_hour, "%02d", hour);
+
+		LOGG(L_DEBUG, "insert_resource_mem: %s, %s, %.2f\n", _coldate.arr, _hour, _memusage);
+
+		if (unix_nt == 1) {
+			EXEC SQL
+			INSERT INTO FORE_SYS_UNIX_HOUR(INSTANCENAME, SUB_INSTANCENAME, 
+				YYYY, YYYYMM, YYYYMMDD, HOUR, COL_DATE, MEMORYUSAGE)
+			VALUES(:_containment, :_sub_inst, 
+				:_yyyy, :_yyyymm, :_yyyymmdd, :_hour, to_timestamp(:_coldate, :_format), :_memusage);
+		} else {
+			EXEC SQL
+			INSERT INTO FORE_SYS_NT_HOUR(INSTANCENAME, SUB_INSTANCENAME, 
+				YYYY, YYYYMM, YYYYMMDD, HOUR, COL_DATE, MEMORYUSAGE)
+			VALUES(:_containment, :_sub_inst, 
+				:_yyyy, :_yyyymm, :_yyyymmdd, :_hour, to_timestamp(:_coldate, :_format), :_memusage);
+		}
+
+		if (ISORAERROR) {
+			LOGG(L_ERROR, "insert_resource_mem: insert failed, code=[%d][%s]\n", 
+				sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
+			LOGG(L_ERROR, "insert_resource_mem: [%s][%s][%s][%s][%s][%s][%s][%f]\n",
+				_containment.arr, _sub_inst.arr, _yyyy, _yyyymm, _yyyymmdd, _hour, _coldate.arr, _memusage);
+			break;
+		} else {
+			commitOracle();
+		}
+
+		memset(buf, 0x00, sizeof(buf));
+		hour += 2;
+	}
+
+	fclose(fp);
+
+	insertForelog(_containment.arr, _sub_inst.arr, rmse, FORECAST_MEM);
+}
+
+
+void insert_resource_swap(char* db_dir, char* today, char* foredat)
+{
+EXEC SQL BEGIN DECLARE SECTION;
+	char _yyyy[5];
+	char _yyyymm[3];
+	char _yyyymmdd[3];
+	char _hour[3];
+
+	varchar _containment[128+1];
+	varchar _sub_inst[128+1];
+
+	varchar	_coldate[65];
+	varchar _format[65];
+
+	float	_swapusage;
+EXEC SQL END DECLARE SECTION;
+
+	FILE* fp = NULL;
+	char fname[256];
+	char buf[256];
+	char* p = NULL;
+	int hour = 0;
+	int len = 0;
+	float rmse = 0.0;
+
+	memset(_yyyy, 0x00, sizeof(_yyyy));
+	memset(_yyyymm, 0x00, sizeof(_yyyymm));
+	memset(_yyyymmdd, 0x00, sizeof(_yyyymmdd));
+	memset(_hour, 0x00, sizeof(_hour));
+
+	memset(fname, 0x00, sizeof(fname));
+	memset(buf, 0x00, sizeof(buf));
+
+	MEMSET(_containment);
+	MEMSET(_sub_inst);
+
+	STRCPY(_format, "YYYYMMDDHH24MISS");
+
+	strncpy(_yyyy,   &today[0], 4);
+	strncpy(_yyyymm, &today[4], 2);
+	strncpy(_yyyymmdd, &today[6], 2);
+
+	sprintf(fname, "%s/%s/swap/%s", db_dir, today, foredat);
+
+	if ((fp = fopen(fname, "r")) == NULL) {
+		LOGG(L_ERROR, "insert_resource_swap: fopen(%s) failed\n", fname);
+		return;
+	}
+
+	if ((p = fgets(buf, 256, fp)) == NULL) {
+		LOGG(L_ERROR, "insert_resource_swap: fgets(instancename) failed\n");
+		return;
+	}
+
+	split_instancename(buf, _sub_inst.arr, _containment.arr);
+	_sub_inst.len = strlen((char*)_sub_inst.arr);
+	_containment.len = strlen((char*)_containment.arr);
+
+	if ((p = fgets(buf, 256, fp)) == NULL) {
+		LOGG(L_ERROR, "insert_resource_swap: fgets(rmse) failed\n");
+		return;
+	}
+
+	len = strlen(buf);
+	if (buf[len-1] == '\n')
+		buf[len-1] = '\0';
+
+	rmse = atof(buf);
+
+	LOGG(L_DEBUG, "insert_resource_swap: [%s][%s][%f]\n", _sub_inst.arr, _containment.arr, rmse);
+
+	while((p = fgets(buf, 256, fp)) != NULL) {
+		MEMSET(_coldate);
+		memset(_hour, 0x00, sizeof(_hour));
+
+		len = strlen(buf);
+		if (buf[len-1] == '\n')
+			buf[len-1] = '\0';
+
+		_swapusage = atof(buf) * 10;
+/*
+		LOGG(L_DEBUG, "insert_resource_swap: [%s]\n", buf);
+*/
+		sprintf(_coldate.arr, "%s%02d0000", today, hour);
+		_coldate.len = strlen((char*)_coldate.arr);
+
+		sprintf(_hour, "%02d", hour);
+
+		LOGG(L_DEBUG, "insert_resource_swap: %s, %s, %.2f\n", _coldate.arr, _hour, _swapusage);
+
+		EXEC SQL
+		INSERT INTO FORE_SYS_SWAP_HOUR(INSTANCENAME, SUB_INSTANCENAME, 
+			YYYY, YYYYMM, YYYYMMDD, HOUR, COL_DATE, SWAPUSAGE)
+		VALUES(:_containment, :_sub_inst, 
+			:_yyyy, :_yyyymm, :_yyyymmdd, :_hour, to_timestamp(:_coldate, :_format), :_swapusage);
+
+		if (ISORAERROR) {
+			LOGG(L_ERROR, "insert_resource_swap: insert failed, code=[%d][%s]\n", 
+				sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
+			LOGG(L_ERROR, "insert_resource_swap: [%s][%s][%s][%s][%s][%s][%s][%f]\n",
+				_containment.arr, _sub_inst.arr, _yyyy, _yyyymm, _yyyymmdd, _hour, _coldate.arr, _swapusage);
+			break;
+		} else {
+			commitOracle();
+		}
+
+		memset(buf, 0x00, sizeof(buf));
+		hour += 2;
+	}
+
+	fclose(fp);
+
+	insertForelog(_containment.arr, _sub_inst.arr, rmse, FORECAST_SWAP);
+}
+
+
+void insert_resource_fsusage(char* db_dir, char* today, char* foredat)
+{
+EXEC SQL BEGIN DECLARE SECTION;
+	char _yyyy[5];
+	char _yyyymm[3];
+	char _yyyymmdd[3];
+	char _hour[3];
+
+	varchar _containment[128+1];
+	varchar _sub_inst[128+1];
+
+	varchar	_coldate[65];
+	varchar _format[65];
+
+	float	_fsusage;
+EXEC SQL END DECLARE SECTION;
+
+	FILE* fp = NULL;
+	char fname[256];
+	char buf[256];
+	char* p = NULL;
+	int hour = 0;
+	int len = 0;
+	float rmse = 0.0;
+
+	memset(_yyyy, 0x00, sizeof(_yyyy));
+	memset(_yyyymm, 0x00, sizeof(_yyyymm));
+	memset(_yyyymmdd, 0x00, sizeof(_yyyymmdd));
+	memset(_hour, 0x00, sizeof(_hour));
+
+	memset(fname, 0x00, sizeof(fname));
+	memset(buf, 0x00, sizeof(buf));
+
+	MEMSET(_containment);
+	MEMSET(_sub_inst);
+
+	STRCPY(_format, "YYYYMMDDHH24MISS");
+
+	strncpy(_yyyy,   &today[0], 4);
+	strncpy(_yyyymm, &today[4], 2);
+	strncpy(_yyyymmdd, &today[6], 2);
+
+	sprintf(fname, "%s/%s/fs/%s", db_dir, today, foredat);
+
+	if ((fp = fopen(fname, "r")) == NULL) {
+		LOGG(L_ERROR, "insert_resource_fsusage: fopen(%s) failed\n", fname);
+		return;
+	}
+
+	if ((p = fgets(buf, 256, fp)) == NULL) {
+		LOGG(L_ERROR, "insert_resource_fsusage: fgets(instancename) failed\n");
+		return;
+	}
+
+	split_instancename(buf, _sub_inst.arr, _containment.arr);
+	_sub_inst.len = strlen((char*)_sub_inst.arr);
+	_containment.len = strlen((char*)_containment.arr);
+
+	if ((p = fgets(buf, 256, fp)) == NULL) {
+		LOGG(L_ERROR, "insert_resource_fsusage: fgets(rmse) failed\n");
+		return;
+	}
+
+	len = strlen(buf);
+	if (buf[len-1] == '\n')
+		buf[len-1] = '\0';
+
+	rmse = atof(buf);
+
+	LOGG(L_DEBUG, "insert_resource_fsusage: [%s][%s][%f]\n", _sub_inst.arr, _containment.arr, rmse);
+
+	while((p = fgets(buf, 256, fp)) != NULL) {
+		MEMSET(_coldate);
+		memset(_hour, 0x00, sizeof(_hour));
+
+		len = strlen(buf);
+		if (buf[len-1] == '\n')
+			buf[len-1] = '\0';
+
+		_fsusage = atof(buf) * 10;
+/*
+		LOGG(L_DEBUG, "insert_resource_fsusage: [%s]\n", buf);
+*/
+		sprintf(_coldate.arr, "%s%02d0000", today, hour);
+		_coldate.len = strlen((char*)_coldate.arr);
+
+		sprintf(_hour, "%02d", hour);
+
+		LOGG(L_DEBUG, "insert_resource_fsusage: %s, %s, %.2f\n", _coldate.arr, _hour, _fsusage);
+
+		EXEC SQL
+		INSERT INTO FORE_SYS_FILESYSTEM_HOUR(INSTANCENAME, SUB_INSTANCENAME, 
+			YYYY, YYYYMM, YYYYMMDD, HOUR, COL_DATE, FSUSAGE)
+		VALUES(:_containment, :_sub_inst, 
+			:_yyyy, :_yyyymm, :_yyyymmdd, :_hour, to_timestamp(:_coldate, :_format), :_fsusage);
+
+		if (ISORAERROR) {
+			LOGG(L_ERROR, "insert_resource_fsusage: insert failed, code=[%d][%s]\n", 
+				sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
+			LOGG(L_ERROR, "insert_resource_fsusage: [%s][%s][%s][%s][%s][%s][%s][%f]\n",
+				_containment.arr, _sub_inst.arr, _yyyy, _yyyymm, _yyyymmdd, _hour, _coldate.arr, _fsusage);
+			break;
+		} else {
+			commitOracle();
+		}
+
+		memset(buf, 0x00, sizeof(buf));
+		hour += 2;
+	}
+
+	fclose(fp);
+
+	insertForelog(_containment.arr, _sub_inst.arr, rmse, FORECAST_FSUSAGE);
+}
+
+
+void insert_environment_temp(char* db_dir, char* today, char* foredat)
+{
+EXEC SQL BEGIN DECLARE SECTION;
+	char _yyyy[5];
+	char _yyyymm[3];
+	char _yyyymmdd[3];
+	char _hour[3];
+
+	varchar _containment[128+1];
+	varchar _sub_inst[128+1];
+
+	varchar	_coldate[65];
+	varchar _format[65];
+
+	float	_tempusage;
+EXEC SQL END DECLARE SECTION;
+
+	FILE* fp = NULL;
+	char fname[256];
+	char buf[256];
+	char* p = NULL;
+	int hour = 0;
+	int len = 0;
+	float rmse = 0.0;
+
+	memset(_yyyy, 0x00, sizeof(_yyyy));
+	memset(_yyyymm, 0x00, sizeof(_yyyymm));
+	memset(_yyyymmdd, 0x00, sizeof(_yyyymmdd));
+	memset(_hour, 0x00, sizeof(_hour));
+
+	memset(fname, 0x00, sizeof(fname));
+	memset(buf, 0x00, sizeof(buf));
+
+	MEMSET(_containment);
+	MEMSET(_sub_inst);
+
+	STRCPY(_format, "YYYYMMDDHH24MISS");
+
+	strncpy(_yyyy,   &today[0], 4);
+	strncpy(_yyyymm, &today[4], 2);
+	strncpy(_yyyymmdd, &today[6], 2);
+
+	sprintf(fname, "%s/%s/temp/%s", db_dir, today, foredat);
+
+	if ((fp = fopen(fname, "r")) == NULL) {
+		LOGG(L_ERROR, "insert_environment_temp: fopen(%s) failed\n", fname);
+		return;
+	}
+
+	if ((p = fgets(buf, 256, fp)) == NULL) {
+		LOGG(L_ERROR, "insert_environment_temp: fgets(instancename) failed\n");
+		return;
+	}
+
+	split_instancename(buf, _sub_inst.arr, _containment.arr);
+	_sub_inst.len = strlen((char*)_sub_inst.arr);
+	_containment.len = strlen((char*)_containment.arr);
+
+	if ((p = fgets(buf, 256, fp)) == NULL) {
+		LOGG(L_ERROR, "insert_environment_temp: fgets(rmse) failed\n");
+		return;
+	}
+
+	len = strlen(buf);
+	if (buf[len-1] == '\n')
+		buf[len-1] = '\0';
+
+	rmse = atof(buf);
+
+	LOGG(L_DEBUG, "insert_environment_temp: [%s][%s][%f]\n", _sub_inst.arr, _containment.arr, rmse);
+
+	while((p = fgets(buf, 256, fp)) != NULL) {
+		MEMSET(_coldate);
+		memset(_hour, 0x00, sizeof(_hour));
+
+		len = strlen(buf);
+		if (buf[len-1] == '\n')
+			buf[len-1] = '\0';
+
+		_tempusage = atof(buf) * 10;
+/*
+		LOGG(L_DEBUG, "insert_environment_temp: [%s]\n", buf);
+*/
+		sprintf(_coldate.arr, "%s%02d0000", today, hour);
+		_coldate.len = strlen((char*)_coldate.arr);
+
+		sprintf(_hour, "%02d", hour);
+
+		LOGG(L_DEBUG, "insert_environment_temp: %s, %s, %.2f\n", _coldate.arr, _hour, _tempusage);
+
+		EXEC SQL
+		INSERT INTO FORE_SYS_FTHERMO_HOUR(INSTANCENAME, SUB_INSTANCENAME, 
+			YYYY, YYYYMM, YYYYMMDD, HOUR, COL_DATE, TEMPER)
+		VALUES(:_containment, :_sub_inst, 
+			:_yyyy, :_yyyymm, :_yyyymmdd, :_hour, to_timestamp(:_coldate, :_format), :_tempusage);
+
+		if (ISORAERROR) {
+			LOGG(L_ERROR, "insert_environment_temp: insert failed, code=[%d][%s]\n", 
+				sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
+			LOGG(L_ERROR, "insert_environment_temp: [%s][%s][%s][%s][%s][%s][%s][%f]\n",
+				_containment.arr, _sub_inst.arr, _yyyy, _yyyymm, _yyyymmdd, _hour, _coldate.arr, _tempusage);
+			break;
+		} else {
+			commitOracle();
+		}
+
+		memset(buf, 0x00, sizeof(buf));
+		hour += 2;
+	}
+
+	fclose(fp);
+
+	insertForelog(_containment.arr, _sub_inst.arr, rmse, FORECAST_FTHERMO);
+}
+
+
+void insert_apc_cpu(char* db_dir, char* today, char* foredat)
+{
+EXEC SQL BEGIN DECLARE SECTION;
+	char _yyyy[5];
+	char _yyyymm[3];
+	char _yyyymmdd[3];
+	char _hour[3];
+
+	varchar _containment[128+1];
+	varchar _sub_inst[128+1];
+
+	varchar	_coldate[65];
+	varchar _format[65];
+
+	float	_cpuusage;
+EXEC SQL END DECLARE SECTION;
+
+	FILE* fp = NULL;
+	char fname[256];
+	char buf[256];
+	char* p = NULL;
+	int hour = 0;
+	int len = 0;
+	float rmse = 0.0;
+
+	memset(_yyyy, 0x00, sizeof(_yyyy));
+	memset(_yyyymm, 0x00, sizeof(_yyyymm));
+	memset(_yyyymmdd, 0x00, sizeof(_yyyymmdd));
+	memset(_hour, 0x00, sizeof(_hour));
+
+	memset(fname, 0x00, sizeof(fname));
+	memset(buf, 0x00, sizeof(buf));
+
+	MEMSET(_containment);
+	MEMSET(_sub_inst);
+
+	STRCPY(_format, "YYYYMMDDHH24MISS");
+
+	strncpy(_yyyy,   &today[0], 4);
+	strncpy(_yyyymm, &today[4], 2);
+	strncpy(_yyyymmdd, &today[6], 2);
+
+	sprintf(fname, "%s/%s/apccpu/%s", db_dir, today, foredat);
+
+	if ((fp = fopen(fname, "r")) == NULL) {
+		LOGG(L_ERROR, "insert_apc_cpu: fopen(%s) failed\n", fname);
+		return;
+	}
+
+	if ((p = fgets(buf, 256, fp)) == NULL) {
+		LOGG(L_ERROR, "insert_apc_cpu: fgets(instancename) failed\n");
+		return;
+	}
+
+	split_instancename(buf, _sub_inst.arr, _containment.arr);
+	_sub_inst.len = strlen((char*)_sub_inst.arr);
+	_containment.len = strlen((char*)_containment.arr);
+
+	if ((p = fgets(buf, 256, fp)) == NULL) {
+		LOGG(L_ERROR, "insert_apc_cpu: fgets(rmse) failed\n");
+		return;
+	}
+
+	len = strlen(buf);
+	if (buf[len-1] == '\n')
+		buf[len-1] = '\0';
+
+	rmse = atof(buf);
+
+	LOGG(L_DEBUG, "insert_apc_cpu: [%s][%s][%f]\n", _sub_inst.arr, _containment.arr, rmse);
+
+	while((p = fgets(buf, 256, fp)) != NULL) {
+		MEMSET(_coldate);
+		memset(_hour, 0x00, sizeof(_hour));
+
+		len = strlen(buf);
+		if (buf[len-1] == '\n')
+			buf[len-1] = '\0';
+
+		_cpuusage = atof(buf) * 10;
+/*
+		LOGG(L_DEBUG, "insert_apc_cpu: [%s]\n", buf);
+*/
+		sprintf(_coldate.arr, "%s%02d0000", today, hour);
+		_coldate.len = strlen((char*)_coldate.arr);
+
+		sprintf(_hour, "%02d", hour);
+
+		LOGG(L_DEBUG, "insert_apc_cpu: %s, %s, %.2f\n", _coldate.arr, _hour, _cpuusage);
+
+		EXEC SQL
+		INSERT INTO FORE_SYS_WCONTROLLER_HOUR(INSTANCENAME, 
+			YYYY, YYYYMM, YYYYMMDD, HOUR, COL_DATE, CPUUSAGE)
+		VALUES(:_containment,
+			:_yyyy, :_yyyymm, :_yyyymmdd, :_hour, to_timestamp(:_coldate, :_format), :_cpuusage);
+
+		if (ISORAERROR) {
+			LOGG(L_ERROR, "insert_apc_cpu: insert failed, code=[%d][%s]\n", 
+				sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
+			LOGG(L_ERROR, "insert_apc_cpu: [%s][%s][%s][%s][%s][%s][%s][%f]\n",
+				_containment.arr, _sub_inst.arr, _yyyy, _yyyymm, _yyyymmdd, _hour, _coldate.arr, _cpuusage);
+			break;
+		} else {
+			commitOracle();
+		}
+
+		memset(buf, 0x00, sizeof(buf));
+		hour += 2;
+	}
+
+	fclose(fp);
+
+	insertForelog(_containment.arr, _sub_inst.arr, rmse, FORECAST_APCCPU);
+}
+
+
+void insert_apc_mem(char* db_dir, char* today, char* foredat)
+{
+EXEC SQL BEGIN DECLARE SECTION;
+	char _yyyy[5];
+	char _yyyymm[3];
+	char _yyyymmdd[3];
+	char _hour[3];
+
+	varchar _containment[128+1];
+	varchar _sub_inst[128+1];
+
+	varchar	_coldate[65];
+	varchar _format[65];
+
+	float	_memusage;
+EXEC SQL END DECLARE SECTION;
+
+	FILE* fp = NULL;
+	char fname[256];
+	char buf[256];
+	char* p = NULL;
+	int hour = 0;
+	int len = 0;
+	float rmse = 0.0;
+
+	memset(_yyyy, 0x00, sizeof(_yyyy));
+	memset(_yyyymm, 0x00, sizeof(_yyyymm));
+	memset(_yyyymmdd, 0x00, sizeof(_yyyymmdd));
+	memset(_hour, 0x00, sizeof(_hour));
+
+	memset(fname, 0x00, sizeof(fname));
+	memset(buf, 0x00, sizeof(buf));
+
+	MEMSET(_containment);
+	MEMSET(_sub_inst);
+
+	STRCPY(_format, "YYYYMMDDHH24MISS");
+
+	strncpy(_yyyy,   &today[0], 4);
+	strncpy(_yyyymm, &today[4], 2);
+	strncpy(_yyyymmdd, &today[6], 2);
+
+	sprintf(fname, "%s/%s/apcmem/%s", db_dir, today, foredat);
+
+	if ((fp = fopen(fname, "r")) == NULL) {
+		LOGG(L_ERROR, "insert_apc_mem: fopen(%s) failed\n", fname);
+		return;
+	}
+
+	if ((p = fgets(buf, 256, fp)) == NULL) {
+		LOGG(L_ERROR, "insert_apc_mem: fgets(instancename) failed\n");
+		return;
+	}
+
+	split_instancename(buf, _sub_inst.arr, _containment.arr);
+	_sub_inst.len = strlen((char*)_sub_inst.arr);
+	_containment.len = strlen((char*)_containment.arr);
+
+	if ((p = fgets(buf, 256, fp)) == NULL) {
+		LOGG(L_ERROR, "insert_apc_mem: fgets(rmse) failed\n");
+		return;
+	}
+
+	len = strlen(buf);
+	if (buf[len-1] == '\n')
+		buf[len-1] = '\0';
+
+	rmse = atof(buf);
+
+	LOGG(L_DEBUG, "insert_apc_mem: [%s][%s][%f]\n", _sub_inst.arr, _containment.arr, rmse);
+
+	while((p = fgets(buf, 256, fp)) != NULL) {
+		MEMSET(_coldate);
+		memset(_hour, 0x00, sizeof(_hour));
+
+		len = strlen(buf);
+		if (buf[len-1] == '\n')
+			buf[len-1] = '\0';
+
+		_memusage = atof(buf) * 10;
+/*
+		LOGG(L_DEBUG, "insert_apc_mem: [%s]\n", buf);
+*/
+		sprintf(_coldate.arr, "%s%02d0000", today, hour);
+		_coldate.len = strlen((char*)_coldate.arr);
+
+		sprintf(_hour, "%02d", hour);
+
+		LOGG(L_DEBUG, "insert_apc_mem: %s, %s, %.2f\n", _coldate.arr, _hour, _memusage);
+
+		EXEC SQL
+		UPDATE FORE_SYS_WCONTROLLER_HOUR
+			SET MEMORYUSAGE = :_memusage
+		WHERE INSTANCENAME = :_containment
+			AND COL_DATE = to_timestamp(:_coldate, :_format);
+
+		if (ISORAERROR) {
+			LOGG(L_ERROR, "insert_apc_mem: insert failed, code=[%d][%s]\n", 
+				sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
+			LOGG(L_ERROR, "insert_apc_mem: [%s][%s][%s][%s][%s][%s][%s][%f]\n",
+				_containment.arr, _sub_inst.arr, _yyyy, _yyyymm, _yyyymmdd, _hour, _coldate.arr, _memusage);
+			break;
+		} else {
+			commitOracle();
+		}
+
+		memset(buf, 0x00, sizeof(buf));
+		hour += 2;
+	}
+
+	fclose(fp);
+
+	insertForelog(_containment.arr, _sub_inst.arr, rmse, FORECAST_APCMEM);
+}
+
+
+void insert_apcluster_const(char* db_dir, char* today, char* foredat)
+{
+EXEC SQL BEGIN DECLARE SECTION;
+	char _yyyy[5];
+	char _yyyymm[3];
+	char _yyyymmdd[3];
+	char _hour[3];
+
+	varchar _containment[128+1];
+	varchar _sub_inst[128+1];
+
+	varchar	_coldate[65];
+	varchar _format[65];
+
+	float	_sumconst;
+EXEC SQL END DECLARE SECTION;
+
+	FILE* fp = NULL;
+	char fname[256];
+	char buf[256];
+	char* p = NULL;
+	int hour = 0;
+	int len = 0;
+	float rmse = 0.0;
+
+	memset(_yyyy, 0x00, sizeof(_yyyy));
+	memset(_yyyymm, 0x00, sizeof(_yyyymm));
+	memset(_yyyymmdd, 0x00, sizeof(_yyyymmdd));
+	memset(_hour, 0x00, sizeof(_hour));
+
+	memset(fname, 0x00, sizeof(fname));
+	memset(buf, 0x00, sizeof(buf));
+
+	MEMSET(_containment);
+	MEMSET(_sub_inst);
+
+	STRCPY(_format, "YYYYMMDDHH24MISS");
+
+	strncpy(_yyyy,   &today[0], 4);
+	strncpy(_yyyymm, &today[4], 2);
+	strncpy(_yyyymmdd, &today[6], 2);
+
+	sprintf(fname, "%s/%s/const/%s", db_dir, today, foredat);
+
+	if ((fp = fopen(fname, "r")) == NULL) {
+		LOGG(L_ERROR, "insert_apcluster_const: fopen(%s) failed\n", fname);
+		return;
+	}
+
+	if ((p = fgets(buf, 256, fp)) == NULL) {
+		LOGG(L_ERROR, "insert_apcluster_const: fgets(instancename) failed\n");
+		return;
+	}
+
+	split_instancename(buf, _sub_inst.arr, _containment.arr);
+	_sub_inst.len = strlen((char*)_sub_inst.arr);
+	_containment.len = strlen((char*)_containment.arr);
+
+	if ((p = fgets(buf, 256, fp)) == NULL) {
+		LOGG(L_ERROR, "insert_apcluster_const: fgets(rmse) failed\n");
+		return;
+	}
+
+	len = strlen(buf);
+	if (buf[len-1] == '\n')
+		buf[len-1] = '\0';
+
+	rmse = atof(buf);
+
+	LOGG(L_DEBUG, "insert_apcluster_const: [%s][%s][%f]\n", _sub_inst.arr, _containment.arr, rmse);
+
+	while((p = fgets(buf, 256, fp)) != NULL) {
+		MEMSET(_coldate);
+		memset(_hour, 0x00, sizeof(_hour));
+
+		len = strlen(buf);
+		if (buf[len-1] == '\n')
+			buf[len-1] = '\0';
+
+		_sumconst = atof(buf) * 10;
+/*
+		LOGG(L_DEBUG, "insert_apcluster_const: [%s]\n", buf);
+*/
+		sprintf(_coldate.arr, "%s%02d0000", today, hour);
+		_coldate.len = strlen((char*)_coldate.arr);
+
+		sprintf(_hour, "%02d", hour);
+
+		LOGG(L_DEBUG, "insert_apcluster_const: %s, %s, %.2f\n", _coldate.arr, _hour, _sumconst);
+
+		EXEC SQL
+		INSERT INTO FORE_SYS_ACCESSPOINTCLUSTER_HOUR(INSTANCENAME, 
+			YYYY, YYYYMM, YYYYMMDD, HOUR, COL_DATE, SUMCONSTATION)
+		VALUES(:_containment,
+			:_yyyy, :_yyyymm, :_yyyymmdd, :_hour, to_timestamp(:_coldate, :_format), :_sumconst);
+
+		if (ISORAERROR) {
+			LOGG(L_ERROR, "insert_apcluster_const: insert failed, code=[%d][%s]\n", 
+				sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
+			LOGG(L_ERROR, "insert_apcluster_const: [%s][%s][%s][%s][%s][%s][%s][%f]\n",
+				_containment.arr, _sub_inst.arr, _yyyy, _yyyymm, _yyyymmdd, _hour, _coldate.arr, _sumconst);
+			break;
+		} else {
+			commitOracle();
+		}
+
+		memset(buf, 0x00, sizeof(buf));
+		hour += 2;
+	}
+
+	fclose(fp);
+/*
+	insertForelog(_containment.arr, _sub_inst.arr, rmse, FORECAST_CONST);
+*/
+}
